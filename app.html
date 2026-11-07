@@ -2,107 +2,91 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>ClearNote — منصة المذاكرة</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  /* ستايلات واجهة الطالب الفخمة */
   :root {
     --navy: #152741; --accent: #a8741a; --bg: #f4f6f8;
     --white: #ffffff; --text: #1a1a1a; --muted: #5b6472;
   }
-  body { background: var(--bg); margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; color: var(--text); }
-  
-  /* شريط علوي أنيق */
+  body { background: var(--bg); margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); font-size: 16px; }
+
+  /* شريط علوي أنيق ومكبر */
   .app-navbar {
-    background: var(--navy); color: white; padding: 16px 24px;
+    background: var(--navy); color: white; padding: 18px 20px;
     display: flex; justify-content: space-between; align-items: center;
     position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   }
-  .app-brand { font-family: Georgia, serif; font-size: 24px; letter-spacing: 2px; font-weight: bold; }
+  .app-brand { font-family: Georgia, serif; font-size: 22px; letter-spacing: 2px; font-weight: bold; }
   .app-brand span { color: var(--accent); }
   
-  .nav-user { display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 600; }
+  .nav-user { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600; }
   .avatar-badge {
-    width: 35px; height: 35px; border-radius: 50%; background: var(--accent);
-    display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;
+    width: 40px; height: 40px; border-radius: 50%; background: var(--accent);
+    display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size:18px;
   }
   .btn-logout {
     background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    color: white; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: inherit;
-    transition: 0.2s;
+    color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px;
   }
-  .btn-logout:hover { background: rgba(255,255,255,0.2); }
 
-  /* الحاوية الرئيسية */
-  .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+  .container { max-width: 900px; margin: 25px auto; padding: 0 15px; }
   
-  /* Breadcrumbs (مسار التنقل) */
   .breadcrumbs {
-    background: var(--white); padding: 12px 20px; border-radius: 10px;
-    font-size: 14px; color: var(--muted); margin-bottom: 25px;
+    background: var(--white); padding: 14px 18px; border-radius: 12px;
+    font-size: 15px; color: var(--muted); margin-bottom: 20px;
     display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e9ecef;
   }
-  .breadcrumbs span { cursor: pointer; color: var(--navy); font-weight: 700; transition: 0.2s; }
-  .breadcrumbs span:hover { color: var(--accent); }
-  .breadcrumbs i { font-size: 10px; color: #ccc; }
+  .breadcrumbs span { cursor: pointer; color: var(--navy); font-weight: 700; }
+  .breadcrumbs i { font-size: 12px; color: #ccc; }
 
   /* شبكة الكروت */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
   .card-item {
-    background: var(--white); border: 1px solid #e9ecef; border-radius: 14px; padding: 22px;
-    cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 12px;
+    background: var(--white); border: 2px solid #e9ecef; border-radius: 16px; padding: 20px;
+    cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 12px;
     position: relative; overflow: hidden;
   }
+  .card-item:hover { border-color: var(--navy); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(21,39,65,0.08); }
   .card-item::before {
-    content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%;
-    background: var(--accent); opacity: 0; transition: 0.3s;
+    content: ''; position: absolute; top: 0; right: 0; width: 6px; height: 100%; background: var(--accent);
   }
-  .card-item:hover { border-color: var(--navy); transform: translateY(-5px); box-shadow: 0 10px 25px rgba(21,39,65,0.08); }
-  .card-item:hover::before { opacity: 1; }
   
-  .card-title { font-size: 18px; font-weight: 800; color: var(--navy); margin: 0; }
-  .card-type {
-    font-size: 11px; font-weight: 700; color: var(--accent); background: #fdfaf3;
-    padding: 4px 10px; border-radius: 20px; width: max-content; letter-spacing: 0.5px;
-  }
+  .card-title { font-size: 19px; font-weight: 800; color: var(--navy); margin: 0; }
+  .card-type { font-size: 12px; font-weight: 700; color: var(--accent); background: #fdfaf3; padding: 4px 12px; border-radius: 20px; width: max-content; }
 
-  /* عارض المحتوى (Content Viewer) */
+  /* تخصيص كروت الأجزاء الأساسية */
+  .card-item.module_explain::before { background: #27ae60; }
+  .card-item.module_video::before { background: #e74c3c; }
+  .card-item.module_questions::before { background: #3498db; }
+  .card-item.module_summary::before { background: #9b59b6; }
+  .card-item.module_terms::before { background: #e67e22; }
+
+  /* عارض المحتوى */
   .content-viewer {
-    background: var(--white); border-radius: 14px; padding: 30px;
+    background: var(--white); border-radius: 16px; padding: 25px;
     box-shadow: 0 5px 25px rgba(0,0,0,0.05); border: 1px solid #e9ecef;
-    animation: fadeIn 0.4s ease;
   }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  
   .content-header {
     display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;
+    border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
   }
-  .content-header h2 { margin: 0; color: var(--navy); font-size: 24px; font-family: Georgia, serif; }
+  .content-header h2 { margin: 0; color: var(--navy); font-size: 22px; font-family: Georgia, serif; }
   .btn-back {
-    background: var(--navy); color: white; border: none; padding: 10px 20px;
-    border-radius: 8px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px;
-    transition: 0.2s;
+    background: var(--navy); color: white; border: none; padding: 12px 20px;
+    border-radius: 10px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 15px;
   }
-  .btn-back:hover { background: #0f1e33; }
   
-  .iframe-container { width: 100%; min-height: 60vh; border-radius: 8px; overflow: hidden; border: 1px solid #e9ecef; }
+  .iframe-container { width: 100%; min-height: 60vh; border-radius: 12px; overflow: hidden; border: 1px solid #e9ecef; }
   .iframe-container iframe { width: 100%; height: 100%; border: none; }
 
-  .loading { text-align: center; color: var(--muted); padding: 50px; font-weight: 600; }
+  .loading { text-align: center; color: var(--muted); padding: 40px; font-size: 18px; font-weight: 600; }
 
-  /* التجاوب مع الموبايل */
-  @media (max-width: 768px) {
-    .app-navbar { padding: 12px 16px; }
-    .app-brand { font-size: 20px; }
-    .nav-user span { display: none; } /* إخفاء الاسم في الموبايل لتوفير مساحة */
-    .container { margin: 15px auto; padding: 0 15px; }
-    .grid { grid-template-columns: 1fr; gap: 15px; }
-    .card-item { padding: 18px; }
-    .content-viewer { padding: 20px; }
-    .content-header h2 { font-size: 20px; }
+  /* تجاوب مع شاشات الكمبيوتر */
+  @media (min-width: 600px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -139,7 +123,6 @@
   </div>
 </div>
 
-<!-- FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <script type="module">
@@ -164,7 +147,7 @@ async function loadTreeData() {
     treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderLevel("root");
   } catch (e) {
-    document.getElementById("cardsContainer").innerHTML = `<div class="loading" style="color:#b91c1c;">خطأ في التحميل: ${e.message}</div>`;
+    document.getElementById("cardsContainer").innerHTML = `<div class="loading" style="color:red;">خطأ: ${e.message}</div>`;
   }
 }
 
@@ -183,25 +166,35 @@ function renderLevel(parentId) {
   }
 
   nodes.forEach(node => {
-    let typeLabel = "محتوى";
+    let typeLabel = "تصنيف";
+    let typeIcon = "";
+    
     if (node.type === 'year') typeLabel = "سنة دراسية";
     else if (node.type === 'program') typeLabel = "برنامج";
     else if (node.type === 'subject') typeLabel = "مادة";
-    else if (node.type === 'lecture') typeLabel = "محاضرة / سكشن";
+    else if (node.type === 'module_explain') { typeLabel = "الشرح"; typeIcon = "<i class='fas fa-file-alt' style='color:#27ae60; margin-left:8px;'></i>"; }
+    else if (node.type === 'module_video') { typeLabel = "فيديو"; typeIcon = "<i class='fas fa-video' style='color:#e74c3c; margin-left:8px;'></i>"; }
+    else if (node.type === 'module_questions') { typeLabel = "أسئلة"; typeIcon = "<i class='fas fa-question-circle' style='color:#3498db; margin-left:8px;'></i>"; }
+    else if (node.type === 'module_summary') { typeLabel = "ملخص"; typeIcon = "<i class='fas fa-clipboard-list' style='color:#9b59b6; margin-left:8px;'></i>"; }
+    else if (node.type === 'module_terms') { typeLabel = "مصطلحات"; typeIcon = "<i class='fas fa-book' style='color:#e67e22; margin-left:8px;'></i>"; }
 
     const card = document.createElement("div");
-    card.className = "card-item";
+    card.className = `card-item ${node.type}`;
     card.onclick = () => handleNodeClick(node);
+    
+    // لو ده جزء أساسي (module)، العنوان هيبقى فيه اللوجو
+    const titleHtml = node.type.startsWith('module_') ? `${typeIcon} ${node.title}` : node.title;
+
     card.innerHTML = `
       <div class="card-type">${typeLabel}</div>
-      <h3 class="card-title">${node.title}</h3>
+      <h3 class="card-title">${titleHtml}</h3>
     `;
     container.appendChild(card);
   });
 }
 
 function handleNodeClick(node) {
-  if (node.type === 'content') {
+  if (node.type === 'content' || node.type.startsWith('module_')) {
     openContentViewer(node);
   } else {
     renderLevel(node.id);
@@ -230,7 +223,7 @@ function openContentViewer(node) {
   document.getElementById("viewerTitle").textContent = node.title;
 
   const iframe = document.getElementById("contentFrame");
-  const htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px; font-family:sans-serif;'><h2>لا يوجد محتوى مرفق بهذه المحاضرة حتى الآن.</h2></div>";
+  const htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px; font-family:sans-serif;'><h2>لا يوجد محتوى مرفق بهذا الجزء حتى الآن.</h2></div>";
   
   const fullHTML = `
     <!DOCTYPE html>
@@ -239,7 +232,7 @@ function openContentViewer(node) {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; line-height: 1.8; color: #1a1a1a; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; line-height: 1.8; font-size: 17px; color: #1a1a1a; }
         img { max-width: 100%; height: auto; border-radius: 8px; }
       </style>
     </head>
