@@ -15,23 +15,18 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-export const ROLES = { ADMIN: "admin", STUDENT: "student", TA: "ta", DOCTOR: "doctor" };
-
 export function showToast(msg, type = "success") {
   const toast = document.createElement("div");
-  toast.style.cssText = `position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:${type === "error" ? "#b91c1c" : "#1f6b45"};color:white;padding:12px 24px;border-radius:8px;font-family:sans-serif;font-size:14px;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.25);`;
-  toast.textContent = msg; document.body.appendChild(toast);
+  toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === "error" ? "#b91c1c" : "#1f6b45"}; color:white; padding:14px 24px; border-radius:10px; font-family:sans-serif; font-size:15px; font-weight:bold; z-index:99999; box-shadow:0 6px 20px rgba(0,0,0,.3);`;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
 }
 
 export async function signUp(email, password, name, extraData = {}) {
   const cred = await createUserWithEmailAndPassword(auth, email, password);
-  await setDoc(doc(db, "users", cred.user.uid), { 
-    uid: cred.user.uid, 
-    email, 
-    name, 
-    ...extraData,
-    createdAt: serverTimestamp() 
+  await setDoc(doc(db, "users", cred.user.uid), {
+    uid: cred.user.uid, email, name, ...extraData, createdAt: serverTimestamp()
   });
   return cred.user;
 }
