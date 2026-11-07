@@ -15,18 +15,24 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-export const ROLES = { ADMIN: "admin", STUDENT: "student" };
+export const ROLES = { ADMIN: "admin", STUDENT: "student", TA: "ta", DOCTOR: "doctor" };
 
 export function showToast(msg, type = "success") {
   const toast = document.createElement("div");
-  toast.style.cssText = `position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:${type === "error" ? "#b91c1c" : "#1f6b45"};color:white;padding:12px 24px;border-radius:6px;font-family:sans-serif;font-size:14px;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.25);`;
+  toast.style.cssText = `position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:${type === "error" ? "#b91c1c" : "#1f6b45"};color:white;padding:12px 24px;border-radius:8px;font-family:sans-serif;font-size:14px;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.25);`;
   toast.textContent = msg; document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
 }
 
-export async function signUp(email, password, name) {
+export async function signUp(email, password, name, extraData = {}) {
   const cred = await createUserWithEmailAndPassword(auth, email, password);
-  await setDoc(doc(db, "users", cred.user.uid), { uid: cred.user.uid, email, name: name || email.split("@")[0], role: ROLES.STUDENT, createdAt: serverTimestamp() });
+  await setDoc(doc(db, "users", cred.user.uid), { 
+    uid: cred.user.uid, 
+    email, 
+    name, 
+    ...extraData,
+    createdAt: serverTimestamp() 
+  });
   return cred.user;
 }
 
@@ -50,5 +56,5 @@ export function onAuth(callback) {
   });
 }
 
-export function isAdmin(userData) { return userData && userData.role === ROLES.ADMIN; }
+export function isAdmin(userData) { return userData && userData.role === 'admin'; }
 export function goTo(page) { window.location.href = page; }
