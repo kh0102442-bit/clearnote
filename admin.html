@@ -11,7 +11,7 @@
 
 <div class="admin-layout">
   
-  <!-- Sidebar (Desktop Only) -->
+  <!-- Sidebar (Desktop) -->
   <div class="admin-sidebar">
     <div class="admin-brand">CLEAR<span>NOTE</span></div>
     <div class="sidebar-nav">
@@ -23,62 +23,61 @@
     </div>
   </div>
 
-  <!-- Topbar (Mobile Only) -->
+  <!-- Topbar (Mobile) -->
   <div class="admin-topbar">
-    <div class="admin-brand">CLEAR<span>NOTE</span> <span style="font-size:10px; color:#aaa;">ADMIN</span></div>
-    <button class="btn-logout-icon" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i></button>
+    <div class="admin-brand">CLEAR<span>NOTE</span></div>
+    <button class="btn-logout-icon" onclick="doLogout()" style="border:none; background:transparent; font-size:20px; color:#b91c1c;"><i class="fas fa-sign-out-alt"></i></button>
   </div>
 
   <!-- Main Content Area -->
   <div class="admin-content">
     
-    <!-- View: Content (Tree Builder) -->
+    <!-- 1. Content View -->
     <div id="view-content">
       <div class="section-header">
         <h2 class="section-title">إدارة المحتوى</h2>
-        <button class="btn-add-main" onclick="openDrawer('addNode', 'root', 'year')"><i class="fas fa-plus"></i> إضافة سنة</button>
+        <button class="btn-add-main" onclick="openDrawer('addNode', 'root', 'year')"><i class="fas fa-plus"></i> جذر جديد</button>
       </div>
 
       <div class="toolbox-wrapper">
-        <div class="toolbox-label"><i class="fas fa-toolbox"></i> صندوق الأدوات (اسحب الأداة للمحتوى)</div>
+        <div class="toolbox-label"><i class="fas fa-toolbox"></i> اسحب الأداة وضعها تحت المحاضرة</div>
         <div class="toolbox">
-          <div class="tool-item" style="color:#2a4b8d; background:#eef2fa;"><i class="fas fa-file-alt"></i> الشرح</div>
-          <div class="tool-item" style="color:#8b1f1f; background:#fbeaea;"><i class="fas fa-video"></i> فيديو</div>
-          <div class="tool-item" style="color:#1c5a3c; background:#e8f3ed;"><i class="fas fa-question-circle"></i> أسئلة</div>
-          <div class="tool-item" style="color:#8a6218; background:#f4eee2;"><i class="fas fa-clipboard-list"></i> ملخص</div>
-          <div class="tool-item" style="color:#5a2c7a; background:#efe8f5;"><i class="fas fa-book"></i> مصطلحات</div>
-          <div class="tool-item" style="color:#006064; background:#e0f7fa;"><i class="fas fa-check-double"></i> اختبار شامل</div>
-          <div class="tool-item" style="color:#e65100; background:#fff3e0;"><i class="fas fa-check"></i> اختبار جزئي</div>
-          <div class="tool-item" style="color:#4a148c; background:#f3e5f5;"><i class="fas fa-trophy"></i> مسابقة</div>
+          <div class="tool-item" draggable="true" ondragstart="dragTool(event, 'explain')" style="color:#2a4b8d; background:#eef2fa;"><i class="fas fa-file-alt"></i> الشرح</div>
+          <div class="tool-item" draggable="true" ondragstart="dragTool(event, 'video')" style="color:#8b1f1f; background:#fbeaea;"><i class="fas fa-video"></i> فيديو</div>
+          <div class="tool-item" draggable="true" ondragstart="dragTool(event, 'questions')" style="color:#1c5a3c; background:#e8f3ed;"><i class="fas fa-question-circle"></i> أسئلة</div>
+          <div class="tool-item" draggable="true" ondragstart="dragTool(event, 'summary')" style="color:#8a6218; background:#f4eee2;"><i class="fas fa-clipboard-list"></i> ملخص</div>
+          <div class="tool-item" draggable="true" ondragstart="dragTool(event, 'terms')" style="color:#5a2c7a; background:#efe8f5;"><i class="fas fa-book"></i> مصطلحات</div>
         </div>
       </div>
 
       <div id="treeContainer">
-        <p style="text-align:center; color:var(--muted);">جاري تحميل الشجرة...</p>
+        <p style="text-align:center; color:var(--muted);">جاري التحميل...</p>
       </div>
     </div>
 
-    <!-- View: Students -->
+    <!-- 2. Students View -->
     <div id="view-students" style="display:none;">
       <div class="section-header"><h2 class="section-title">إدارة الطلاب</h2></div>
-      <div class="tree-card"><p style="text-align:center; color:var(--muted);">قائمة الطلاب (قريباً)</p></div>
+      <div id="studentsContainer" class="tree-card">
+        <p style="text-align:center; color:var(--muted);">جاري تحميل الطلاب...</p>
+      </div>
     </div>
 
-    <!-- View: Devices -->
+    <!-- 3. Devices View -->
     <div id="view-devices" style="display:none;">
-      <div class="section-header"><h2 class="section-title">إدارة الأجهزة</h2></div>
-      <div class="tree-card"><p style="text-align:center; color:var(--muted);">قائمة الأجهزة (قريباً)</p></div>
+      <div class="section-header"><h2 class="section-title">الأجهزة</h2></div>
+      <div class="tree-card"><p style="text-align:center; color:var(--muted);">قريباً...</p></div>
     </div>
 
-    <!-- View: Settings -->
+    <!-- 4. Settings View -->
     <div id="view-settings" style="display:none;">
       <div class="section-header"><h2 class="section-title">الإعدادات</h2></div>
-      <div class="tree-card"><p style="text-align:center; color:var(--muted);">إعدادات النظام (قريباً)</p></div>
+      <div class="tree-card"><p style="text-align:center; color:var(--muted);">قريباً...</p></div>
     </div>
 
   </div>
 
-  <!-- Bottom Navigation (Mobile Only) -->
+  <!-- Bottom Navigation (Mobile) -->
   <div class="bottom-nav">
     <div class="nav-item-bottom active" onclick="switchTab('content')"><i class="fas fa-layer-group"></i> المحتوى</div>
     <div class="nav-item-bottom" onclick="switchTab('students')"><i class="fas fa-users"></i> الطلاب</div>
@@ -88,30 +87,28 @@
 
 </div>
 
-<!-- Drawer Overlay -->
+<!-- Drawer (Add Node / Add Tool Content) -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-
-<!-- Add/Edit Drawer -->
 <div class="drawer" id="contentDrawer">
   <div class="drawer-header">
     <h3 id="drawerTitle">إضافة عنصر</h3>
-    <button class="close-drawer" onclick="closeDrawer()"><i class="fas fa-times"></i></button>
+    <button class="close-drawer" onclick="closeDrawer()" style="background:none; border:none; font-size:20px;"><i class="fas fa-times"></i></button>
   </div>
   <div class="drawer-body">
+    <input type="hidden" id="editId" value="">
+    <input type="hidden" id="parentId" value="">
+    <input type="hidden" id="nodeType" value="">
+    
     <div class="form-group">
       <label>العنوان</label>
       <input type="text" id="nodeTitle" placeholder="مثال: الفرقة الأولى...">
     </div>
     <div class="form-group">
-      <label>الوصف (اختياري)</label>
-      <input type="text" id="nodeDesc" placeholder="وصف قصير...">
-    </div>
-    <div class="form-group">
-      <label>المصادر (هام جداً)</label>
+      <label>المصادر</label>
       <textarea id="nodeSources" rows="2" placeholder="من أين تم إعداد هذا المحتوى؟"></textarea>
     </div>
     
-    <div id="contentInputGroup" style="display:none;">
+    <div id="toolContentInputs" style="display:none;">
       <div class="form-group">
         <label>نوع المحتوى</label>
         <select id="contentType">
@@ -121,13 +118,13 @@
       </div>
       <div class="form-group">
         <label>كود HTML</label>
-        <textarea id="nodeCode" rows="4" style="font-family: monospace;"></textarea>
+        <textarea id="nodeCode" rows="6" style="font-family: monospace;"></textarea>
       </div>
     </div>
   </div>
   <div class="drawer-footer">
     <button class="btn-drawer-cancel" onclick="closeDrawer()">إلغاء</button>
-    <button class="btn-drawer-save" onclick="saveNode()">حفظ</button>
+    <button class="btn-drawer-save" onclick="saveItem()">حفظ</button>
   </div>
 </div>
 
@@ -136,73 +133,43 @@ import { db, onAuth, isAdmin, goTo, showToast, signOutUser } from "./shared.js";
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let treeData = [];
-let currentEditId = null;
-let currentParentId = "root";
-let currentType = "year";
+let currentAction = ""; 
+let currentToolKey = "";
 
-const NODE_TYPES = {
-  year: { label: 'سنة دراسية', icon: 'fa-calendar-alt' },
-  program: { label: 'برنامج', icon: 'fa-graduation-cap' },
-  subject: { label: 'مادة', icon: 'fa-book' },
-  lecture: { label: 'محاضرة/سكشن', icon: 'fa-chalkboard-teacher' },
-  content: { label: 'محتوى', icon: 'fa-file-alt' },
-  custom: { label: 'تبويب مخصص', icon: 'fa-folder' }
-};
+const NODE_TYPES = { year: { label: 'سنة دراسية', icon: 'fa-calendar-alt' }, program: { label: 'برنامج', icon: 'fa-graduation-cap' }, subject: { label: 'مادة', icon: 'fa-book' }, lecture: { label: 'محاضرة', icon: 'fa-chalkboard-teacher' }, custom: { label: 'تبويب', icon: 'fa-folder' } };
+const TOOLS = { explain: { label: 'الشرح', color: '#2a4b8d', icon: 'fa-file-alt' }, video: { label: 'فيديو', color: '#8b1f1f', icon: 'fa-video' }, questions: { label: 'أسئلة', color: '#1c5a3c', icon: 'fa-question-circle' }, summary: { label: 'ملخص', color: '#8a6218', icon: 'fa-clipboard-list' }, terms: { label: 'مصطلحات', color: '#5a2c7a', icon: 'fa-book' } };
 
-const TOOLS = {
-  explain:  { label: 'الشرح', color: '#2a4b8d', icon: 'fa-file-alt' },
-  video:    { label: 'فيديو', color: '#8b1f1f', icon: 'fa-video' },
-  questions:{ label: 'أسئلة', color: '#1c5a3c', icon: 'fa-question-circle' },
-  summary:  { label: 'ملخص', color: '#8a6218', icon: 'fa-clipboard-list' },
-  terms:    { label: 'مصطلحات', color: '#5a2c7a', icon: 'fa-book' },
-  final:    { label: 'اختبار شامل', color: '#006064', icon: 'fa-check-double' },
-  partial:  { label: 'اختبار جزئي', color: '#e65100', icon: 'fa-check' },
-  quiz:     { label: 'مسابقة', color: '#4a148c', icon: 'fa-trophy' }
-};
-
-// 1. Auth Check
 onAuth((user, userData) => {
   if (!user || !isAdmin(userData)) { goTo("index.html"); return; }
   loadTree();
+  loadStudents();
 });
 
 window.doLogout = async () => { await signOutUser(); goTo("index.html"); };
 
-// 2. Navigation
 window.switchTab = function(tab) {
   document.querySelectorAll(".nav-item-bottom").forEach(n => n.classList.remove("active"));
   document.querySelectorAll(".admin-content > div").forEach(v => v.style.display = "none");
-  
-  // Update active state for both mobile and desktop navs
   document.querySelectorAll(`.nav-item-bottom`).forEach(n => {
     if(n.innerText.includes('المحتوى') && tab === 'content') n.classList.add('active');
     if(n.innerText.includes('الطلاب') && tab === 'students') n.classList.add('active');
     if(n.innerText.includes('الأجهزة') && tab === 'devices') n.classList.add('active');
     if(n.innerText.includes('الإعدادات') && tab === 'settings') n.classList.add('active');
   });
-  
   document.getElementById("view-" + tab).style.display = "block";
 };
 
-// 3. Load & Render Tree
 async function loadTree() {
-  try {
-    const snap = await getDocs(collection(db, "content_tree"));
-    treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderTree();
-  } catch (e) {
-    document.getElementById("treeContainer").innerHTML = `<p style="color:red;">خطأ: ${e.message}</p>`;
-  }
+  const snap = await getDocs(collection(db, "content_tree"));
+  treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderTree();
 }
 
 function renderTree() {
   const container = document.getElementById("treeContainer");
-  const rootNodes = treeData.filter(n => n.parentId === "root");
-  if (rootNodes.length === 0) {
-    container.innerHTML = `<div class="tree-card" style="text-align:center; padding: 30px;"><p style="color:var(--muted);">لا يوجد محتوى بعد. ابدأ بإضافة سنة دراسية.</p></div>`;
-    return;
-  }
-  container.innerHTML = buildHTML(rootNodes);
+  const roots = treeData.filter(n => n.parentId === "root");
+  if (roots.length === 0) { container.innerHTML = `<div class="tree-card" style="text-align:center; padding: 30px;"><p style="color:var(--muted);">لا يوجد محتوى. ابدأ بإضافة سنة.</p></div>`; return; }
+  container.innerHTML = buildHTML(roots);
 }
 
 function buildHTML(nodes) {
@@ -211,20 +178,19 @@ function buildHTML(nodes) {
     const children = treeData.filter(n => n.parentId === node.id);
     const typeInfo = NODE_TYPES[node.type] || NODE_TYPES.custom;
     
-    // الأدوات المضافة
     let toolsHtml = "";
     if (node.tools && Object.keys(node.tools).length > 0) {
       toolsHtml = `<div class="node-tools">`;
       Object.entries(node.tools).forEach(([key, toolData]) => {
-        const toolInfo = TOOLS[key] || { label: 'أداة', color: '#333', icon: 'fa-cog' };
-        toolsHtml += `<div class="tool-badge" style="background:${toolData.color || toolInfo.color};" onclick="editToolContent('${node.id}', '${key}')">${toolData.label || toolInfo.label} <i class="fas fa-pen" style="font-size:10px;"></i></div>`;
+        const t = TOOLS[key] || { label: 'أداة', color: '#333', icon: 'fa-cog' };
+        toolsHtml += `<div class="tool-badge" style="background:${toolData.color || t.color};" onclick="openToolContent('${node.id}', '${key}')">${toolData.label || t.label} <i class="fas fa-pen" style="font-size:10px;"></i></div>`;
       });
       toolsHtml += `</div>`;
     }
 
     html += `
-      <div class="tree-card">
-        <div class="tree-card-header">
+      <div class="tree-card" ondragover="allowDrop(event)" ondrop="dropTool(event, '${node.id}')">
+        <div class="tree-card-header" draggable="true" ondragstart="dragNode(event, '${node.id}')">
           <div class="tree-info">
             <div style="display:flex; align-items:center; gap:8px;">
               <i class="fas ${typeInfo.icon}" style="color:var(--accent); font-size:18px;"></i>
@@ -233,9 +199,9 @@ function buildHTML(nodes) {
             <span class="tree-badge">${typeInfo.label}</span>
           </div>
           <div class="tree-actions">
-            <button class="btn-circle" onclick="openDrawer('addNode', '${node.id}', 'custom')" title="إضافة تبويب"><i class="fas fa-plus"></i></button>
-            <button class="btn-circle" onclick="openDrawer('editNode', '${node.id}', '${node.type}')" title="تعديل"><i class="fas fa-edit"></i></button>
-            ${node.type !== 'content' && node.type !== 'lecture' ? `<button class="btn-circle danger" onclick="deleteNode('${node.id}')" title="حذف"><i class="fas fa-trash"></i></button>` : ''}
+            <button class="btn-circle" onclick="openDrawer('addNode', '${node.id}', 'custom')"><i class="fas fa-plus"></i></button>
+            <button class="btn-circle" onclick="openDrawer('editNode', '${node.id}', '${node.type}')"><i class="fas fa-edit"></i></button>
+            ${node.type !== 'content' ? `<button class="btn-circle danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>` : ''}
           </div>
         </div>
         ${toolsHtml}
@@ -246,39 +212,52 @@ function buildHTML(nodes) {
   return html;
 }
 
-// 4. Drawer Logic
-window.openDrawer = function(action, id, type) {
-  const drawer = document.getElementById("contentDrawer");
-  const overlay = document.getElementById("drawerOverlay");
-  const title = document.getElementById("drawerTitle");
-  const inputGroup = document.getElementById("contentInputGroup");
-  
-  currentEditId = action === 'editNode' ? id : null;
-  currentParentId = action === 'editNode' ? treeData.find(n => n.id === id)?.parentId : id;
-  currentType = type;
-  
-  document.getElementById("nodeTitle").value = "";
-  document.getElementById("nodeDesc").value = "";
-  document.getElementById("nodeSources").value = "";
-  document.getElementById("nodeCode").value = "";
-  inputGroup.style.display = "none";
+// ===== Drag & Drop for Tools =====
+window.dragTool = function(ev, toolKey) { ev.dataTransfer.setData("type", "tool"); ev.dataTransfer.setData("toolKey", toolKey); };
+window.dragNode = function(ev, nodeId) { ev.dataTransfer.setData("type", "node"); ev.dataTransfer.setData("nodeId", nodeId); };
+window.allowDrop = function(ev) { ev.preventDefault(); };
 
-  if (action === 'editNode') {
-    const node = treeData.find(n => n.id === id);
-    title.textContent = `تعديل: ${node.title}`;
-    document.getElementById("nodeTitle").value = node.title;
-    document.getElementById("nodeDesc").value = node.desc || "";
-    document.getElementById("nodeSources").value = node.sources || "";
-    if (node.type === 'content') {
-      inputGroup.style.display = "block";
-      document.getElementById("nodeCode").value = node.htmlContent || "";
-    }
-  } else {
-    title.textContent = `إضافة ${NODE_TYPES[type]?.label || 'تبويب'}`;
+window.dropTool = async function(ev, targetNodeId) {
+  ev.preventDefault();
+  const type = ev.dataTransfer.getData("type");
+  if (type === "tool") {
+    const toolKey = ev.dataTransfer.getData("toolKey");
+    const node = treeData.find(n => n.id === targetNodeId);
+    if (node.type !== 'lecture' && node.type !== 'custom') { showToast("الأدوات تضاف فقط تحت المحاضرة!", "error"); return; }
+    const currentTools = node.tools || {};
+    if (currentTools[toolKey]) { showToast("الأداة موجودة بالفعل!", "error"); return; }
+    currentTools[toolKey] = { label: TOOLS[toolKey].label, color: TOOLS[toolKey].color };
+    await updateDoc(doc(db, "content_tree", targetNodeId), { tools: currentTools });
+    showToast("تمت إضافة الأداة!");
+    loadTree();
   }
-  
-  drawer.classList.add("open");
-  overlay.classList.add("open");
+};
+
+// ===== Drawer Logic =====
+window.openDrawer = function(action, id, type) {
+  currentAction = action;
+  document.getElementById("drawerTitle").textContent = action === 'addNode' ? "إضافة عنصر جديد" : "تعديل العنصر";
+  document.getElementById("editId").value = action === 'editNode' ? id : "";
+  document.getElementById("parentId").value = action === 'editNode' ? (treeData.find(n => n.id === id)?.parentId || "root") : id;
+  document.getElementById("nodeType").value = type;
+  document.getElementById("nodeTitle").value = action === 'editNode' ? treeData.find(n => n.id === id)?.title : "";
+  document.getElementById("nodeSources").value = action === 'editNode' ? (treeData.find(n => n.id === id)?.sources || "") : "";
+  document.getElementById("toolContentInputs").style.display = "none";
+  document.getElementById("nodeCode").value = "";
+  document.getElementById("contentDrawer").classList.add("open");
+  document.getElementById("drawerOverlay").classList.add("open");
+};
+
+window.openToolContent = function(nodeId, toolKey) {
+  currentAction = "editToolContent";
+  currentToolKey = toolKey;
+  document.getElementById("drawerTitle").textContent = `إضافة محتوى أداة: ${TOOLS[toolKey].label}`;
+  document.getElementById("editId").value = nodeId;
+  document.getElementById("nodeTitle").value = treeData.find(n => n.id === nodeId)?.title || "";
+  document.getElementById("nodeSources").value = "";
+  document.getElementById("toolContentInputs").style.display = "block";
+  document.getElementById("contentDrawer").classList.add("open");
+  document.getElementById("drawerOverlay").classList.add("open");
 };
 
 window.closeDrawer = function() {
@@ -286,54 +265,59 @@ window.closeDrawer = function() {
   document.getElementById("drawerOverlay").classList.remove("open");
 };
 
-// 5. Save Logic
-window.saveNode = async function() {
+// ===== Save Logic =====
+window.saveItem = async function() {
   const title = document.getElementById("nodeTitle").value.trim();
-  const desc = document.getElementById("nodeDesc").value.trim();
   const sources = document.getElementById("nodeSources").value.trim();
-  const htmlContent = document.getElementById("nodeCode").value;
-  
-  if (!title) { showToast("أدخل العنوان", "error"); return; }
-  
-  const data = { parentId: currentParentId, type: currentType, title, desc, sources, updatedAt: serverTimestamp() };
-  if (currentType === 'content') data.htmlContent = htmlContent;
+  const html = document.getElementById("nodeCode").value;
+  const editId = document.getElementById("editId").value;
 
-  try {
-    if (currentEditId) {
-      await updateDoc(doc(db, "content_tree", currentEditId), data);
-      showToast("تم التعديل");
+  if (!title) { showToast("أدخل العنوان", "error"); return; }
+
+  if (currentAction === "editToolContent") {
+    const node = treeData.find(n => n.id === editId);
+    const currentTools = node.tools || {};
+    currentTools[currentToolKey].content = html; 
+    currentTools[currentToolKey].sources = sources;
+    await updateDoc(doc(db, "content_tree", editId), { tools: currentTools });
+    showToast("تم حفظ المحتوى بنجاح!");
+  } else {
+    const data = {
+      parentId: document.getElementById("parentId").value,
+      type: document.getElementById("nodeType").value,
+      title, sources, updatedAt: serverTimestamp()
+    };
+    if (editId) {
+      await updateDoc(doc(db, "content_tree", editId), data);
+      showToast("تم التعديل!");
     } else {
       data.createdAt = serverTimestamp();
       await addDoc(collection(db, "content_tree"), data);
-      showToast("تمت الإضافة");
+      showToast("تمت الإضافة!");
     }
-    closeDrawer();
-    loadTree();
-  } catch (e) {
-    showToast("خطأ: " + e.message, "error");
   }
+  closeDrawer();
+  loadTree();
 };
 
-// 6. Delete Logic
-window.deleteNode = async function(id) {
-  if (treeData.some(n => n.parentId === id)) {
-    showToast("احذف التبويبات الفرعية أولاً!", "error");
-    return;
-  }
-  if (!confirm("هل أنت متأكد من الحذف؟")) return;
-  try {
-    await deleteDoc(doc(db, "content_tree", id));
-    showToast("تم الحذف");
-    loadTree();
-  } catch (e) {
-    showToast("خطأ في الحذف", "error");
-  }
-};
-
-// 7. Tool Click
-window.editToolContent = function(nodeId, toolKey) {
-  showToast("هنا هتفتح صفحة إضافة المحتوى للأداة: " + TOOLS[toolKey].label, "success");
-};
+// ===== Students Logic =====
+async function loadStudents() {
+  const snap = await getDocs(collection(db, "users"));
+  let html = "";
+  snap.forEach(doc => {
+    const u = doc.data();
+    if (u.role !== 'admin') {
+      html += `<div class="tree-card" style="margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div><h3 class="tree-title">${u.name}</h3><span class="tree-badge">${u.role}</span></div>
+          <button class="btn-circle" onclick="toggleUserStatus('${doc.id}', '${u.role}')">تفعيل</button>
+        </div>
+      </div>`;
+    }
+  });
+  if (!html) html = `<div class="tree-card" style="text-align:center; padding:30px;">لا يوجد طلاب مسجلين بعد.</div>`;
+  document.getElementById("studentsContainer").innerHTML = html;
+}
 </script>
 </body>
 </html>
