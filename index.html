@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ClearNote — منصة المذاكرة</title>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -22,18 +22,18 @@
 
     <!-- Login -->
     <div id="loginForm" class="auth-form active">
-      <label>البريد الإلكتروني أو الهاتف أو الرقم القومي</label>
+      <label>البريد الجامعي أو الهاتف</label>
       <input type="text" id="loginEmail" placeholder="أدخل بيانات الدخول" dir="ltr" style="text-align: right;">
       <label>كلمة المرور</label>
       <input type="password" id="loginPassword" placeholder="••••••••">
       <button class="btn-primary" id="loginBtn" onclick="doLogin()">دخول</button>
     </div>
 
-    <!-- Signup (Multi-step) -->
+    <!-- Signup -->
     <div id="signupForm" class="auth-form">
       <div class="step-progress"><div class="step-progress-bar" id="stepProgress"></div></div>
       
-      <!-- Step 1: Personal Info -->
+      <!-- Step 1 -->
       <div class="signup-step active" id="step1">
         <div class="step-title">البيانات الأساسية</div>
         <label>الاسم الرباعي</label>
@@ -45,7 +45,7 @@
         <button class="btn-primary" onclick="nextStep(2)">التالي</button>
       </div>
 
-      <!-- Step 2: Academic Info -->
+      <!-- Step 2 -->
       <div class="signup-step" id="step2">
         <div class="step-title">البيانات الأكاديمية</div>
         <label>البريد الجامعي</label>
@@ -53,16 +53,16 @@
         <label>الجامعة</label>
         <input type="text" id="su_university" placeholder="جامعة القاهرة">
         <label>الدور</label>
-        <select id="su_role" style="width:100%; padding:14px; border:2px solid var(--line); border-radius:10px; font-size:16px; font-family:inherit; margin-bottom:15px; background:#fafbfc;">
+        <select id="su_role">
           <option value="student">طالب</option>
           <option value="ta">معيد</option>
           <option value="doctor">دكتور</option>
         </select>
         <button class="btn-primary" onclick="nextStep(3)">التالي</button>
-        <button class="btn-cancel" style="width:100%; padding:12px; background:transparent; border:none; color:var(--muted); margin-top:10px; cursor:pointer;" onclick="prevStep(1)">رجوع</button>
+        <button class="btn-cancel" onclick="prevStep(1)">رجوع</button>
       </div>
 
-      <!-- Step 3: Account -->
+      <!-- Step 3 -->
       <div class="signup-step" id="step3">
         <div class="step-title">بيانات الحساب</div>
         <label>كلمة المرور</label>
@@ -70,17 +70,16 @@
         <label>تأكيد كلمة المرور</label>
         <input type="password" id="su_confirmPassword" placeholder="أعد كتابة كلمة المرور">
         <button class="btn-primary" id="signupBtn" onclick="doSignup()">إنشاء الحساب</button>
-        <button class="btn-cancel" style="width:100%; padding:12px; background:transparent; border:none; color:var(--muted); margin-top:10px; cursor:pointer;" onclick="prevStep(2)">رجوع</button>
+        <button class="btn-cancel" onclick="prevStep(2)">رجوع</button>
       </div>
     </div>
-
     <div class="auth-foot">ClearNote · v1.0</div>
   </div>
 </div>
 
 <div id="welcomeScreen" class="welcome-screen" style="display:none">
   <div class="welcome-box">
-    <div class="brand" style="margin-bottom:20px">
+    <div class="brand" style="margin-bottom:15px">
       <div class="brand-name" style="color:#fff">CLEAR<span style="color:#c9a44a">NOTE</span></div>
     </div>
     <h2>أهلاً بك، <span id="welcomeName">—</span></h2>
@@ -89,17 +88,15 @@
       <div class="info-row"><span>الدور:</span> <b id="welcomeRole">—</b></div>
       <div class="info-row"><span>البريد:</span> <b id="welcomeEmail">—</b></div>
     </div>
-    
-    <button class="btn-primary" id="studentBtn" style="display:none; background:#152741; margin-bottom:10px;" onclick="window.location.href='app.html'">الدخول إلى المنصة</button>
-    <button class="btn-primary" id="adminBtn" style="display:none; background:#1f6b45; margin-bottom:10px;" onclick="window.location.href='admin.html'">لوحة التحكم (أدمن)</button>
-    <button class="btn-primary" onclick="doLogout()">تسجيل الخروج</button>
+    <button class="btn-primary" id="studentBtn" style="display:none; background:#152741; margin-bottom:8px;" onclick="window.location.href='app.html'">الدخول إلى المنصة</button>
+    <button class="btn-primary" id="adminBtn" style="display:none; background:#1f6b45; margin-bottom:8px;" onclick="window.location.href='admin.html'">لوحة التحكم (أدمن)</button>
+    <button class="btn-primary" onclick="doLogout()" style="background:#b91c1c;">تسجيل الخروج</button>
   </div>
 </div>
 
 <script type="module">
 import { auth, signIn, signUp, signOutUser, onAuth, isAdmin, goTo, showToast } from "./shared.js";
 
-// التبويبات
 window.switchTab = function (tab) {
   document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
   document.querySelectorAll(".auth-form").forEach(f => f.classList.remove("active"));
@@ -108,7 +105,6 @@ window.switchTab = function (tab) {
   document.getElementById("statusMsg").textContent = "";
 };
 
-// التنقل بين الخطوات
 window.nextStep = function (step) {
   document.querySelectorAll(".signup-step").forEach(s => s.classList.remove("active"));
   document.getElementById("step" + step).classList.add("active");
@@ -126,7 +122,6 @@ function setStatus(msg, type = "err") {
   el.textContent = msg || "";
 }
 
-// تسجيل الدخول
 window.doLogin = async function () {
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
@@ -141,7 +136,6 @@ window.doLogin = async function () {
   }
 };
 
-// إنشاء حساب
 window.doSignup = async function () {
   const name = document.getElementById("su_name").value.trim();
   const nationalId = document.getElementById("su_national").value.trim();
@@ -160,10 +154,7 @@ window.doSignup = async function () {
   btn.disabled = true; btn.textContent = "جاري الإنشاء…"; setStatus("");
 
   try {
-    // هنستخدم البريد الجامعي كإيميل للدخول
-    const user = await signUp(uniEmail, password, name, {
-      nationalId, phone, uniEmail, university, role
-    });
+    await signUp(uniEmail, password, name, { nationalId, phone, uniEmail, university, role });
     setStatus("✅ تم إنشاء الحساب!", "ok");
   } catch (err) {
     setStatus(err.message);
@@ -192,7 +183,6 @@ onAuth((user, userData) => {
   else if (userData?.role === 'doctor') roleText = "دكتور";
   
   document.getElementById("welcomeRole").textContent = roleText;
-  
   document.getElementById("studentBtn").style.display = "block";
   if (isAdmin(userData)) {
     document.getElementById("adminBtn").style.display = "block";
