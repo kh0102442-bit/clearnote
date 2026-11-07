@@ -1,108 +1,66 @@
-/* إعدادات الجذر: هنا بنخلي كل شيء يكبر تلقائياً */
+/* === نظام الألوان الأساسي === */
 :root {
-  --navy: #0f172a;
-  --navy-light: #1e293b;
-  --accent: #d97706;
-  --bg: #f1f5f9;
+  --navy: #152741;
+  --navy-dark: #0f1e33;
+  --accent: #a8741a;
+  --green: #1f6b45;
+  --bg: #f4f6f8;
   --white: #ffffff;
-  --text: #0f172a;
-  --muted: #64748b;
-  --border: #e2e8f0;
+  --text: #1a1a1a;
+  --muted: #5b6472;
+  --line: #e9ecef;
   
-  /* حجم الخط الأساسي ديناميكي */
-  --font-base: clamp(16px, 4vw, 18px);
-  --font-lg: clamp(20px, 5vw, 24px);
-  --font-xl: clamp(24px, 6vw, 32px);
+  /* الحجم الأساسي للخط (كبير للموبايل) */
+  --base-font: 18px;
 }
 
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+/* منع أي حركة أفقية أو تكبير عشوائي */
+html {
+  font-size: var(--base-font);
+  -webkit-text-size-adjust: 100%;
 }
 
 html, body {
-  margin: 0;
-  padding: 0;
+  margin: 0; padding: 0;
+  max-width: 100vw; overflow-x: hidden;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: var(--font-base);
-  min-height: 100dvh; /* دي بتخلي الطول يتظبط مع شاشة الموبايل */
-  overflow-x: hidden; /* منع أي حركة أفقية */
-  -webkit-font-smoothing: antialiased;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* أزرار كبيرة جداً ومريحة للمس */
-button {
+/* جعل كل الأزرار والمدخلات كبيرة ومريحة للمس */
+input, select, textarea, button {
   font-family: inherit;
-  font-size: var(--font-base);
-  cursor: pointer;
-  border: none;
+  font-size: 1.1rem !important; /* حجم خط كبير */
+  min-height: 52px; /* مساحة لمس مريحة */
   border-radius: 12px;
-  padding: 16px 24px;
+}
+
+button {
+  cursor: pointer;
   font-weight: 700;
   transition: transform 0.1s, opacity 0.2s;
-  min-height: 54px; /* أقل طول لزرار عشان الإصبع يدوس عليه */
 }
+button:active { transform: scale(0.97); opacity: 0.9; }
 
-button:active {
-  transform: scale(0.97);
-}
-
-input, textarea, select {
-  font-family: inherit;
-  font-size: var(--font-base);
-  width: 100%;
-  padding: 16px;
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  background: #f8fafc;
-  min-height: 54px;
-  transition: border-color 0.2s;
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: var(--navy);
-  background: var(--white);
-}
-
-/* تصميم شاشة الدخول */
-.auth-screen {
-  min-height: 100dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #020617, #1e293b);
-  padding: 20px;
-}
-
-.auth-box {
-  background: var(--white);
-  padding: 30px 24px;
-  border-radius: 24px;
-  width: 100%;
-  max-width: 450px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
+/* === تنسيقات شاشة الدخول (للحفاظ على شكله القديم) === */
+.auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0a0c0f 0%, #152741 100%); padding: 15px; }
+.auth-box { background: var(--white); border-radius: 20px; padding: 30px 20px; width: 100%; max-width: 420px; box-shadow: 0 10px 40px rgba(0,0,0,.4); }
 .brand { text-align: center; margin-bottom: 30px; }
-.brand-name { font-family: Georgia, serif; font-size: var(--font-xl); font-weight: 900; letter-spacing: 2px; color: var(--navy); }
+.brand-name { font-family: Georgia, serif; font-size: 2rem; font-weight: 700; letter-spacing: 3px; color: var(--navy); }
 .brand-name span { color: var(--accent); }
-.brand-sub { font-size: 13px; letter-spacing: 4px; color: var(--muted); margin-top: 8px; font-weight: 700; }
-
-.auth-tabs { display: flex; background: var(--bg); padding: 6px; border-radius: 14px; margin-bottom: 25px; }
-.auth-tab { flex: 1; padding: 12px; border-radius: 10px; background: transparent; color: var(--muted); font-size: 16px; border: none; min-height: auto; }
-.auth-tab.active { background: var(--navy); color: var(--white); box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
-
-.btn-primary { background: var(--navy); color: var(--white); width: 100%; font-size: 18px; margin-top: 10px; }
-.btn-primary:active { background: var(--navy-light); }
-
-.auth-form label { display: block; margin: 15px 0 8px; font-weight: 800; font-size: 15px; color: var(--navy); }
+.brand-sub { font-size: 0.9rem; letter-spacing: 3px; color: var(--muted); margin-top: 5px; }
+.auth-tabs { display: flex; gap: 5px; background: #f0f2f5; padding: 5px; border-radius: 14px; margin-bottom: 25px; }
+.auth-tab { flex: 1; padding: 14px; border: none; background: transparent; border-radius: 10px; font-size: 1.1rem; font-weight: 700; color: var(--muted); }
+.auth-tab.active { background: var(--navy); color: white; box-shadow: 0 4px 10px rgba(21,39,65,.2); }
 .auth-form { display: none; }
-.auth-form.active { display: block; animation: fadeIn 0.3s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-.status-msg { font-size: 15px; min-height: 24px; text-align: center; font-weight: bold; margin-bottom: 10px; }
-.status-msg.err { color: #dc2626; }
-.status-msg.ok { color: #16a34a; }
+.auth-form.active { display: block; }
+.auth-form label { display: block; font-size: 1rem; color: var(--navy); font-weight: 700; margin-bottom: 8px; margin-top: 15px; }
+.auth-form input { width: 100%; padding: 16px; border: 2px solid var(--line); background: #fafbfc; box-sizing: border-box; }
+.btn-primary { width: 100%; padding: 18px; background: var(--navy); color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold; margin-top: 25px; box-shadow: 0 4px 15px rgba(21,39,65,.2); }
+.status-msg { font-size: 1rem; min-height: 24px; margin: 10px 0; text-align: center; font-weight: 600; }
+.status-msg.err { color: #b91c1c; }
+.status-msg.ok { color: var(--green); }
+.auth-foot { text-align: center; font-size: 0.9rem; color: var(--muted); margin-top: 30px; }
