@@ -2,9 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ClearNote — منصة المذاكرة</title>
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -53,17 +53,15 @@
       <div class="info-row"><span>البريد:</span> <b id="welcomeEmail">—</b></div>
     </div>
     
-    <!-- الأزرار الجديدة بعد التوجيه -->
-    <button class="btn-primary" id="studentBtn" style="display:none; background:#152741; margin-bottom:10px;" onclick="goTo('app.html')">الدخول إلى المنصة (طالب)</button>
-    
-    <button class="btn-primary" id="adminBtn" style="display:none; background:#1f6b45; margin-bottom:10px;" onclick="goTo('admin.html')">الدخول إلى لوحة التحكم (أدمن)</button>
-    
+    <!-- الأزرار -->
+    <button class="btn-primary" id="studentBtn" style="display:none; background:#152741; margin-bottom:10px;" onclick="window.location.href='app.html'">الدخول إلى المنصة</button>
+    <button class="btn-primary" id="adminBtn" style="display:none; background:#1f6b45; margin-bottom:10px;" onclick="window.location.href='admin.html'">لوحة التحكم (أدمن)</button>
     <button class="btn-primary" onclick="doLogout()">تسجيل الخروج</button>
   </div>
 </div>
 
 <script type="module">
-import { auth, signIn, signUp, signOutUser, onAuth, isAdmin, goTo, showToast } from "./shared.js?v=3";
+import { auth, signIn, signUp, signOutUser, onAuth, isAdmin, goTo, showToast } from "./shared.js";
 
 window.switchTab = function (tab) {
   document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
@@ -126,10 +124,7 @@ onAuth((user, userData) => {
   document.getElementById("welcomeEmail").textContent = user.email;
   document.getElementById("welcomeRole").textContent = (userData && userData.role === 'admin') ? "أدمن" : "طالب";
   
-  // إظهار زر الطالب للجميع
   document.getElementById("studentBtn").style.display = "block";
-  
-  // إظهار زر الأدمن لو هو أدمن
   if (isAdmin(userData)) {
     document.getElementById("adminBtn").style.display = "block";
   }
