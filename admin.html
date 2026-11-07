@@ -2,98 +2,113 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ClearNote — لوحة التحكم</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  body { background: #f4f6f8; display: flex; min-height: 100vh; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
-  .sidebar { width: 260px; background: #152741; color: white; display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; right: 0; box-shadow: -2px 0 10px rgba(0,0,0,0.1); z-index: 100; }
-  .sidebar-brand { padding: 24px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  .sidebar-brand h2 { font-family: Georgia, serif; font-size: 22px; letter-spacing: 2px; margin: 0; color: #fff; }
-  .sidebar-brand span { color: #a8741a; }
-  .nav-menu { flex: 1; padding: 20px 0; overflow-y: auto; }
-  .nav-item { padding: 14px 24px; display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.2s; font-size: 15px; }
-  .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; border-right: 4px solid #a8741a; }
-  .nav-item i { width: 20px; text-align: center; font-size: 18px; }
-  .main-content { margin-right: 260px; flex: 1; padding: 30px; box-sizing: border-box; max-width: calc(100% - 260px); }
-  .top-bar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
-  .top-bar h1 { margin: 0; font-size: 20px; color: #152741; font-family: Georgia, serif; }
-  .user-info { display: flex; align-items: center; gap: 15px; font-size: 14px; color: #5b6472; }
-  .btn-logout { background: #fbeaea; color: #b91c1c; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; }
-  .btn-logout:hover { background: #f8d7da; }
-  .card { background: #fff; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-  .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; margin-bottom: 20px; }
-  .card-title { font-size: 18px; font-weight: bold; color: #152741; margin: 0; }
-  .btn-primary { background: #152741; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
-  .btn-primary:hover { background: #0f1e33; }
-  .tree-node { margin-right: 20px; border-right: 1px dashed #c7cbd1; padding-right: 15px; margin-top: 10px; }
-  .node-item { display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; padding: 12px 15px; border-radius: 6px; border: 1px solid #e9ecef; margin-bottom: 8px; transition: 0.2s; }
-  .node-item:hover { border-color: #152741; box-shadow: 0 2px 8px rgba(21,39,65,0.08); }
-  .node-info { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #1a1a1a; }
+  /* ستايلات لوحة التحكم */
+  body { background: #f4f6f8; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
+  
+  /* شريط التنقل العلوي */
+  .admin-navbar {
+    background: #152741; color: white; padding: 15px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .admin-brand { font-family: Georgia, serif; font-size: 20px; font-weight: bold; }
+  .admin-brand span { color: #a8741a; }
+  
+  /* زر الإضافة الرئيسي */
+  .btn-add-main {
+    background: #a8741a; color: white; border: none; padding: 8px 16px;
+    border-radius: 6px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 5px;
+  }
+
+  /* الحاوية */
+  .admin-container { padding: 20px; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+  
+  /* شجرة المحتوى */
+  .tree-node { margin-bottom: 10px; }
+  .node-item {
+    background: #fff; border: 1px solid #e9ecef; border-radius: 10px; padding: 15px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: 0.2s;
+    margin-bottom: 8px;
+  }
+  .node-item:hover { border-color: #152741; }
+  
+  .node-info { display: flex; flex-direction: column; gap: 5px; }
+  .node-title { font-weight: 700; color: #152741; font-size: 16px; }
+  .node-type { font-size: 11px; color: #a8741a; background: #fdfaf3; padding: 2px 8px; border-radius: 4px; width: max-content; }
+  
   .node-actions { display: flex; gap: 8px; }
-  .node-btn { background: transparent; border: 1px solid #c7cbd1; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 12px; color: #5b6472; transition: 0.2s; }
-  .node-btn:hover { background: #152741; color: #fff; border-color: #152741; }
-  .node-btn.danger:hover { background: #b91c1c; border-color: #b91c1c; }
-  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
+  .btn-icon {
+    width: 32px; height: 32px; border-radius: 6px; border: 1px solid #c7cbd1;
+    background: #f8f9fa; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #5b6472; transition: 0.2s;
+  }
+  .btn-icon:hover { background: #152741; color: white; border-color: #152741; }
+  .btn-icon.danger:hover { background: #b91c1c; border-color: #b91c1c; }
+
+  .children-container {
+    margin-right: 20px; padding-right: 15px; border-right: 2px dashed #c7cbd1;
+    display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;
+  }
+
+  /* أيقونات ثابتة للأجزاء الأساسية */
+  .fixed-icons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .fixed-icon {
+    background: #eef2fa; color: #2a4b8d; padding: 6px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px;
+    border: 1px solid #c9d6ee; cursor: pointer;
+  }
+
+  /* المودال (النافذة المنبثقة) */
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); padding: 15px; }
   .modal-overlay.active { display: flex; }
-  .modal-box { background: #fff; border-radius: 10px; width: 100%; max-width: 500px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-  .modal-box h3 { margin-top: 0; color: #152741; }
+  .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 500px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+  .modal-box h3 { margin-top: 0; color: #152741; font-size: 20px; }
   .form-group { margin-bottom: 15px; }
-  .form-group label { display: block; font-size: 13px; font-weight: 600; color: #152741; margin-bottom: 6px; }
-  .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #c7cbd1; border-radius: 6px; font-family: inherit; font-size: 14px; box-sizing: border-box; }
+  .form-group label { display: block; font-size: 14px; font-weight: 700; color: #152741; margin-bottom: 8px; }
+  .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #c7cbd1; border-radius: 8px; font-family: inherit; font-size: 15px; box-sizing: border-box; }
   .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
-  .btn-cancel { background: #e9ecef; color: #5b6472; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; }
+  .btn-cancel { background: #e9ecef; color: #5b6472; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 700; font-family: inherit; }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-<div class="sidebar">
-  <div class="sidebar-brand">
-    <h2>CLEAR<span>NOTE</span></h2>
-    <div style="font-size:10px; color:rgba(255,255,255,0.5); margin-top:5px; letter-spacing:1px;">ADMIN PANEL</div>
-  </div>
-  <div class="nav-menu">
-    <div class="nav-item active"><i class="fas fa-sitemap"></i> شجرة المحتوى</div>
-    <div class="nav-item" onclick="alert('قريباً')"><i class="fas fa-users"></i> الطلاب</div>
-    <div class="nav-item" onclick="alert('قريباً')"><i class="fas fa-mobile-alt"></i> الأجهزة</div>
-    <div class="nav-item" onclick="alert('قريباً')"><i class="fas fa-cog"></i> الإعدادات</div>
+<div class="admin-navbar">
+  <div class="admin-brand">CLEAR<span>NOTE</span> <span style="font-size:12px; color:#aaa; font-weight:normal;">| ADMIN</span></div>
+  <div style="display:flex; gap:10px;">
+    <button class="btn-add-main" onclick="openAddModal(null, 'root')"><i class="fas fa-plus"></i> إضافة جذر</button>
+    <button style="background:transparent; border:none; color:#fff; cursor:pointer;" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i></button>
   </div>
 </div>
 
-<div class="main-content">
-  <div class="top-bar">
-    <h1>شجرة المحتوى (Tree Builder)</h1>
-    <div class="user-info">
-      <span>مرحباً، <b id="adminName">...</b></span>
-      <button class="btn-logout" onclick="doLogout()">خروج</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">إدارة التصنيفات والمحتوى</h2>
-      <button class="btn-primary" onclick="openAddModal(null, 'root')"><i class="fas fa-plus"></i> إضافة سنة دراسية</button>
-    </div>
-    <div id="treeContainer" style="min-height: 200px;">
-      <p style="text-align:center; color:#5b6472;">جاري تحميل الشجرة...</p>
-    </div>
+<div class="admin-container">
+  <div id="treeContainer">
+    <p style="text-align:center; color:#5b6472;">جاري تحميل الشجرة...</p>
   </div>
 </div>
 
+<!-- المودال -->
 <div class="modal-overlay" id="nodeModal">
   <div class="modal-box">
     <h3 id="modalTitle">إضافة عنصر جديد</h3>
     <input type="hidden" id="nodeParentId">
     <input type="hidden" id="nodeType">
+    
     <div class="form-group">
-      <label>الاسم / العنوان</label>
-      <input type="text" id="nodeTitle" placeholder="مثال: الفرقة الأولى...">
+      <label>العنوان</label>
+      <input type="text" id="nodeTitle" placeholder="مثال: الفرقة الأولى / Anatomy / محاضرة 1...">
     </div>
+    
     <div class="form-group" id="codeGroup" style="display:none;">
       <label>كود المحتوى (HTML)</label>
       <textarea id="nodeCode" rows="6" style="font-family: monospace;" placeholder="<h1>محتوى المحاضرة</h1>..."></textarea>
     </div>
+
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
       <button class="btn-primary" onclick="saveNode()">حفظ</button>
@@ -111,25 +126,24 @@ const NODE_TYPES = {
   program: { label: 'برنامج',       icon: 'fa-graduation-cap' },
   subject: { label: 'مادة',         icon: 'fa-book' },
   lecture: { label: 'محاضرة/سكشن', icon: 'fa-chalkboard-teacher' },
+  custom:  { label: 'تبويب مخصص',  icon: 'fa-folder' },
   content: { label: 'محتوى',        icon: 'fa-file-alt' }
 };
 
 onAuth((user, userData) => {
   if (!user || !isAdmin(userData)) { goTo("index.html"); return; }
-  document.getElementById("adminName").textContent = userData.name;
   loadTree();
 });
 
 window.doLogout = async () => { await signOutUser(); goTo("index.html"); };
 
 async function loadTree() {
-  const container = document.getElementById("treeContainer");
   try {
     const snap = await getDocs(collection(db, "content_tree"));
     treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderTree();
   } catch (e) {
-    container.innerHTML = `<p style="color:red;">خطأ: ${e.message} (تأكد من إعدادات الـ Rules في Firebase)</p>`;
+    document.getElementById("treeContainer").innerHTML = `<p style="color:red;">خطأ: ${e.message}</p>`;
   }
 }
 
@@ -140,39 +154,64 @@ function renderTree() {
     container.innerHTML = `<p style="text-align:center; color:#5b6472;">لا يوجد محتوى بعد. ابدأ بإضافة سنة دراسية.</p>`;
     return;
   }
-  function buildHTML(nodes) {
-    let html = "";
-    nodes.forEach(node => {
-      const children = treeData.filter(n => n.parentId === node.id);
-      const typeInfo = NODE_TYPES[node.type] || { label: 'عنصر', icon: 'fa-folder' };
-      html += `
-        <div class="node-item">
-          <div class="node-info">
-            <i class="fas ${typeInfo.icon}" style="color:#a8741a;"></i>
-            <span>${node.title}</span>
-            <small style="color:#5b6472; font-weight:normal; margin-right:10px;">(${typeInfo.label})</small>
-          </div>
-          <div class="node-actions">
-            ${node.type !== 'content' ? `<button class="node-btn" onclick="openAddModal('${node.id}', '${node.type}')"><i class="fas fa-plus"></i> إضافة</button>` : ''}
-            <button class="node-btn" onclick="editNode('${node.id}')"><i class="fas fa-edit"></i></button>
-            <button class="node-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>
-          </div>
-        </div>`;
-      if (children.length > 0) html += `<div class="tree-node">${buildHTML(children)}</div>`;
-    });
-    return html;
-  }
   container.innerHTML = buildHTML(rootNodes);
 }
 
+function buildHTML(nodes) {
+  let html = "";
+  nodes.forEach(node => {
+    const children = treeData.filter(n => n.parentId === node.id);
+    const typeInfo = NODE_TYPES[node.type] || NODE_TYPES.custom;
+    
+    // الأيقونات الثابتة اللي مش بتتمسح للأجزاء الأساسية
+    let fixedIconsHtml = "";
+    if (node.type === 'lecture') {
+      fixedIconsHtml = `
+        <div class="fixed-icons">
+          <div class="fixed-icon" onclick="alert('هنا هتضيف الشرح')"><i class="fas fa-file-alt"></i> الشرح</div>
+          <div class="fixed-icon" onclick="alert('هنا هتضيف الفيديو')"><i class="fas fa-video"></i> فيديو</div>
+          <div class="fixed-icon" onclick="alert('هنا هتضيف الأسئلة')"><i class="fas fa-question-circle"></i> أسئلة</div>
+          <div class="fixed-icon" onclick="alert('هنا هتضيف الملخص')"><i class="fas fa-clipboard-list"></i> ملخص</div>
+          <div class="fixed-icon" onclick="alert('هنا هتضيف المصطلحات')"><i class="fas fa-book"></i> مصطلحات</div>
+        </div>
+      `;
+    }
+
+    html += `
+      <div class="tree-node">
+        <div class="node-item">
+          <div class="node-info">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <i class="fas ${typeInfo.icon}" style="color:#a8741a; font-size:18px;"></i>
+              <span class="node-title">${node.title}</span>
+            </div>
+            <span class="node-type">${typeInfo.label}</span>
+            ${fixedIconsHtml}
+          </div>
+          <div class="node-actions">
+            <button class="btn-icon" onclick="openAddModal('${node.id}', '${node.type}')" title="إضافة تبويب فرعي"><i class="fas fa-plus"></i></button>
+            <button class="btn-icon" onclick="editNode('${node.id}')" title="تعديل"><i class="fas fa-edit"></i></button>
+            ${node.type !== 'content' && node.type !== 'lecture' ? `<button class="btn-icon danger" onclick="deleteNode('${node.id}')" title="حذف"><i class="fas fa-trash"></i></button>` : ''}
+          </div>
+        </div>
+        ${children.length > 0 ? `<div class="children-container">${buildHTML(children)}</div>` : ''}
+      </div>
+    `;
+  });
+  return html;
+}
+
+// فتح مودال الإضافة
 window.openAddModal = function(parentId, parentType) {
-  let newType = parentType === 'root' ? 'year' : parentType === 'year' ? 'program' : parentType === 'program' ? 'subject' : parentType === 'subject' ? 'lecture' : 'content';
+  let newType = "custom"; // الافتراضي بقى تبويب مخصص عشان نقدر نضيف برامج جوه برامج
+  if (parentType === 'root') newType = 'year';
+  
   document.getElementById("modalTitle").textContent = `إضافة ${NODE_TYPES[newType]?.label || 'عنصر'}`;
   document.getElementById("nodeParentId").value = parentId || "root";
   document.getElementById("nodeType").value = newType;
   document.getElementById("nodeTitle").value = "";
   document.getElementById("nodeCode").value = "";
-  document.getElementById("codeGroup").style.display = newType === 'content' ? 'block' : 'none';
+  document.getElementById("codeGroup").style.display = "none";
   document.getElementById("nodeModal").classList.add("active");
   document.getElementById("nodeModal").dataset.editId = "";
 };
@@ -224,7 +263,7 @@ window.saveNode = async function() {
 
 window.deleteNode = async function(id) {
   if (treeData.some(n => n.parentId === id)) {
-    showToast("احذف الفروع أولاً!", "error");
+    showToast("احذف التبويبات الفرعية أولاً!", "error");
     return;
   }
   if (!confirm("هل أنت متأكد من الحذف؟")) return;
