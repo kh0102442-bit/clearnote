@@ -1,0 +1,223 @@
+/* ============================================================
+   ClearNote — Base Styles
+   ============================================================ */
+
+:root {
+  --navy: #152741;
+  --navy-dark: #0f1e33;
+  --accent: #a8741a;
+  --green: #1f6b45;
+  --ink: #1a1a1a;
+  --muted: #5b6472;
+  --line: #c7cbd1;
+  --bg: #f4f6f8;
+  --white: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ===== Auth Screen ===== */
+.auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a0c0f 0%, #152741 100%);
+  padding: 20px;
+}
+
+.auth-box {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 36px 32px 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+
+.brand { text-align: center; margin-bottom: 24px; }
+
+.brand-name {
+  font-family: Georgia, serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--navy);
+}
+.brand-name span { color: var(--accent); }
+
+.brand-sub {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  background: #f0f2f5;
+  padding: 4px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+  font-weight: 600;
+}
+
+.auth-tab.active {
+  background: var(--navy);
+  color: white;
+}
+
+.auth-form { display: none; }
+.auth-form.active { display: block; }
+
+.auth-form label {
+  display: block;
+  font-size: 12.5px;
+  color: var(--navy);
+  font-weight: 600;
+  margin-bottom: 6px;
+  margin-top: 12px;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  margin-bottom: 4px;
+  transition: border-color .2s;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 18px;
+  transition: background .2s;
+}
+
+.btn-primary:hover { background: var(--navy-dark); }
+.btn-primary:disabled { opacity: .6; cursor: wait; }
+
+.status-msg {
+  font-size: 13px;
+  min-height: 18px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.status-msg.err { color: #b91c1c; }
+.status-msg.ok { color: var(--green); }
+
+.auth-foot {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 20px;
+  letter-spacing: 1px;
+}
+
+/* ===== Welcome Screen ===== */
+.welcome-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #152741 0%, #0a0c0f 100%);
+  padding: 20px;
+}
+
+.welcome-box {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 12px;
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 460px;
+  color: white;
+  text-align: center;
+}
+
+.welcome-box h2 {
+  font-size: 22px;
+  margin: 0 0 6px;
+  font-family: Georgia, serif;
+  color: #fff;
+}
+
+.welcome-sub {
+  color: rgba(255,255,255,.65);
+  font-size: 14px;
+  margin: 0 0 24px;
+}
+
+.welcome-info {
+  background: rgba(0,0,0,.25);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  text-align: right;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.info-row:last-child { border-bottom: none; }
+.info-row span { color: rgba(255,255,255,.6); }
+.info-row b { color: #c9a44a; }
+
+.welcome-box .btn-primary {
+  background: var(--accent);
+  color: white;
+}
+.welcome-box .btn-primary:hover { background: #8a6218; }
+
+@keyframes cnToastIn {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (max-width: 480px) {
+  .auth-box, .welcome-box { padding: 26px 22px; }
+  .brand-name { font-size: 22px; }
+  .welcome-box h2 { font-size: 18px; }
+}
