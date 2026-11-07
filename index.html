@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ClearNote — منصة المذاكرة</title>
-<!-- إضافة رقم إصدار للملف عشان نمنع الكاش -->
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
 
@@ -53,15 +52,18 @@
       <div class="info-row"><span>الدور:</span> <b id="welcomeRole">—</b></div>
       <div class="info-row"><span>البريد:</span> <b id="welcomeEmail">—</b></div>
     </div>
-    <!-- زرار لوحة التحكم -->
-    <button class="btn-primary" id="adminBtn" style="display:none; background:#1f6b45; margin-bottom:10px;" onclick="window.location.href='admin.html'">الدخول إلى لوحة التحكم</button>
+    
+    <!-- الأزرار الجديدة بعد التوجيه -->
+    <button class="btn-primary" id="studentBtn" style="display:none; background:#152741; margin-bottom:10px;" onclick="goTo('app.html')">الدخول إلى المنصة (طالب)</button>
+    
+    <button class="btn-primary" id="adminBtn" style="display:none; background:#1f6b45; margin-bottom:10px;" onclick="goTo('admin.html')">الدخول إلى لوحة التحكم (أدمن)</button>
+    
     <button class="btn-primary" onclick="doLogout()">تسجيل الخروج</button>
   </div>
 </div>
 
 <script type="module">
-// بنجيب الملف ونضيف عليه رقم إصدار عشان الكاش
-import { auth, signIn, signUp, signOutUser, onAuth, isAdmin, goTo, showToast } from "./shared.js?v=2";
+import { auth, signIn, signUp, signOutUser, onAuth, isAdmin, goTo, showToast } from "./shared.js?v=3";
 
 window.switchTab = function (tab) {
   document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
@@ -124,6 +126,10 @@ onAuth((user, userData) => {
   document.getElementById("welcomeEmail").textContent = user.email;
   document.getElementById("welcomeRole").textContent = (userData && userData.role === 'admin') ? "أدمن" : "طالب";
   
+  // إظهار زر الطالب للجميع
+  document.getElementById("studentBtn").style.display = "block";
+  
+  // إظهار زر الأدمن لو هو أدمن
   if (isAdmin(userData)) {
     document.getElementById("adminBtn").style.display = "block";
   }
