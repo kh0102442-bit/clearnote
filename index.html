@@ -167,6 +167,7 @@ onAuth(async (user, userData) => {
   welcomeScreen.style.display = "flex";
   document.getElementById("welcomeName").textContent = userData?.name || user.email;
   document.getElementById("welcomeEmail").textContent = user.email;
+    document.getElementById("welcomeRole").textContent = (userData && userData.role === 'admin') ? "أدمن" : "طالب";
    if (isAdmin(userData)) {
     document.getElementById("adminBtn").style.display = "block";
   }
