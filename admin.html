@@ -6,134 +6,94 @@
 <title>ClearNote — لوحة التحكم</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  /* ===== Admin Dashboard Styles ===== */
-  body { background: #f4f6f8; display: flex; min-height: 100vh; margin: 0; }
-  
-  .sidebar {
-    width: 260px; background: #152741; color: white; display: flex;
-    flex-direction: column; position: fixed; top: 0; bottom: 0; right: 0;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.1); z-index: 100;
-  }
+  body { background: #f4f6f8; display: flex; min-height: 100vh; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  .sidebar { width: 260px; background: #152741; color: white; display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; right: 0; box-shadow: -2px 0 10px rgba(0,0,0,0.1); z-index: 100; }
   .sidebar-brand { padding: 24px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
   .sidebar-brand h2 { font-family: Georgia, serif; font-size: 22px; letter-spacing: 2px; margin: 0; color: #fff; }
   .sidebar-brand span { color: #a8741a; }
-  
   .nav-menu { flex: 1; padding: 20px 0; overflow-y: auto; }
-  .nav-item {
-    padding: 14px 24px; display: flex; align-items: center; gap: 12px;
-    color: rgba(255,255,255,0.7); text-decoration: none; cursor: pointer;
-    transition: all 0.2s; font-size: 15px;
-  }
+  .nav-item { padding: 14px 24px; display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.2s; font-size: 15px; }
   .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; border-right: 4px solid #a8741a; }
   .nav-item i { width: 20px; text-align: center; font-size: 18px; }
-
-  .main-content {
-    margin-right: 260px; flex: 1; padding: 30px; box-sizing: border-box;
-    max-width: calc(100% - 260px);
-  }
-  
-  .top-bar {
-    display: flex; justify-content: space-between; align-items: center;
-    background: #fff; padding: 15px 25px; border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;
-  }
+  .main-content { margin-right: 260px; flex: 1; padding: 30px; box-sizing: border-box; max-width: calc(100% - 260px); }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
   .top-bar h1 { margin: 0; font-size: 20px; color: #152741; font-family: Georgia, serif; }
   .user-info { display: flex; align-items: center; gap: 15px; font-size: 14px; color: #5b6472; }
   .btn-logout { background: #fbeaea; color: #b91c1c; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; }
   .btn-logout:hover { background: #f8d7da; }
-
-  /* ===== Tree Builder ===== */
   .card { background: #fff; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
   .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; margin-bottom: 20px; }
   .card-title { font-size: 18px; font-weight: bold; color: #152741; margin: 0; }
-  
   .btn-primary { background: #152741; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
   .btn-primary:hover { background: #0f1e33; }
-  
   .tree-node { margin-right: 20px; border-right: 1px dashed #c7cbd1; padding-right: 15px; margin-top: 10px; }
-  .node-item {
-    display: flex; align-items: center; justify-content: space-between;
-    background: #f8f9fa; padding: 12px 15px; border-radius: 6px;
-    border: 1px solid #e9ecef; margin-bottom: 8px; transition: 0.2s;
-  }
+  .node-item { display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; padding: 12px 15px; border-radius: 6px; border: 1px solid #e9ecef; margin-bottom: 8px; transition: 0.2s; }
   .node-item:hover { border-color: #152741; box-shadow: 0 2px 8px rgba(21,39,65,0.08); }
   .node-info { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #1a1a1a; }
   .node-actions { display: flex; gap: 8px; }
   .node-btn { background: transparent; border: 1px solid #c7cbd1; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 12px; color: #5b6472; transition: 0.2s; }
   .node-btn:hover { background: #152741; color: #fff; border-color: #152741; }
   .node-btn.danger:hover { background: #b91c1c; border-color: #b91c1c; }
-  
-  /* Modal */
   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
   .modal-overlay.active { display: flex; }
   .modal-box { background: #fff; border-radius: 10px; width: 100%; max-width: 500px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
   .modal-box h3 { margin-top: 0; color: #152741; }
   .form-group { margin-bottom: 15px; }
   .form-group label { display: block; font-size: 13px; font-weight: 600; color: #152741; margin-bottom: 6px; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #c7cbd1; border-radius: 6px; font-family: inherit; font-size: 14px; box-sizing: border-box; }
+  .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #c7cbd1; border-radius: 6px; font-family: inherit; font-size: 14px; box-sizing: border-box; }
   .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
   .btn-cancel { background: #e9ecef; color: #5b6472; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 600; }
 </style>
-<!-- FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-<!-- Sidebar -->
 <div class="sidebar">
   <div class="sidebar-brand">
     <h2>CLEAR<span>NOTE</span></h2>
     <div style="font-size:10px; color:rgba(255,255,255,0.5); margin-top:5px; letter-spacing:1px;">ADMIN PANEL</div>
   </div>
   <div class="nav-menu">
-    <div class="nav-item active" onclick="switchTab('tree')"><i class="fas fa-sitemap"></i> شجرة المحتوى</div>
-    <div class="nav-item" onclick="alert('قريباً: إدارة الطلاب')"><i class="fas fa-users"></i> الطلاب</div>
-    <div class="nav-item" onclick="alert('قريباً: إدارة الأجهزة')"><i class="fas fa-mobile-alt"></i> الأجهزة</div>
-    <div class="nav-item" onclick="alert('قريباً: الإعدادات')"><i class="fas fa-cog"></i> الإعدادات</div>
+    <div class="nav-item active"><i class="fas fa-sitemap"></i> شجرة المحتوى</div>
+    <div class="nav-item" onclick="alert('قريباً')"><i class="fas fa-users"></i> الطلاب</div>
+    <div class="nav-item" onclick="alert('قريباً')"><i class="fas fa-mobile-alt"></i> الأجهزة</div>
+    <div class="nav-item" onclick="alert('قريباً')"><i class="fas fa-cog"></i> الإعدادات</div>
   </div>
 </div>
 
-<!-- Main Content -->
 <div class="main-content">
   <div class="top-bar">
-    <h1 id="pageTitle">شجرة المحتوى (Tree Builder)</h1>
+    <h1>شجرة المحتوى (Tree Builder)</h1>
     <div class="user-info">
       <span>مرحباً، <b id="adminName">...</b></span>
       <button class="btn-logout" onclick="doLogout()">خروج</button>
     </div>
   </div>
 
-  <div id="treeTab">
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">إدارة التصنيفات والمحتوى</h2>
-        <button class="btn-primary" onclick="openAddModal(null, 'root')"><i class="fas fa-plus"></i> إضافة سنة دراسية</button>
-      </div>
-      
-      <div id="treeContainer" style="min-height: 200px;">
-        <p style="text-align:center; color:#5b6472;">جاري تحميل الشجرة...</p>
-      </div>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">إدارة التصنيفات والمحتوى</h2>
+      <button class="btn-primary" onclick="openAddModal(null, 'root')"><i class="fas fa-plus"></i> إضافة سنة دراسية</button>
+    </div>
+    <div id="treeContainer" style="min-height: 200px;">
+      <p style="text-align:center; color:#5b6472;">جاري تحميل الشجرة...</p>
     </div>
   </div>
 </div>
 
-<!-- Modal -->
 <div class="modal-overlay" id="nodeModal">
   <div class="modal-box">
     <h3 id="modalTitle">إضافة عنصر جديد</h3>
     <input type="hidden" id="nodeParentId">
     <input type="hidden" id="nodeType">
-    
     <div class="form-group">
       <label>الاسم / العنوان</label>
-      <input type="text" id="nodeTitle" placeholder="مثال: الفرقة الأولى / Anatomy / محاضرة 1...">
+      <input type="text" id="nodeTitle" placeholder="مثال: الفرقة الأولى...">
     </div>
-    
     <div class="form-group" id="codeGroup" style="display:none;">
-      <label>كود المحتوى (HTML خام للشرح، الأسئلة، الملخص...)</label>
+      <label>كود المحتوى (HTML)</label>
       <textarea id="nodeCode" rows="6" style="font-family: monospace;" placeholder="<h1>محتوى المحاضرة</h1>..."></textarea>
     </div>
-
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
       <button class="btn-primary" onclick="saveNode()">حفظ</button>
@@ -142,71 +102,49 @@
 </div>
 
 <script type="module">
-import { db, onAuth, isAdmin, goTo, showToast } from "./shared.js";
-import { 
-  collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, orderBy 
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { db, onAuth, isAdmin, goTo, showToast, signOutUser } from "./shared.js";
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let currentUser = null;
 let treeData = [];
-
-// أنواع العناصر (مرتبة من الأكبر للأصغر)
 const NODE_TYPES = {
-  year:    { label: 'سنة دراسية',  icon: 'fa-calendar-alt', parent: 'root' },
-  program: { label: 'برنامج',       icon: 'fa-graduation-cap', parent: 'year' },
-  subject: { label: 'مادة',         icon: 'fa-book', parent: 'program' },
-  lecture: { label: 'محاضرة/سكشن', icon: 'fa-chalkboard-teacher', parent: 'subject' },
-  content: { label: 'محتوى (شرح/ملخص/أسئلة)', icon: 'fa-file-alt', parent: 'lecture' }
+  year:    { label: 'سنة دراسية',  icon: 'fa-calendar-alt' },
+  program: { label: 'برنامج',       icon: 'fa-graduation-cap' },
+  subject: { label: 'مادة',         icon: 'fa-book' },
+  lecture: { label: 'محاضرة/سكشن', icon: 'fa-chalkboard-teacher' },
+  content: { label: 'محتوى',        icon: 'fa-file-alt' }
 };
 
-// ===== Auth Check =====
 onAuth((user, userData) => {
-  if (!user || !isAdmin(userData)) {
-    goTo("index.html"); // لو مش أدمن، اطرده برة
-    return;
-  }
-  currentUser = userData;
+  if (!user || !isAdmin(userData)) { goTo("index.html"); return; }
   document.getElementById("adminName").textContent = userData.name;
   loadTree();
 });
 
-window.doLogout = async () => {
-  const { signOutUser } = await import("./shared.js");
-  await signOutUser();
-  goTo("index.html");
-};
+window.doLogout = async () => { await signOutUser(); goTo("index.html"); };
 
-// ===== Load Tree =====
 async function loadTree() {
   const container = document.getElementById("treeContainer");
   try {
-    const q = query(collection(db, "content_tree"), orderBy("createdAt", "asc"));
-    const snap = await getDocs(q);
+    const snap = await getDocs(collection(db, "content_tree"));
     treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderTree();
   } catch (e) {
-    container.innerHTML = `<p style="color:red;">خطأ في تحميل البيانات: ${e.message}</p>`;
+    container.innerHTML = `<p style="color:red;">خطأ: ${e.message} (تأكد من إعدادات الـ Rules في Firebase)</p>`;
   }
 }
 
-// ===== Render Tree =====
 function renderTree() {
   const container = document.getElementById("treeContainer");
-  container.innerHTML = "";
-  
   const rootNodes = treeData.filter(n => n.parentId === "root");
-  
   if (rootNodes.length === 0) {
     container.innerHTML = `<p style="text-align:center; color:#5b6472;">لا يوجد محتوى بعد. ابدأ بإضافة سنة دراسية.</p>`;
     return;
   }
-
-  function buildHTML(nodes, parentType) {
+  function buildHTML(nodes) {
     let html = "";
     nodes.forEach(node => {
       const children = treeData.filter(n => n.parentId === node.id);
       const typeInfo = NODE_TYPES[node.type] || { label: 'عنصر', icon: 'fa-folder' };
-      
       html += `
         <div class="node-item">
           <div class="node-info">
@@ -215,58 +153,40 @@ function renderTree() {
             <small style="color:#5b6472; font-weight:normal; margin-right:10px;">(${typeInfo.label})</small>
           </div>
           <div class="node-actions">
-            ${node.type !== 'content' ? `<button class="node-btn" onclick="openAddModal('${node.id}', '${node.type}')"><i class="fas fa-plus"></i> إضافة فرع</button>` : ''}
-            ${node.type === 'content' ? `<button class="node-btn" onclick="alert('المعاينة ستضاف قريباً')">معاينة</button>` : ''}
+            ${node.type !== 'content' ? `<button class="node-btn" onclick="openAddModal('${node.id}', '${node.type}')"><i class="fas fa-plus"></i> إضافة</button>` : ''}
             <button class="node-btn" onclick="editNode('${node.id}')"><i class="fas fa-edit"></i></button>
             <button class="node-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>
           </div>
-        </div>
-      `;
-      
-      if (children.length > 0) {
-        html += `<div class="tree-node">${buildHTML(children, node.type)}</div>`;
-      }
+        </div>`;
+      if (children.length > 0) html += `<div class="tree-node">${buildHTML(children)}</div>`;
     });
     return html;
   }
-
-  container.innerHTML = buildHTML(rootNodes, 'root');
+  container.innerHTML = buildHTML(rootNodes);
 }
 
-// ===== Modal Logic =====
 window.openAddModal = function(parentId, parentType) {
-  // معرفة نوع العنصر الجديد بناءً على الأب
-  let newType = "";
-  if (parentType === 'root') newType = 'year';
-  else if (parentType === 'year') newType = 'program';
-  else if (parentType === 'program') newType = 'subject';
-  else if (parentType === 'subject') newType = 'lecture';
-  else if (parentType === 'lecture') newType = 'content';
-
+  let newType = parentType === 'root' ? 'year' : parentType === 'year' ? 'program' : parentType === 'program' ? 'subject' : parentType === 'subject' ? 'lecture' : 'content';
   document.getElementById("modalTitle").textContent = `إضافة ${NODE_TYPES[newType]?.label || 'عنصر'}`;
   document.getElementById("nodeParentId").value = parentId || "root";
   document.getElementById("nodeType").value = newType;
   document.getElementById("nodeTitle").value = "";
   document.getElementById("nodeCode").value = "";
-  
   document.getElementById("codeGroup").style.display = newType === 'content' ? 'block' : 'none';
   document.getElementById("nodeModal").classList.add("active");
+  document.getElementById("nodeModal").dataset.editId = "";
 };
 
 window.editNode = function(id) {
   const node = treeData.find(n => n.id === id);
   if(!node) return;
-  
   document.getElementById("modalTitle").textContent = `تعديل: ${node.title}`;
   document.getElementById("nodeParentId").value = node.parentId;
   document.getElementById("nodeType").value = node.type;
   document.getElementById("nodeTitle").value = node.title;
   document.getElementById("nodeCode").value = node.htmlContent || "";
-  
   document.getElementById("codeGroup").style.display = node.type === 'content' ? 'block' : 'none';
   document.getElementById("nodeModal").classList.add("active");
-  
-  // نحفظ الـ ID عشان نعدله مش نضيف واحد جديد
   document.getElementById("nodeModal").dataset.editId = id;
 };
 
@@ -275,7 +195,6 @@ window.closeModal = function() {
   document.getElementById("nodeModal").dataset.editId = "";
 };
 
-// ===== Save Node =====
 window.saveNode = async function() {
   const parentId = document.getElementById("nodeParentId").value;
   const type = document.getElementById("nodeType").value;
@@ -284,43 +203,31 @@ window.saveNode = async function() {
   const editId = document.getElementById("nodeModal").dataset.editId;
   
   if (!title) { showToast("أدخل العنوان", "error"); return; }
-  
-  const data = {
-    parentId,
-    type,
-    title,
-    updatedAt: serverTimestamp()
-  };
-  
+  const data = { parentId, type, title, updatedAt: serverTimestamp() };
   if (type === 'content') data.htmlContent = htmlContent;
 
   try {
     if (editId) {
       await updateDoc(doc(db, "content_tree", editId), data);
-      showToast("تم التعديل بنجاح");
+      showToast("تم التعديل");
     } else {
       data.createdAt = serverTimestamp();
       await addDoc(collection(db, "content_tree"), data);
-      showToast("تمت الإضافة بنجاح");
+      showToast("تمت الإضافة");
     }
     closeModal();
     loadTree();
   } catch (e) {
-    showToast("حدث خطأ: " + e.message, "error");
+    showToast("خطأ: " + e.message, "error");
   }
 };
 
-// ===== Delete Node =====
 window.deleteNode = async function(id) {
-  // لازم نتأكد إن العنصر ملوش أبناء عشان منضيعش الداتا
-  const hasChildren = treeData.some(n => n.parentId === id);
-  if (hasChildren) {
-    showToast("لا يمكن الحذف! هناك عناصر متفرعة منه. احذف الفروع أولاً.", "error");
+  if (treeData.some(n => n.parentId === id)) {
+    showToast("احذف الفروع أولاً!", "error");
     return;
   }
-  
   if (!confirm("هل أنت متأكد من الحذف؟")) return;
-  
   try {
     await deleteDoc(doc(db, "content_tree", id));
     showToast("تم الحذف");
