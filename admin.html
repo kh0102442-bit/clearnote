@@ -6,46 +6,27 @@
 <title>ClearNote — لوحة التحكم</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  /* تنسيقات خاصة بلوحة التحكم فقط */
   body { padding-bottom: 50px; }
-
-  .admin-header {
-    background: var(--navy); color: white; padding: 20px 20px;
-    display: flex; justify-content: space-between; align-items: center;
-    position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  }
+  .admin-header { background: var(--navy); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
   .admin-brand { font-family: Georgia, serif; font-size: 1.6rem; font-weight: bold; }
   .admin-brand span { color: var(--accent); }
-  
   .btn-add-main { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
   .btn-logout { background: rgba(255,255,255,0.1); color: white; border: none; width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
-
   .admin-container { padding: 20px 15px; width: 100%; box-sizing: border-box; max-width: 800px; margin: 0 auto; }
-
-  /* الكروت */
-  .tree-group { margin-bottom: 20px; }
-  .node-card {
-    background: var(--white); border: 2px solid var(--line); border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04); overflow: hidden;
-  }
   
+  .tree-group { margin-bottom: 20px; }
+  .node-card { background: var(--white); border: 2px solid var(--line); border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); overflow: hidden; }
   .node-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: var(--white); }
   .node-title-area { display: flex; align-items: center; gap: 15px; flex: 1; min-width: 0; }
   .node-icon { width: 65px; height: 65px; border-radius: 16px; background: #eef2fa; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
   .node-text { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 5px; }
   .node-title { font-weight: 800; color: var(--navy); font-size: 1.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .node-type { font-size: 1rem; color: var(--accent); font-weight: 700; }
-
   .node-actions { display: flex; gap: 8px; flex-shrink: 0; }
-  .action-btn {
-    width: 52px; height: 52px; border-radius: 14px; border: 2px solid var(--line);
-    background: #f8f9fa; display: flex; align-items: center; justify-content: center;
-    color: var(--muted); font-size: 1.3rem;
-  }
+  .action-btn { width: 52px; height: 52px; border-radius: 14px; border: 2px solid var(--line); background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 1.3rem; }
   .action-btn:active { background: var(--navy); color: #fff; }
   .action-btn.manage { color: var(--green); border-color: #c9d6ee; background: #eef2fa; }
   .action-btn.danger { color: #b91c1c; background: #fbeaea; border-color: #fbeaea; }
-
   .children-area { display: none; padding: 15px 20px 20px 20px; background: #fafbfc; border-top: 2px solid var(--line); }
   .children-area.active { display: block; }
 
@@ -56,33 +37,27 @@
   .node-card[data-type="module_summary"] .node-icon { background: #f3e5f5; color: #9b59b6; }
   .node-card[data-type="module_terms"] .node-icon { background: #fff3e0; color: #e67e22; }
 
-  /* المودال (الشاشة المنبثقة) */
+  /* المودال */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: flex-end; z-index: 1000; backdrop-filter: blur(4px); }
   .modal-overlay.active { display: flex; }
   .modal-box { background: var(--white); border-radius: 24px 24px 0 0; width: 100%; padding: 30px 20px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; animation: slideUp 0.3s ease; }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  
   .modal-box h3 { margin: 0 0 15px; color: var(--navy); font-size: 1.8rem; text-align: center; }
   .modal-box p { margin: 0 0 25px; color: var(--muted); font-size: 1.1rem; text-align: center; }
-  
   .form-group { margin-bottom: 20px; }
   .form-group label { display: block; font-size: 1.1rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
-  .form-group input, .form-group textarea, .form-group select {
-    width: 100%; padding: 18px; border: 2px solid var(--line); background: #fafbfc; box-sizing: border-box;
-  }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 18px; border: 2px solid var(--line); background: #fafbfc; box-sizing: border-box; border-radius: 10px; font-size: 1rem; }
   .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--navy); }
-  
   .modal-actions { display: flex; gap: 15px; margin-top: 30px; }
-  .btn-save { flex: 1; background: var(--navy); color: white; border: none; padding: 18px; font-size: 1.2rem; }
-  .btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 18px; font-size: 1.2rem; }
+  .btn-save { flex: 1; background: var(--navy); color: white; border: none; padding: 18px; font-size: 1.2rem; border-radius: 12px; font-weight: bold; }
+  .btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 18px; font-size: 1.2rem; border-radius: 12px; font-weight: bold; }
 
   /* الأزرار الـ 5 الكبيرة */
   .modules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-  .module-item { background: #f8f9fa; border: 2px solid var(--line); border-radius: 16px; padding: 30px 10px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+  .module-item { background: #f8f9fa; border: 2px solid var(--line); border-radius: 16px; padding: 30px 10px; display: flex; flex-direction: column; align-items: center; gap: 15px; cursor: pointer; }
   .module-item:active { background: #eef2fa; border-color: var(--navy); }
   .module-icon { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; }
   .module-title { font-size: 1.3rem; font-weight: 800; color: var(--navy); }
-  
   .icon-explain { background: #27ae60; }
   .icon-video { background: #e74c3c; }
   .icon-questions { background: #3498db; }
@@ -107,7 +82,7 @@
   </div>
 </div>
 
-<!-- مودال إضافة عنصر -->
+<!-- مودال الإضافة -->
 <div class="modal-overlay" id="nodeModal">
   <div class="modal-box">
     <h3 id="modalTitle">إضافة</h3>
