@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>ClearNote — منصة المذاكرة</title>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -20,23 +20,60 @@
     </div>
     <div class="status-msg" id="statusMsg"></div>
 
+    <!-- Login -->
     <div id="loginForm" class="auth-form active">
-      <label>البريد الإلكتروني</label>
-      <input type="email" id="loginEmail" placeholder="you@example.com">
+      <label>البريد الإلكتروني أو الهاتف أو الرقم القومي</label>
+      <input type="text" id="loginEmail" placeholder="أدخل بيانات الدخول" dir="ltr" style="text-align: right;">
       <label>كلمة المرور</label>
       <input type="password" id="loginPassword" placeholder="••••••••">
       <button class="btn-primary" id="loginBtn" onclick="doLogin()">دخول</button>
     </div>
 
+    <!-- Signup (Multi-step) -->
     <div id="signupForm" class="auth-form">
-      <label>الاسم</label>
-      <input type="text" id="signupName" placeholder="اسمك الكامل">
-      <label>البريد الإلكتروني</label>
-      <input type="email" id="signupEmail" placeholder="you@example.com">
-      <label>كلمة المرور (6 أحرف على الأقل)</label>
-      <input type="password" id="signupPassword" placeholder="••••••••">
-      <button class="btn-primary" id="signupBtn" onclick="doSignup()">إنشاء الحساب</button>
+      <div class="step-progress"><div class="step-progress-bar" id="stepProgress"></div></div>
+      
+      <!-- Step 1: Personal Info -->
+      <div class="signup-step active" id="step1">
+        <div class="step-title">البيانات الأساسية</div>
+        <label>الاسم الرباعي</label>
+        <input type="text" id="su_name" placeholder="محمد أحمد محمود">
+        <label>الرقم القومي</label>
+        <input type="text" id="su_national" placeholder="14 رقم" maxlength="14" dir="ltr" style="text-align: right;">
+        <label>رقم الهاتف</label>
+        <input type="tel" id="su_phone" placeholder="01xxxxxxxxx" dir="ltr" style="text-align: right;">
+        <button class="btn-primary" onclick="nextStep(2)">التالي</button>
+      </div>
+
+      <!-- Step 2: Academic Info -->
+      <div class="signup-step" id="step2">
+        <div class="step-title">البيانات الأكاديمية</div>
+        <label>البريد الجامعي</label>
+        <input type="email" id="su_uniEmail" placeholder="student@university.edu" dir="ltr" style="text-align: right;">
+        <label>الجامعة</label>
+        <input type="text" id="su_university" placeholder="جامعة القاهرة">
+        <label>الدور</label>
+        <select id="su_role" style="width:100%; padding:14px; border:2px solid var(--line); border-radius:10px; font-size:16px; font-family:inherit; margin-bottom:15px; background:#fafbfc;">
+          <option value="student">طالب</option>
+          <option value="ta">معيد</option>
+          <option value="doctor">دكتور</option>
+        </select>
+        <button class="btn-primary" onclick="nextStep(3)">التالي</button>
+        <button class="btn-cancel" style="width:100%; padding:12px; background:transparent; border:none; color:var(--muted); margin-top:10px; cursor:pointer;" onclick="prevStep(1)">رجوع</button>
+      </div>
+
+      <!-- Step 3: Account -->
+      <div class="signup-step" id="step3">
+        <div class="step-title">بيانات الحساب</div>
+        <label>كلمة المرور</label>
+        <input type="password" id="su_password" placeholder="6 أحرف على الأقل">
+        <label>تأكيد كلمة المرور</label>
+        <input type="password" id="su_confirmPassword" placeholder="أعد كتابة كلمة المرور">
+        <button class="btn-primary" id="signupBtn" onclick="doSignup()">إنشاء الحساب</button>
+        <button class="btn-cancel" style="width:100%; padding:12px; background:transparent; border:none; color:var(--muted); margin-top:10px; cursor:pointer;" onclick="prevStep(2)">رجوع</button>
+      </div>
     </div>
+
     <div class="auth-foot">ClearNote · v1.0</div>
   </div>
 </div>
@@ -53,7 +90,6 @@
       <div class="info-row"><span>البريد:</span> <b id="welcomeEmail">—</b></div>
     </div>
     
-    <!-- الأزرار -->
     <button class="btn-primary" id="studentBtn" style="display:none; background:#152741; margin-bottom:10px;" onclick="window.location.href='app.html'">الدخول إلى المنصة</button>
     <button class="btn-primary" id="adminBtn" style="display:none; background:#1f6b45; margin-bottom:10px;" onclick="window.location.href='admin.html'">لوحة التحكم (أدمن)</button>
     <button class="btn-primary" onclick="doLogout()">تسجيل الخروج</button>
@@ -63,6 +99,7 @@
 <script type="module">
 import { auth, signIn, signUp, signOutUser, onAuth, isAdmin, goTo, showToast } from "./shared.js";
 
+// التبويبات
 window.switchTab = function (tab) {
   document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
   document.querySelectorAll(".auth-form").forEach(f => f.classList.remove("active"));
@@ -71,17 +108,30 @@ window.switchTab = function (tab) {
   document.getElementById("statusMsg").textContent = "";
 };
 
+// التنقل بين الخطوات
+window.nextStep = function (step) {
+  document.querySelectorAll(".signup-step").forEach(s => s.classList.remove("active"));
+  document.getElementById("step" + step).classList.add("active");
+  document.getElementById("stepProgress").style.width = (step * 33) + "%";
+};
+window.prevStep = function (step) {
+  document.querySelectorAll(".signup-step").forEach(s => s.classList.remove("active"));
+  document.getElementById("step" + step).classList.add("active");
+  document.getElementById("stepProgress").style.width = (step * 33) + "%";
+};
+
 function setStatus(msg, type = "err") {
   const el = document.getElementById("statusMsg");
   el.className = "status-msg " + (msg ? type : "");
   el.textContent = msg || "";
 }
 
+// تسجيل الدخول
 window.doLogin = async function () {
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
   const btn = document.getElementById("loginBtn");
-  if (!email || !password) { setStatus("أدخل البريد وكلمة المرور"); return; }
+  if (!email || !password) { setStatus("أدخل بيانات الدخول"); return; }
   btn.disabled = true; btn.textContent = "جاري الدخول…"; setStatus("");
   try {
     await signIn(email, password);
@@ -91,16 +141,29 @@ window.doLogin = async function () {
   }
 };
 
+// إنشاء حساب
 window.doSignup = async function () {
-  const name = document.getElementById("signupName").value.trim();
-  const email = document.getElementById("signupEmail").value.trim();
-  const password = document.getElementById("signupPassword").value;
+  const name = document.getElementById("su_name").value.trim();
+  const nationalId = document.getElementById("su_national").value.trim();
+  const phone = document.getElementById("su_phone").value.trim();
+  const uniEmail = document.getElementById("su_uniEmail").value.trim();
+  const university = document.getElementById("su_university").value.trim();
+  const role = document.getElementById("su_role").value;
+  const password = document.getElementById("su_password").value;
+  const confirm = document.getElementById("su_confirmPassword").value;
   const btn = document.getElementById("signupBtn");
-  if (!name || !email || !password) { setStatus("أدخل كل الحقول"); return; }
+
+  if (!name || !nationalId || !phone || !uniEmail || !university || !password) { setStatus("أدخل كل الحقول"); return; }
+  if (password !== confirm) { setStatus("كلمتا المرور غير متطابقتين"); return; }
   if (password.length < 6) { setStatus("كلمة المرور 6 أحرف على الأقل"); return; }
+
   btn.disabled = true; btn.textContent = "جاري الإنشاء…"; setStatus("");
+
   try {
-    await signUp(email, password, name);
+    // هنستخدم البريد الجامعي كإيميل للدخول
+    const user = await signUp(uniEmail, password, name, {
+      nationalId, phone, uniEmail, university, role
+    });
     setStatus("✅ تم إنشاء الحساب!", "ok");
   } catch (err) {
     setStatus(err.message);
@@ -122,7 +185,13 @@ onAuth((user, userData) => {
   welcomeScreen.style.display = "flex";
   document.getElementById("welcomeName").textContent = userData?.name || user.email;
   document.getElementById("welcomeEmail").textContent = user.email;
-  document.getElementById("welcomeRole").textContent = (userData && userData.role === 'admin') ? "أدمن" : "طالب";
+  
+  let roleText = "طالب";
+  if (userData?.role === 'admin') roleText = "أدمن";
+  else if (userData?.role === 'ta') roleText = "معيد";
+  else if (userData?.role === 'doctor') roleText = "دكتور";
+  
+  document.getElementById("welcomeRole").textContent = roleText;
   
   document.getElementById("studentBtn").style.display = "block";
   if (isAdmin(userData)) {
