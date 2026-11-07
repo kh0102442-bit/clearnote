@@ -2,93 +2,128 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>ClearNote — لوحة التحكم</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  /* ستايلات لوحة التحكم */
-  body { background: #f4f6f8; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
-  
-  /* شريط التنقل العلوي */
-  .admin-navbar {
-    background: #152741; color: white; padding: 15px 20px;
+  /* === إعدادات أساسية للموبايل === */
+  :root {
+    --navy: #152741; --navy-dark: #0f1e33; --accent: #a8741a;
+    --bg: #f4f6f8; --white: #ffffff; --text: #1a1a1a; --muted: #5b6472; --line: #e9ecef;
+  }
+  body { background: var(--bg); margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; padding-bottom: 80px; }
+
+  /* === الهيدر === */
+  .admin-header {
+    background: var(--navy); color: white; padding: 16px 20px;
     display: flex; justify-content: space-between; align-items: center;
-    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   }
-  .admin-brand { font-family: Georgia, serif; font-size: 20px; font-weight: bold; }
-  .admin-brand span { color: #a8741a; }
+  .admin-brand { font-family: Georgia, serif; font-size: 22px; font-weight: bold; letter-spacing: 1px; }
+  .admin-brand span { color: var(--accent); }
   
-  /* زر الإضافة الرئيسي */
-  .btn-add-main {
-    background: #a8741a; color: white; border: none; padding: 8px 16px;
-    border-radius: 6px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 5px;
-  }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-add { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .btn-logout { background: rgba(255,255,255,0.1); color: white; border: none; width: 38px; height: 38px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-  /* الحاوية */
-  .admin-container { padding: 20px; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+  /* === الحاوية الرئيسية === */
+  .admin-container { padding: 20px 15px; max-width: 800px; margin: 0 auto; }
+
+  /* === شجرة المحتوى (تصميم كروت للموبايل) === */
+  .node-card {
+    background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+    margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); overflow: hidden;
+  }
   
-  /* شجرة المحتوى */
-  .tree-node { margin-bottom: 10px; }
-  .node-item {
-    background: #fff; border: 1px solid #e9ecef; border-radius: 10px; padding: 15px;
-    display: flex; justify-content: space-between; align-items: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: 0.2s;
-    margin-bottom: 8px;
+  .node-header {
+    padding: 16px; display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; background: var(--white); transition: background 0.2s;
   }
-  .node-item:hover { border-color: #152741; }
+  .node-header:active { background: #f8f9fa; }
   
-  .node-info { display: flex; flex-direction: column; gap: 5px; }
-  .node-title { font-weight: 700; color: #152741; font-size: 16px; }
-  .node-type { font-size: 11px; color: #a8741a; background: #fdfaf3; padding: 2px 8px; border-radius: 4px; width: max-content; }
-  
-  .node-actions { display: flex; gap: 8px; }
-  .btn-icon {
-    width: 32px; height: 32px; border-radius: 6px; border: 1px solid #c7cbd1;
-    background: #f8f9fa; display: flex; align-items: center; justify-content: center;
-    cursor: pointer; color: #5b6472; transition: 0.2s;
-  }
-  .btn-icon:hover { background: #152741; color: white; border-color: #152741; }
-  .btn-icon.danger:hover { background: #b91c1c; border-color: #b91c1c; }
+  .node-title-area { display: flex; align-items: center; gap: 12px; flex: 1; }
+  .node-icon { width: 40px; height: 40px; border-radius: 10px; background: #eef2fa; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .node-text { display: flex; flex-direction: column; gap: 4px; }
+  .node-title { font-weight: 700; color: var(--navy); font-size: 16px; }
+  .node-type { font-size: 12px; color: var(--accent); font-weight: 600; }
 
-  .children-container {
-    margin-right: 20px; padding-right: 15px; border-right: 2px dashed #c7cbd1;
-    display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;
+  .node-controls { display: flex; gap: 8px; }
+  .control-btn {
+    width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line);
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 14px; cursor: pointer; transition: 0.2s;
   }
+  .control-btn:active { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .control-btn.danger { color: #b91c1c; border-color: #fbeaea; background: #fbeaea; }
+  .control-btn.danger:active { background: #b91c1c; color: #fff; }
 
-  /* أيقونات ثابتة للأجزاء الأساسية */
-  .fixed-icons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-  .fixed-icon {
-    background: #eef2fa; color: #2a4b8d; padding: 6px 12px; border-radius: 6px;
-    font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px;
-    border: 1px solid #c9d6ee; cursor: pointer;
+  /* === التبويبات الفرعية (الأبناء) === */
+  .children-area { padding: 0 16px 16px 16px; border-right: 3px solid #eef2fa; margin-right: 15px; display: none; }
+  .children-area.active { display: block; animation: fadeIn 0.3s; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(-5px);} to{opacity:1; transform:translateY(0);} }
+
+  /* === الأيقونات الثابتة (الشرح، فيديو، الخ) === */
+  .fixed-modules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--line); }
+  .module-card {
+    background: #f8f9fa; border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer; transition: 0.2s; text-align: center;
   }
+  .module-card:active { background: #eef2fa; border-color: var(--navy); transform: scale(0.98); }
+  .module-icon {
+    width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .module-title { font-size: 13px; font-weight: 700; color: var(--navy); }
 
-  /* المودال (النافذة المنبثقة) */
-  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); padding: 15px; }
+  /* ألوان اللوجوهات المخصصة */
+  .icon-explain { background: linear-gradient(135deg, #1f6b45, #27ae60); }
+  .icon-video { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+  .icon-questions { background: linear-gradient(135deg, #2980b9, #3498db); }
+  .icon-summary { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+  .icon-terms { background: linear-gradient(135deg, #d35400, #e67e22); }
+
+  /* === المودال (النافذة المنبثقة) === */
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; align-items: flex-end; z-index: 1000; backdrop-filter: blur(4px); }
   .modal-overlay.active { display: flex; }
-  .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 500px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
-  .modal-box h3 { margin-top: 0; color: #152741; font-size: 20px; }
-  .form-group { margin-bottom: 15px; }
-  .form-group label { display: block; font-size: 14px; font-weight: 700; color: #152741; margin-bottom: 8px; }
-  .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #c7cbd1; border-radius: 8px; font-family: inherit; font-size: 15px; box-sizing: border-box; }
-  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
-  .btn-cancel { background: #e9ecef; color: #5b6472; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 700; font-family: inherit; }
+  
+  .modal-box {
+    background: var(--white); border-radius: 20px 20px 0 0; width: 100%;
+    padding: 24px 20px; max-height: 90vh; overflow-y: auto;
+    animation: slideUp 0.3s ease; box-sizing: border-box;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  
+  .modal-box h3 { margin: 0 0 20px; color: var(--navy); font-size: 20px; text-align: center; }
+  .modal-box p { margin: 0 0 15px; color: var(--muted); font-size: 14px; text-align: center; }
+  
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .form-group input, .form-group textarea {
+    width: 100%; padding: 14px; border: 2px solid var(--line); border-radius: 10px;
+    font-family: inherit; font-size: 16px; box-sizing: border-box; background: #fafbfc;
+  }
+  .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--navy); background: #fff; }
+  
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-save { flex: 1; background: var(--navy); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+  .btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-<div class="admin-navbar">
-  <div class="admin-brand">CLEAR<span>NOTE</span> <span style="font-size:12px; color:#aaa; font-weight:normal;">| ADMIN</span></div>
-  <div style="display:flex; gap:10px;">
-    <button class="btn-add-main" onclick="openAddModal(null, 'root')"><i class="fas fa-plus"></i> إضافة جذر</button>
-    <button style="background:transparent; border:none; color:#fff; cursor:pointer;" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i></button>
+<div class="admin-header">
+  <div class="admin-brand">CLEAR<span>NOTE</span></div>
+  <div class="header-actions">
+    <button class="btn-add" onclick="openAddModal(null, 'root')"><i class="fas fa-plus"></i> سنة دراسية</button>
+    <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i></button>
   </div>
 </div>
 
 <div class="admin-container">
   <div id="treeContainer">
-    <p style="text-align:center; color:#5b6472;">جاري تحميل الشجرة...</p>
+    <p style="text-align:center; color:var(--muted); padding: 30px 0;">جاري تحميل المحتوى...</p>
   </div>
 </div>
 
@@ -96,22 +131,24 @@
 <div class="modal-overlay" id="nodeModal">
   <div class="modal-box">
     <h3 id="modalTitle">إضافة عنصر جديد</h3>
+    <p id="modalDesc"></p>
+    
     <input type="hidden" id="nodeParentId">
     <input type="hidden" id="nodeType">
     
-    <div class="form-group">
-      <label>العنوان</label>
-      <input type="text" id="nodeTitle" placeholder="مثال: الفرقة الأولى / Anatomy / محاضرة 1...">
+    <div class="form-group" id="titleGroup">
+      <label>الاسم / العنوان</label>
+      <input type="text" id="nodeTitle" placeholder="اكتب العنوان هنا...">
     </div>
     
     <div class="form-group" id="codeGroup" style="display:none;">
-      <label>كود المحتوى (HTML)</label>
-      <textarea id="nodeCode" rows="6" style="font-family: monospace;" placeholder="<h1>محتوى المحاضرة</h1>..."></textarea>
+      <label>كود المحتوى (HTML / نص)</label>
+      <textarea id="nodeCode" rows="6" placeholder="<h1>محتوى المحاضرة</h1>..."></textarea>
     </div>
 
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
-      <button class="btn-primary" onclick="saveNode()">حفظ</button>
+      <button class="btn-save" onclick="saveNode()">حفظ</button>
     </div>
   </div>
 </div>
@@ -147,11 +184,13 @@ async function loadTree() {
   }
 }
 
+// === رسم الشجرة بشكل كروت مناسبة للموبايل ===
 function renderTree() {
   const container = document.getElementById("treeContainer");
   const rootNodes = treeData.filter(n => n.parentId === "root");
+  
   if (rootNodes.length === 0) {
-    container.innerHTML = `<p style="text-align:center; color:#5b6472;">لا يوجد محتوى بعد. ابدأ بإضافة سنة دراسية.</p>`;
+    container.innerHTML = `<p style="text-align:center; color:var(--muted); padding: 30px 0;">لا يوجد محتوى بعد. ابدأ بإضافة سنة دراسية.</p>`;
     return;
   }
   container.innerHTML = buildHTML(rootNodes);
@@ -163,55 +202,111 @@ function buildHTML(nodes) {
     const children = treeData.filter(n => n.parentId === node.id);
     const typeInfo = NODE_TYPES[node.type] || NODE_TYPES.custom;
     
-    // الأيقونات الثابتة اللي مش بتتمسح للأجزاء الأساسية
-    let fixedIconsHtml = "";
+    // هل ده محاضرة؟ لو أه، نعرض الأيقونات الثابتة بتاعتها
+    let modulesHtml = "";
     if (node.type === 'lecture') {
-      fixedIconsHtml = `
-        <div class="fixed-icons">
-          <div class="fixed-icon" onclick="alert('هنا هتضيف الشرح')"><i class="fas fa-file-alt"></i> الشرح</div>
-          <div class="fixed-icon" onclick="alert('هنا هتضيف الفيديو')"><i class="fas fa-video"></i> فيديو</div>
-          <div class="fixed-icon" onclick="alert('هنا هتضيف الأسئلة')"><i class="fas fa-question-circle"></i> أسئلة</div>
-          <div class="fixed-icon" onclick="alert('هنا هتضيف الملخص')"><i class="fas fa-clipboard-list"></i> ملخص</div>
-          <div class="fixed-icon" onclick="alert('هنا هتضيف المصطلحات')"><i class="fas fa-book"></i> مصطلحات</div>
+      modulesHtml = `
+        <div class="fixed-modules">
+          <div class="module-card" onclick="openContentModule('${node.id}', 'الشرح')">
+            <div class="module-icon icon-explain"><i class="fas fa-file-alt"></i></div>
+            <div class="module-title">الشرح</div>
+          </div>
+          <div class="module-card" onclick="openContentModule('${node.id}', 'فيديو')">
+            <div class="module-icon icon-video"><i class="fas fa-video"></i></div>
+            <div class="module-title">فيديو</div>
+          </div>
+          <div class="module-card" onclick="openContentModule('${node.id}', 'أسئلة')">
+            <div class="module-icon icon-questions"><i class="fas fa-question-circle"></i></div>
+            <div class="module-title">أسئلة</div>
+          </div>
+          <div class="module-card" onclick="openContentModule('${node.id}', 'ملخص')">
+            <div class="module-icon icon-summary"><i class="fas fa-clipboard-list"></i></div>
+            <div class="module-title">ملخص</div>
+          </div>
+          <div class="module-card" onclick="openContentModule('${node.id}', 'مصطلحات')">
+            <div class="module-icon icon-terms"><i class="fas fa-book"></i></div>
+            <div class="module-title">مصطلحات</div>
+          </div>
         </div>
       `;
     }
 
     html += `
-      <div class="tree-node">
-        <div class="node-item">
-          <div class="node-info">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <i class="fas ${typeInfo.icon}" style="color:#a8741a; font-size:18px;"></i>
-              <span class="node-title">${node.title}</span>
+      <div class="node-card">
+        <div class="node-header" onclick="toggleChildren('${node.id}')">
+          <div class="node-title-area">
+            <div class="node-icon"><i class="fas ${typeInfo.icon}"></i></div>
+            <div class="node-text">
+              <div class="node-title">${node.title}</div>
+              <div class="node-type">${typeInfo.label}</div>
             </div>
-            <span class="node-type">${typeInfo.label}</span>
-            ${fixedIconsHtml}
           </div>
-          <div class="node-actions">
-            <button class="btn-icon" onclick="openAddModal('${node.id}', '${node.type}')" title="إضافة تبويب فرعي"><i class="fas fa-plus"></i></button>
-            <button class="btn-icon" onclick="editNode('${node.id}')" title="تعديل"><i class="fas fa-edit"></i></button>
-            ${node.type !== 'content' && node.type !== 'lecture' ? `<button class="btn-icon danger" onclick="deleteNode('${node.id}')" title="حذف"><i class="fas fa-trash"></i></button>` : ''}
+          <div class="node-controls" onclick="event.stopPropagation()">
+            <button class="control-btn" onclick="openAddModal('${node.id}', '${node.type}')"><i class="fas fa-plus"></i></button>
+            <button class="control-btn" onclick="editNode('${node.id}')"><i class="fas fa-edit"></i></button>
+            ${node.type !== 'content' && node.type !== 'lecture' ? `<button class="control-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>` : ''}
           </div>
         </div>
-        ${children.length > 0 ? `<div class="children-container">${buildHTML(children)}</div>` : ''}
+        
+        <div class="children-area ${children.length > 0 || node.type === 'lecture' ? '' : 'active'}" id="children-${node.id}">
+          ${modulesHtml}
+          ${children.length > 0 ? buildHTML(children) : ''}
+        </div>
       </div>
     `;
   });
   return html;
 }
 
-// فتح مودال الإضافة
+// فتح وقفل التبويبات
+window.toggleChildren = function(id) {
+  const el = document.getElementById(`children-${id}`);
+  if (el) el.classList.toggle('active');
+};
+
+// === إضافة العناصر ===
 window.openAddModal = function(parentId, parentType) {
-  let newType = "custom"; // الافتراضي بقى تبويب مخصص عشان نقدر نضيف برامج جوه برامج
-  if (parentType === 'root') newType = 'year';
+  let newType = "custom";
+  let title = "إضافة تبويب";
+  let desc = "أضف تبويب جديد (مثل: برنامج، مادة، أو سكشن).";
   
-  document.getElementById("modalTitle").textContent = `إضافة ${NODE_TYPES[newType]?.label || 'عنصر'}`;
+  if (parentType === 'root') {
+    newType = 'year'; title = "إضافة سنة دراسية"; desc = "أضف سنة دراسية جديدة (مثل: الفرقة الأولى).";
+  } else if (parentType === 'year') {
+    newType = 'program'; title = "إضافة برنامج"; desc = "أضف برنامج داخل السنة (مثل: برنامج عام / مميز).";
+  } else if (parentType === 'program') {
+    newType = 'subject'; title = "إضافة مادة"; desc = "أضف مادة داخل البرنامج (مثل: Anatomy).";
+  } else if (parentType === 'subject') {
+    newType = 'lecture'; title = "إضافة محاضرة/سكشن"; desc = "أضف المحاضرة الأولى، أو السكشن الأول.";
+  }
+  
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalDesc").textContent = desc;
   document.getElementById("nodeParentId").value = parentId || "root";
   document.getElementById("nodeType").value = newType;
   document.getElementById("nodeTitle").value = "";
   document.getElementById("nodeCode").value = "";
-  document.getElementById("codeGroup").style.display = "none";
+  
+  document.getElementById("titleGroup").style.display = 'block';
+  document.getElementById("codeGroup").style.display = 'none';
+  
+  document.getElementById("nodeModal").classList.add("active");
+  document.getElementById("nodeModal").dataset.editId = "";
+};
+
+// === إضافة محتوى للأجزاء الثابتة (شرح، فيديو..) ===
+window.openContentModule = function(parentId, moduleName) {
+  document.getElementById("modalTitle").textContent = `إضافة ${moduleName}`;
+  document.getElementById("modalDesc").textContent = `أضف محتوى (كود HTML أو نص) لهذا القسم.`;
+  
+  document.getElementById("nodeParentId").value = parentId;
+  document.getElementById("nodeType").value = "content";
+  document.getElementById("nodeTitle").value = moduleName; // العنوان هيكون اسم الموديول
+  
+  document.getElementById("titleGroup").style.display = 'none'; // نخفي خانة الاسم عشان هو ثابت
+  document.getElementById("codeGroup").style.display = 'block';
+  document.getElementById("nodeCode").value = "";
+  
   document.getElementById("nodeModal").classList.add("active");
   document.getElementById("nodeModal").dataset.editId = "";
 };
@@ -219,12 +314,17 @@ window.openAddModal = function(parentId, parentType) {
 window.editNode = function(id) {
   const node = treeData.find(n => n.id === id);
   if(!node) return;
+  
   document.getElementById("modalTitle").textContent = `تعديل: ${node.title}`;
+  document.getElementById("modalDesc").textContent = `قم بتعديل البيانات أدناه.`;
   document.getElementById("nodeParentId").value = node.parentId;
   document.getElementById("nodeType").value = node.type;
   document.getElementById("nodeTitle").value = node.title;
   document.getElementById("nodeCode").value = node.htmlContent || "";
+  
+  document.getElementById("titleGroup").style.display = node.type === 'content' ? 'none' : 'block';
   document.getElementById("codeGroup").style.display = node.type === 'content' ? 'block' : 'none';
+  
   document.getElementById("nodeModal").classList.add("active");
   document.getElementById("nodeModal").dataset.editId = id;
 };
@@ -241,8 +341,8 @@ window.saveNode = async function() {
   const htmlContent = document.getElementById("nodeCode").value;
   const editId = document.getElementById("nodeModal").dataset.editId;
   
-  if (!title) { showToast("أدخل العنوان", "error"); return; }
-  const data = { parentId, type, title, updatedAt: serverTimestamp() };
+  if (type !== 'content' && !title) { showToast("أدخل العنوان", "error"); return; }
+  const data = { parentId, type, title: title || "محتوى", updatedAt: serverTimestamp() };
   if (type === 'content') data.htmlContent = htmlContent;
 
   try {
