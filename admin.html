@@ -3,553 +3,249 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>ClearNote — لوحة التحكم</title>
+<title>ClearNote — منصة المذاكرة</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  /* === تكبير كل حاجة عشان الموبايل === */
   :root {
     --navy: #152741; --accent: #a8741a; --bg: #f4f6f8;
-    --white: #ffffff; --text: #1a1a1a; --muted: #5b6472; --line: #e9ecef;
+    --white: #ffffff; --text: #1a1a1a; --muted: #5b6472;
   }
-  
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  html, body {
-    width: 100%; max-width: 100vw; overflow-x: hidden;
-    background: var(--bg); color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-size: 16px; /* أساس كبير */
-    -webkit-tap-highlight-color: transparent;
-    padding-bottom: 40px;
-  }
+  body { background: var(--bg); margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); font-size: 16px; }
 
-  /* === الهيدر (كبّرناه) === */
-  .admin-header {
-    background: var(--navy); color: white; padding: 16px 20px;
+  /* شريط علوي أنيق ومكبر */
+  .app-navbar {
+    background: var(--navy); color: white; padding: 18px 20px;
     display: flex; justify-content: space-between; align-items: center;
-    position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   }
-  .admin-brand { font-family: Georgia, serif; font-size: 22px; font-weight: bold; }
-  .admin-brand span { color: var(--accent); }
+  .app-brand { font-family: Georgia, serif; font-size: 22px; letter-spacing: 2px; font-weight: bold; }
+  .app-brand span { color: var(--accent); }
   
-  .btn-add-main {
-    background: var(--accent); color: white; border: none;
-    padding: 12px 20px; border-radius: 10px; font-weight: bold; font-size: 16px;
-    display: flex; align-items: center; gap: 8px; min-height: 48px; cursor: pointer;
+  .nav-user { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600; }
+  .avatar-badge {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--accent);
+    display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size:18px;
   }
   .btn-logout {
-    background: rgba(255,255,255,0.15); color: white; border: none;
-    width: 48px; height: 48px; border-radius: 10px; font-size: 18px;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px;
   }
 
-  /* === الحاوية === */
-  .admin-container { padding: 16px; max-width: 700px; margin: 0 auto; }
+  .container { max-width: 900px; margin: 25px auto; padding: 0 15px; }
+  
+  .breadcrumbs {
+    background: var(--white); padding: 14px 18px; border-radius: 12px;
+    font-size: 15px; color: var(--muted); margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e9ecef;
+  }
+  .breadcrumbs span { cursor: pointer; color: var(--navy); font-weight: 700; }
+  .breadcrumbs i { font-size: 12px; color: #ccc; }
 
-  /* === كروت الشجرة (كبّرناها) === */
-  .node-card {
-    background: var(--white); border: 1px solid var(--line); border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.03); margin-bottom: 12px;
-    overflow: hidden;
+  /* شبكة الكروت */
+  .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  .card-item {
+    background: var(--white); border: 2px solid #e9ecef; border-radius: 16px; padding: 20px;
+    cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 12px;
+    position: relative; overflow: hidden;
+  }
+  .card-item:hover { border-color: var(--navy); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(21,39,65,0.08); }
+  .card-item::before {
+    content: ''; position: absolute; top: 0; right: 0; width: 6px; height: 100%; background: var(--accent);
   }
   
-  .node-header {
-    padding: 16px; display: flex; justify-content: space-between; align-items: center;
-    cursor: pointer; min-height: 74px; background: var(--white);
-  }
-  .node-header:active { background: #f8f9fa; }
-  
-  .node-title-area { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
-  .node-icon {
-    width: 48px; height: 48px; border-radius: 12px; background: #eef2fa;
-    color: var(--navy); display: flex; align-items: center; justify-content: center;
-    font-size: 22px; flex-shrink: 0;
-  }
-  .node-text { flex: 1; min-width: 0; }
-  .node-title {
-    font-weight: 800; color: var(--navy); font-size: 17px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .node-type {
-    font-size: 13px; color: var(--accent); font-weight: 700;
-    margin-top: 2px;
-  }
+  .card-title { font-size: 19px; font-weight: 800; color: var(--navy); margin: 0; }
+  .card-type { font-size: 12px; font-weight: 700; color: var(--accent); background: #fdfaf3; padding: 4px 12px; border-radius: 20px; width: max-content; }
 
-  .node-actions { display: flex; gap: 8px; flex-shrink: 0; }
-  .action-btn {
-    width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line);
-    background: #f8f9fa; display: flex; align-items: center; justify-content: center;
-    color: var(--muted); font-size: 18px; cursor: pointer; transition: 0.2s;
-  }
-  .action-btn:active { background: var(--navy); color: #fff; }
-  .action-btn.edit { color: #2980b9; background: #eaf4fb; border-color: #bfe0f5; }
-  .action-btn.edit:active { background: #2980b9; color: #fff; }
-  .action-btn.danger { color: #b91c1c; background: #fbeaea; border-color: #f8d7da; }
-  .action-btn.danger:active { background: #b91c1c; color: #fff; }
+  /* تخصيص كروت الأجزاء الأساسية */
+  .card-item.module_explain::before { background: #27ae60; }
+  .card-item.module_video::before { background: #e74c3c; }
+  .card-item.module_questions::before { background: #3498db; }
+  .card-item.module_summary::before { background: #9b59b6; }
+  .card-item.module_terms::before { background: #e67e22; }
 
-  /* === التفرعات الداخلية === */
-  .children-area {
-    display: none; padding: 12px; background: #f9fafc;
-    border-top: 1px solid var(--line);
+  /* عارض المحتوى */
+  .content-viewer {
+    background: var(--white); border-radius: 16px; padding: 25px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.05); border: 1px solid #e9ecef;
   }
-  .children-area.active { display: block; animation: slideDown 0.25s ease; }
-  @keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 2000px; } }
+  .content-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  }
+  .content-header h2 { margin: 0; color: var(--navy); font-size: 22px; font-family: Georgia, serif; }
+  .btn-back {
+    background: var(--navy); color: white; border: none; padding: 12px 20px;
+    border-radius: 10px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 15px;
+  }
+  
+  .iframe-container { width: 100%; min-height: 60vh; border-radius: 12px; overflow: hidden; border: 1px solid #e9ecef; }
+  .iframe-container iframe { width: 100%; height: 100%; border: none; }
 
-  /* === الـ 5 أجزاء الثابتة (كبّرناها) === */
-  .fixed-modules {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
-    padding: 12px 0; margin-bottom: 8px; border-bottom: 2px dashed #e0e4e8;
-  }
-  .module-card {
-    background: var(--white); border: 2px solid var(--line); border-radius: 12px;
-    padding: 16px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px;
-    cursor: pointer; transition: 0.2s; position: relative; min-height: 110px;
-    justify-content: center;
-  }
-  .module-card:active { transform: scale(0.97); border-color: var(--navy); background: #f8f9fa; }
-  .module-card.has-content { border-color: #27ae60; background: #f0fbf5; }
-  
-  .module-icon {
-    width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; font-size: 24px; color: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-  .module-title { font-size: 15px; font-weight: 800; color: var(--navy); text-align: center; }
-  
-  .badge-check {
-    position: absolute; top: 8px; left: 8px; background: #27ae60; color: #fff;
-    width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; font-size: 12px; font-weight: bold;
-  }
+  .loading { text-align: center; color: var(--muted); padding: 40px; font-size: 18px; font-weight: 600; }
 
-  /* ألوان اللوجوهات الاحترافية */
-  .ic-explain { background: linear-gradient(135deg, #1f6b45, #27ae60); }
-  .ic-video { background: linear-gradient(135deg, #c0392b, #e74c3c); }
-  .ic-questions { background: linear-gradient(135deg, #2980b9, #3498db); }
-  .ic-summary { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
-  .ic-terms { background: linear-gradient(135deg, #d35400, #e67e22); }
-
-  /* === المودال (نافذة منبثقة مريحة) === */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-    display: none; z-index: 1000; align-items: flex-start; justify-content: center;
-    padding: 20px 12px; overflow-y: auto;
+  /* تجاوب مع شاشات الكمبيوتر */
+  @media (min-width: 600px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
   }
-  .modal-overlay.active { display: flex; }
-  
-  .modal-box {
-    background: var(--white); border-radius: 16px; width: 100%; max-width: 500px;
-    padding: 24px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    margin-top: 40px; margin-bottom: 40px;
-    animation: popIn 0.25s ease;
-  }
-  @keyframes popIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-  
-  .modal-box h3 { margin: 0 0 8px; color: var(--navy); font-size: 22px; text-align: center; }
-  .modal-box .modal-desc { margin: 0 0 20px; color: var(--muted); font-size: 14px; text-align: center; }
-  
-  .form-group { margin-bottom: 18px; }
-  .form-group label {
-    display: block; font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 8px;
-  }
-  .form-group input, .form-group textarea {
-    width: 100%; padding: 16px; border: 2px solid var(--line); border-radius: 10px;
-    font-family: inherit; font-size: 16px; background: #fafbfc; color: var(--text);
-  }
-  .form-group input:focus, .form-group textarea:focus {
-    outline: none; border-color: var(--navy); background: #fff;
-  }
-  .form-group textarea { min-height: 240px; font-family: 'Courier New', monospace; resize: vertical; }
-  
-  .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
-  .btn-save {
-    flex: 1; background: var(--navy); color: white; border: none; padding: 16px;
-    border-radius: 10px; font-size: 17px; font-weight: 800; cursor: pointer; min-height: 54px;
-  }
-  .btn-save:active { background: #0f1e33; }
-  .btn-cancel {
-    flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 16px;
-    border-radius: 10px; font-size: 17px; font-weight: 800; cursor: pointer; min-height: 54px;
-  }
-  .btn-delete-inline {
-    width: 100%; background: #fbeaea; color: #b91c1c; border: 2px solid #f8d7da;
-    padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 700;
-    cursor: pointer; margin-top: 12px; min-height: 50px;
-  }
-
-  /* === حالة فارغة === */
-  .empty-state { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 15px; line-height: 1.8; }
-  .empty-state i { font-size: 50px; color: #c7cbd1; display: block; margin-bottom: 16px; }
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-<div class="admin-header">
-  <div class="admin-brand">CLEAR<span>NOTE</span></div>
-  <div style="display:flex; gap:10px;">
-    <button class="btn-add-main" onclick="openAddModal(null, 'root')"><i class="fas fa-plus"></i> سنة دراسية</button>
-    <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i></button>
+<div class="app-navbar">
+  <div class="app-brand">CLEAR<span>NOTE</span></div>
+  <div class="nav-user">
+    <div class="avatar-badge" id="userAvatar">U</div>
+    <span id="userName">...</span>
+    <button class="btn-logout" onclick="doLogout()">خروج</button>
   </div>
 </div>
 
-<div class="admin-container">
-  <div id="treeContainer">
-    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i> جاري التحميل...</div>
-  </div>
-</div>
-
-<!-- مودال إضافة/تعديل -->
-<div class="modal-overlay" id="nodeModal">
-  <div class="modal-box">
-    <h3 id="nodeModalTitle">إضافة</h3>
-    <p class="modal-desc" id="nodeModalDesc"></p>
-    
-    <div class="form-group" id="titleField">
-      <label>العنوان</label>
-      <input type="text" id="nodeTitle" placeholder="اكتب العنوان هنا...">
+<div class="container">
+  <div class="breadcrumbs" id="breadcrumbs"></div>
+  
+  <div id="mainView">
+    <div id="cardsContainer" class="grid">
+      <div class="loading">جاري تحميل المحتوى...</div>
     </div>
+  </div>
 
-    <input type="hidden" id="nodeParentId">
-    <input type="hidden" id="nodeType">
-    <input type="hidden" id="nodeEditId">
-
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('nodeModal')">إلغاء</button>
-      <button class="btn-save" onclick="saveNode()" id="saveNodeBtn">حفظ</button>
+  <div id="contentView" style="display:none;">
+    <div class="content-viewer">
+      <div class="content-header">
+        <h2 id="viewerTitle">عنوان المحتوى</h2>
+        <button class="btn-back" onclick="closeViewer()"><i class="fas fa-arrow-right"></i> رجوع</button>
+      </div>
+      <div class="iframe-container">
+        <iframe id="contentFrame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin"></iframe>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- مودال إدارة المحتوى للمحاضرة -->
-<div class="modal-overlay" id="moduleModal">
-  <div class="modal-box">
-    <h3 id="moduleModalTitle">إدارة محتوى</h3>
-    <p class="modal-desc">اختر الجزء الذي تريد إضافة محتواه</p>
-    
-    <div class="fixed-modules" style="border-bottom: none; margin-bottom: 0;">
-      <div class="module-card" onclick="openCodeEditor('explain', 'الشرح')">
-        <div class="module-icon ic-explain"><i class="fas fa-file-alt"></i></div>
-        <div class="module-title">الشرح</div>
-      </div>
-      <div class="module-card" onclick="openCodeEditor('video', 'فيديو')">
-        <div class="module-icon ic-video"><i class="fas fa-video"></i></div>
-        <div class="module-title">فيديو</div>
-      </div>
-      <div class="module-card" onclick="openCodeEditor('questions', 'أسئلة')">
-        <div class="module-icon ic-questions"><i class="fas fa-question-circle"></i></div>
-        <div class="module-title">أسئلة</div>
-      </div>
-      <div class="module-card" onclick="openCodeEditor('summary', 'ملخص')">
-        <div class="module-icon ic-summary"><i class="fas fa-clipboard-list"></i></div>
-        <div class="module-title">ملخص</div>
-      </div>
-      <div class="module-card" onclick="openCodeEditor('terms', 'مصطلحات')">
-        <div class="module-icon ic-terms"><i class="fas fa-book"></i></div>
-        <div class="module-title">مصطلحات</div>
-      </div>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('moduleModal')" style="flex: 1;">إغلاق</button>
-    </div>
-  </div>
-</div>
-
-<!-- مودال محرر الكود -->
-<div class="modal-overlay" id="codeModal">
-  <div class="modal-box">
-    <h3 id="codeModalTitle">إضافة كود</h3>
-    <p class="modal-desc" id="codeModalDesc">ألصق كود HTML هنا</p>
-    
-    <div class="form-group">
-      <label>كود المحتوى (HTML)</label>
-      <textarea id="moduleCode" placeholder="<h1>مرحباً</h1>&#10;<p>اكتب المحتوى هنا</p>"></textarea>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('codeModal')">إلغاء</button>
-      <button class="btn-save" onclick="saveModuleCode()">حفظ الكود</button>
-    </div>
-    <button class="btn-delete-inline" onclick="deleteModuleContent()" id="deleteModuleBtn">
-      <i class="fas fa-trash"></i> مسح محتوى هذا الجزء (يبقى فارغ)
-    </button>
-  </div>
-</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <script type="module">
 import { db, onAuth, isAdmin, goTo, showToast, signOutUser } from "./shared.js";
-import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let treeData = [];
-let expandedNodes = new Set();
-let currentModuleCtx = null;
-
-const NODE_TYPES = {
-  year:    { label: 'سنة دراسية',  icon: 'fa-calendar-alt' },
-  program: { label: 'برنامج',       icon: 'fa-graduation-cap' },
-  subject: { label: 'مادة',         icon: 'fa-book' },
-  lecture: { label: 'محاضرة / سكشن', icon: 'fa-chalkboard-teacher' },
-  custom:  { label: 'تبويب مخصص',  icon: 'fa-folder' }
-};
 
 onAuth((user, userData) => {
-  if (!user || !isAdmin(userData)) { goTo("index.html"); return; }
-  loadTree();
+  if (!user) { goTo("index.html"); return; }
+  const name = userData.name || user.email;
+  document.getElementById("userName").textContent = name;
+  document.getElementById("userAvatar").textContent = name.charAt(0).toUpperCase();
+  loadTreeData();
 });
 
 window.doLogout = async () => { await signOutUser(); goTo("index.html"); };
 
-async function loadTree() {
+async function loadTreeData() {
   try {
     const snap = await getDocs(collection(db, "content_tree"));
     treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderTree();
+    renderLevel("root");
   } catch (e) {
-    document.getElementById("treeContainer").innerHTML = `<div class="empty-state" style="color:#b91c1c;"><i class="fas fa-exclamation-triangle"></i> خطأ: ${e.message}</div>`;
+    document.getElementById("cardsContainer").innerHTML = `<div class="loading" style="color:red;">خطأ: ${e.message}</div>`;
   }
 }
 
-function renderTree() {
-  const container = document.getElementById("treeContainer");
-  const rootNodes = treeData.filter(n => n.parentId === "root");
-  
-  if (rootNodes.length === 0) {
-    container.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i>لا يوجد محتوى بعد.<br>اضغط "سنة دراسية" بالأعلى للبدء.</div>`;
+function renderLevel(parentId) {
+  const container = document.getElementById("cardsContainer");
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("contentView").style.display = "none";
+  container.innerHTML = "";
+
+  updateBreadcrumbs(parentId);
+  const nodes = treeData.filter(n => n.parentId === parentId);
+
+  if (nodes.length === 0) {
+    container.innerHTML = `<div class="loading">لا يوجد محتوى هنا حالياً.</div>`;
     return;
   }
-  container.innerHTML = buildHTML(rootNodes, 0);
-}
 
-function buildHTML(nodes, depth) {
-  let html = "";
   nodes.forEach(node => {
-    const children = treeData.filter(n => n.parentId === node.id);
-    const typeInfo = NODE_TYPES[node.type] || NODE_TYPES.custom;
-    const isLecture = node.type === 'lecture';
-    const isExpanded = expandedNodes.has(node.id);
-    const hasChildren = children.length > 0 || isLecture;
-    const modules = node.modules || {};
+    let typeLabel = "تصنيف";
+    let typeIcon = "";
+    
+    if (node.type === 'year') typeLabel = "سنة دراسية";
+    else if (node.type === 'program') typeLabel = "برنامج";
+    else if (node.type === 'subject') typeLabel = "مادة";
+    else if (node.type === 'module_explain') { typeLabel = "الشرح"; typeIcon = "<i class='fas fa-file-alt' style='color:#27ae60; margin-left:8px;'></i>"; }
+    else if (node.type === 'module_video') { typeLabel = "فيديو"; typeIcon = "<i class='fas fa-video' style='color:#e74c3c; margin-left:8px;'></i>"; }
+    else if (node.type === 'module_questions') { typeLabel = "أسئلة"; typeIcon = "<i class='fas fa-question-circle' style='color:#3498db; margin-left:8px;'></i>"; }
+    else if (node.type === 'module_summary') { typeLabel = "ملخص"; typeIcon = "<i class='fas fa-clipboard-list' style='color:#9b59b6; margin-left:8px;'></i>"; }
+    else if (node.type === 'module_terms') { typeLabel = "مصطلحات"; typeIcon = "<i class='fas fa-book' style='color:#e67e22; margin-left:8px;'></i>"; }
 
-    // زرار الإضافة بيختلف حسب النوع
-    let nextLabel = "إضافة فرع";
-    if (node.type === 'year') nextLabel = "إضافة برنامج";
-    else if (node.type === 'program') nextLabel = "إضافة مادة";
-    else if (node.type === 'subject') nextLabel = "إضافة محاضرة";
-    else if (node.type === 'lecture') nextLabel = "إضافة تبويب فرعي";
+    const card = document.createElement("div");
+    card.className = `card-item ${node.type}`;
+    card.onclick = () => handleNodeClick(node);
+    
+    // لو ده جزء أساسي (module)، العنوان هيبقى فيه اللوجو
+    const titleHtml = node.type.startsWith('module_') ? `${typeIcon} ${node.title}` : node.title;
 
-    html += `
-      <div class="node-card">
-        <div class="node-header" onclick="toggleNode('${node.id}')">
-          <div class="node-title-area">
-            <div class="node-icon"><i class="fas ${typeInfo.icon}"></i></div>
-            <div class="node-text">
-              <div class="node-title">${node.title}</div>
-              <div class="node-type">${typeInfo.label}${isLecture && children.length ? ` • ${children.length} فرع` : ''}</div>
-            </div>
-            ${hasChildren ? `<i class="fas fa-chevron-${isExpanded ? 'up' : 'down'}" style="color:#5b6472; font-size:14px; margin-right:8px;"></i>` : ''}
-          </div>
-          <div class="node-actions" onclick="event.stopPropagation()">
-            <button class="action-btn" onclick="openAddModal('${node.id}', '${node.type}')" title="${nextLabel}"><i class="fas fa-plus"></i></button>
-            <button class="action-btn edit" onclick="openEditModal('${node.id}')" title="تعديل"><i class="fas fa-pen"></i></button>
-            <button class="action-btn danger" onclick="deleteNode('${node.id}')" title="حذف"><i class="fas fa-trash"></i></button>
-          </div>
-        </div>
-        
-        <div class="children-area ${isExpanded ? 'active' : ''}">
-          ${isLecture ? renderFixedModules(node) : ''}
-          ${children.length > 0 ? buildHTML(children, depth + 1) : ''}
-        </div>
-      </div>
+    card.innerHTML = `
+      <div class="card-type">${typeLabel}</div>
+      <h3 class="card-title">${titleHtml}</h3>
     `;
+    container.appendChild(card);
   });
-  return html;
 }
 
-function renderFixedModules(node) {
-  const modules = node.modules || {};
-  const mods = [
-    { key: 'explain', label: 'الشرح', icon: 'fa-file-alt', cls: 'ic-explain' },
-    { key: 'video', label: 'فيديو', icon: 'fa-video', cls: 'ic-video' },
-    { key: 'questions', label: 'أسئلة', icon: 'fa-question-circle', cls: 'ic-questions' },
-    { key: 'summary', label: 'ملخص', icon: 'fa-clipboard-list', cls: 'ic-summary' },
-    { key: 'terms', label: 'مصطلحات', icon: 'fa-book', cls: 'ic-terms' }
-  ];
-
-  return `
-    <div class="fixed-modules">
-      ${mods.map(m => {
-        const hasContent = modules[m.key] && modules[m.key].trim().length > 0;
-        return `
-          <div class="module-card ${hasContent ? 'has-content' : ''}" onclick="openCodeEditorFor('${node.id}', '${m.key}', '${m.label}')">
-            ${hasContent ? '<div class="badge-check"><i class="fas fa-check"></i></div>' : ''}
-            <div class="module-icon ${m.cls}"><i class="fas ${m.icon}"></i></div>
-            <div class="module-title">${m.label}</div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
-}
-
-window.toggleNode = function(id) {
-  if (expandedNodes.has(id)) expandedNodes.delete(id);
-  else expandedNodes.add(id);
-  renderTree();
-};
-
-// === إضافة العقد ===
-window.openAddModal = function(parentId, parentType) {
-  let newType, title, desc;
-  
-  if (parentType === 'root') {
-    newType = 'year'; title = 'إضافة سنة دراسية'; desc = 'مثل: الفرقة الأولى';
-  } else if (parentType === 'year') {
-    newType = 'program'; title = 'إضافة برنامج'; desc = 'مثل: البرنامج العام';
-  } else if (parentType === 'program') {
-    newType = 'subject'; title = 'إضافة مادة'; desc = 'مثل: Anatomy';
-  } else if (parentType === 'subject') {
-    newType = 'lecture'; title = 'إضافة محاضرة / سكشن'; desc = 'مثل: المحاضرة الأولى / السكشن الأول';
+function handleNodeClick(node) {
+  if (node.type === 'content' || node.type.startsWith('module_')) {
+    openContentViewer(node);
   } else {
-    newType = 'custom'; title = 'إضافة تبويب فرعي'; desc = 'مثل: مراجعة إضافية، ملاحظات';
+    renderLevel(node.id);
   }
-  
-  document.getElementById("nodeModalTitle").textContent = title;
-  document.getElementById("nodeModalDesc").textContent = desc;
-  document.getElementById("nodeParentId").value = parentId || 'root';
-  document.getElementById("nodeType").value = newType;
-  document.getElementById("nodeEditId").value = '';
-  document.getElementById("nodeTitle").value = '';
-  document.getElementById("saveNodeBtn").textContent = 'إضافة';
-  
-  document.getElementById("nodeModal").classList.add("active");
-  setTimeout(() => document.getElementById("nodeTitle").focus(), 300);
-};
+}
 
-window.openEditModal = function(id) {
-  const node = treeData.find(n => n.id === id);
-  if (!node) return;
-  
-  document.getElementById("nodeModalTitle").textContent = 'تعديل';
-  document.getElementById("nodeModalDesc").textContent = 'عدّل العنوان';
-  document.getElementById("nodeParentId").value = node.parentId;
-  document.getElementById("nodeType").value = node.type;
-  document.getElementById("nodeEditId").value = id;
-  document.getElementById("nodeTitle").value = node.title;
-  document.getElementById("saveNodeBtn").textContent = 'حفظ التعديل';
-  
-  document.getElementById("nodeModal").classList.add("active");
-  setTimeout(() => document.getElementById("nodeTitle").focus(), 300);
-};
+function updateBreadcrumbs(parentId) {
+  const bc = document.getElementById("breadcrumbs");
+  bc.innerHTML = `<span onclick="renderLevel('root')"><i class="fas fa-home"></i> الرئيسية</span>`;
+  if (parentId === "root") return;
 
-window.saveNode = async function() {
-  const parentId = document.getElementById("nodeParentId").value;
-  const type = document.getElementById("nodeType").value;
-  const title = document.getElementById("nodeTitle").value.trim();
-  const editId = document.getElementById("nodeEditId").value;
-  
-  if (!title) { showToast("أدخل العنوان", "error"); return; }
-  
-  const btn = document.getElementById("saveNodeBtn");
-  btn.disabled = true; btn.textContent = 'جاري الحفظ...';
-
-  try {
-    if (editId) {
-      await updateDoc(doc(db, "content_tree", editId), { title, updatedAt: serverTimestamp() });
-      showToast("تم التعديل");
-    } else {
-      const data = {
-        parentId, type, title,
-        modules: type === 'lecture' ? { explain: '', video: '', questions: '', summary: '', terms: '' } : null,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      };
-      const ref = await addDoc(collection(db, "content_tree"), data);
-      expandedNodes.add(parentId);
-    }
-    closeModal('nodeModal');
-    await loadTree();
-  } catch (e) {
-    showToast("خطأ: " + e.message, "error");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = editId ? 'حفظ التعديل' : 'إضافة';
+  let path = [];
+  let current = treeData.find(n => n.id === parentId);
+  while (current) {
+    path.unshift(current);
+    current = treeData.find(n => n.id === current.parentId);
   }
-};
+  path.forEach(p => {
+    bc.innerHTML += ` <i class="fas fa-chevron-left"></i> <span onclick="renderLevel('${p.id}')">${p.title}</span>`;
+  });
+}
 
-// === إدارة محتوى المحاضرة (من هنا بنفتح المودال اللي فيه الأجزاء الخمسة) ===
-window.openCodeEditorFor = function(nodeId, moduleKey, moduleName) {
-  currentModuleCtx = { nodeId, moduleKey, moduleName };
-  
-  const node = treeData.find(n => n.id === nodeId);
-  const existing = node && node.modules ? node.modules[moduleKey] || '' : '';
-  
-  document.getElementById("codeModalTitle").textContent = `إضافة ${moduleName}`;
-  document.getElementById("codeModalDesc").textContent = node.title;
-  document.getElementById("moduleCode").value = existing;
-  
-  document.getElementById("deleteModuleBtn").style.display = existing.trim() ? 'block' : 'none';
-  
-  document.getElementById("codeModal").classList.add("active");
-};
+function openContentViewer(node) {
+  document.getElementById("mainView").style.display = "none";
+  document.getElementById("contentView").style.display = "block";
+  document.getElementById("viewerTitle").textContent = node.title;
 
-window.saveModuleCode = async function() {
-  if (!currentModuleCtx) return;
-  const { nodeId, moduleKey } = currentModuleCtx;
-  const code = document.getElementById("moduleCode").value;
+  const iframe = document.getElementById("contentFrame");
+  const htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px; font-family:sans-serif;'><h2>لا يوجد محتوى مرفق بهذا الجزء حتى الآن.</h2></div>";
   
-  try {
-    const ref = doc(db, "content_tree", nodeId);
-    const snap = await getDoc(ref);
-    const modules = snap.data().modules || {};
-    modules[moduleKey] = code;
-    await updateDoc(ref, { modules, updatedAt: serverTimestamp() });
-    showToast("تم الحفظ ✓");
-    closeModal('codeModal');
-    await loadTree();
-  } catch (e) {
-    showToast("خطأ: " + e.message, "error");
-  }
-};
+  const fullHTML = `
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; line-height: 1.8; font-size: 17px; color: #1a1a1a; }
+        img { max-width: 100%; height: auto; border-radius: 8px; }
+      </style>
+    </head>
+    <body>${htmlContent}</body>
+    </html>
+  `;
+  iframe.srcdoc = fullHTML;
+}
 
-window.deleteModuleContent = async function() {
-  if (!currentModuleCtx) return;
-  if (!confirm("هيتم مسح محتوى هذا الجزء (يبقى فارغ). متأكد؟")) return;
-  
-  const { nodeId, moduleKey } = currentModuleCtx;
-  try {
-    const ref = doc(db, "content_tree", nodeId);
-    const snap = await getDoc(ref);
-    const modules = snap.data().modules || {};
-    modules[moduleKey] = '';
-    await updateDoc(ref, { modules, updatedAt: serverTimestamp() });
-    document.getElementById("moduleCode").value = '';
-    document.getElementById("deleteModuleBtn").style.display = 'none';
-    showToast("تم المسح");
-    await loadTree();
-  } catch (e) {
-    showToast("خطأ: " + e.message, "error");
-  }
-};
-
-window.deleteNode = async function(id) {
-  if (treeData.some(n => n.parentId === id)) {
-    showToast("احذف الفروع أولاً!", "error");
-    return;
-  }
-  if (!confirm("هل أنت متأكد من الحذف النهائي؟")) return;
-  try {
-    await deleteDoc(doc(db, "content_tree", id));
-    expandedNodes.delete(id);
-    showToast("تم الحذف");
-    await loadTree();
-  } catch (e) {
-    showToast("خطأ: " + e.message, "error");
-  }
-};
-
-window.closeModal = function(id) {
-  document.getElementById(id).classList.remove('active');
+window.closeViewer = function() {
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("contentView").style.display = "none";
+  document.getElementById("contentFrame").srcdoc = "";
 };
 </script>
 </body>
