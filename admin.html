@@ -6,90 +6,82 @@
 <title>ClearNote — لوحة التحكم</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  :root {
-    --navy: #152741; --accent: #a8741a; --bg: #f4f6f8;
-    --white: #ffffff; --text: #1a1a1a; --muted: #5b6472; --line: #e9ecef;
-  }
-  html, body {
-    max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;
-    background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    -webkit-tap-highlight-color: transparent; padding-bottom: 30px; font-size: 18px; /* خط أساسي كبير */
-  }
+  /* تنسيقات خاصة بلوحة التحكم فقط */
+  body { padding-bottom: 50px; }
 
-  /* الهيدر - ضخم وواضح */
   .admin-header {
-    background: var(--navy); color: white; padding: 20px;
+    background: var(--navy); color: white; padding: 20px 20px;
     display: flex; justify-content: space-between; align-items: center;
     position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
   }
-  .admin-brand { font-family: Georgia, serif; font-size: 24px; font-weight: bold; }
+  .admin-brand { font-family: Georgia, serif; font-size: 1.6rem; font-weight: bold; }
   .admin-brand span { color: var(--accent); }
-  .btn-add-main { background: var(--accent); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-weight: bold; font-size: 18px; display: flex; align-items: center; gap: 8px; }
-  .btn-logout { background: rgba(255,255,255,0.1); color: white; border: none; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  
+  .btn-add-main { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 8px; }
+  .btn-logout { background: rgba(255,255,255,0.1); color: white; border: none; width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
 
-  .admin-container { padding: 20px 15px; width: 100%; box-sizing: border-box; }
+  .admin-container { padding: 20px 15px; width: 100%; box-sizing: border-box; max-width: 800px; margin: 0 auto; }
 
-  /* الكروت - كبيرة ومريحة */
-  .tree-group { margin-bottom: 15px; width: 100%; box-sizing: border-box; }
+  /* الكروت */
+  .tree-group { margin-bottom: 20px; }
   .node-card {
-    background: var(--white); border: 2px solid var(--line); border-radius: 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03); width: 100%; box-sizing: border-box; overflow: hidden;
+    background: var(--white); border: 2px solid var(--line); border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04); overflow: hidden;
   }
   
-  .node-header { padding: 18px; display: flex; justify-content: space-between; align-items: center; background: var(--white); }
-  .node-title-area { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; }
-  .node-icon { width: 55px; height: 55px; border-radius: 14px; background: #eef2fa; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
-  .node-text { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 4px; }
-  .node-title { font-weight: 800; color: var(--navy); font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .node-type { font-size: 15px; color: var(--accent); font-weight: 700; }
+  .node-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: var(--white); }
+  .node-title-area { display: flex; align-items: center; gap: 15px; flex: 1; min-width: 0; }
+  .node-icon { width: 65px; height: 65px; border-radius: 16px; background: #eef2fa; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
+  .node-text { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 5px; }
+  .node-title { font-weight: 800; color: var(--navy); font-size: 1.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .node-type { font-size: 1rem; color: var(--accent); font-weight: 700; }
 
-  .node-actions { display: flex; gap: 10px; flex-shrink: 0; }
+  .node-actions { display: flex; gap: 8px; flex-shrink: 0; }
   .action-btn {
-    width: 48px; height: 48px; border-radius: 12px; border: 2px solid var(--line);
+    width: 52px; height: 52px; border-radius: 14px; border: 2px solid var(--line);
     background: #f8f9fa; display: flex; align-items: center; justify-content: center;
-    color: var(--muted); font-size: 20px; cursor: pointer;
+    color: var(--muted); font-size: 1.3rem;
   }
   .action-btn:active { background: var(--navy); color: #fff; }
-  .action-btn.manage { color: #1f6b45; border-color: #c9d6ee; background: #eef2fa; }
+  .action-btn.manage { color: var(--green); border-color: #c9d6ee; background: #eef2fa; }
   .action-btn.danger { color: #b91c1c; background: #fbeaea; border-color: #fbeaea; }
 
-  .children-area { display: none; padding: 15px; background: #fafbfc; border-top: 2px solid var(--line); }
+  .children-area { display: none; padding: 15px 20px 20px 20px; background: #fafbfc; border-top: 2px solid var(--line); }
   .children-area.active { display: block; }
-  
-  /* تخصيص ألوان ولوغوهات الأجزاء الأساسية */
+
+  /* ألوان الأجزاء */
   .node-card[data-type="module_explain"] .node-icon { background: #e8f5e9; color: #27ae60; }
   .node-card[data-type="module_video"] .node-icon { background: #ffebee; color: #e74c3c; }
   .node-card[data-type="module_questions"] .node-icon { background: #e3f2fd; color: #3498db; }
   .node-card[data-type="module_summary"] .node-icon { background: #f3e5f5; color: #9b59b6; }
   .node-card[data-type="module_terms"] .node-icon { background: #fff3e0; color: #e67e22; }
 
-  /* المودال - كبير وواضح */
-  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: flex-end; z-index: 1000; }
+  /* المودال (الشاشة المنبثقة) */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: flex-end; z-index: 1000; backdrop-filter: blur(4px); }
   .modal-overlay.active { display: flex; }
   .modal-box { background: var(--white); border-radius: 24px 24px 0 0; width: 100%; padding: 30px 20px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; animation: slideUp 0.3s ease; }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   
-  .modal-box h3 { margin: 0 0 15px; color: var(--navy); font-size: 24px; text-align: center; }
-  .modal-box p { margin: 0 0 20px; color: var(--muted); font-size: 16px; text-align: center; }
+  .modal-box h3 { margin: 0 0 15px; color: var(--navy); font-size: 1.8rem; text-align: center; }
+  .modal-box p { margin: 0 0 25px; color: var(--muted); font-size: 1.1rem; text-align: center; }
   
-  .form-group { margin-bottom: 20px; width: 100%; }
-  .form-group label { display: block; font-size: 17px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 1.1rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
   .form-group input, .form-group textarea, .form-group select {
-    width: 100%; padding: 18px; border: 2px solid var(--line); border-radius: 12px;
-    font-family: inherit; font-size: 18px; box-sizing: border-box; background: #fafbfc;
+    width: 100%; padding: 18px; border: 2px solid var(--line); background: #fafbfc; box-sizing: border-box;
   }
   .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--navy); }
   
-  .modal-actions { display: flex; gap: 15px; margin-top: 25px; }
-  .btn-save { flex: 1; background: var(--navy); color: white; border: none; padding: 18px; border-radius: 12px; font-size: 20px; font-weight: bold; }
-  .btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 18px; border-radius: 12px; font-size: 20px; font-weight: bold; }
+  .modal-actions { display: flex; gap: 15px; margin-top: 30px; }
+  .btn-save { flex: 1; background: var(--navy); color: white; border: none; padding: 18px; font-size: 1.2rem; }
+  .btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 18px; font-size: 1.2rem; }
 
-  /* أزرار الأجزاء الـ 5 */
-  .modules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-  .module-item { background: #f8f9fa; border: 2px solid var(--line); border-radius: 16px; padding: 25px 10px; display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; }
+  /* الأزرار الـ 5 الكبيرة */
+  .modules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+  .module-item { background: #f8f9fa; border: 2px solid var(--line); border-radius: 16px; padding: 30px 10px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
   .module-item:active { background: #eef2fa; border-color: var(--navy); }
-  .module-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff; }
-  .module-title { font-size: 18px; font-weight: 800; color: var(--navy); }
+  .module-icon { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; }
+  .module-title { font-size: 1.3rem; font-weight: 800; color: var(--navy); }
   
   .icon-explain { background: #27ae60; }
   .icon-video { background: #e74c3c; }
@@ -111,11 +103,11 @@
 
 <div class="admin-container">
   <div id="treeContainer">
-    <p style="text-align:center; color:var(--muted); padding: 20px; font-size:20px;">جاري التحميل...</p>
+    <p style="text-align:center; color:var(--muted); padding: 20px; font-size:1.2rem;">جاري التحميل...</p>
   </div>
 </div>
 
-<!-- مودال الإضافة -->
+<!-- مودال إضافة عنصر -->
 <div class="modal-overlay" id="nodeModal">
   <div class="modal-box">
     <h3 id="modalTitle">إضافة</h3>
@@ -133,7 +125,7 @@
   </div>
 </div>
 
-<!-- مودال إدارة المحتوى (الـ 5 أجزاء) -->
+<!-- مودال إدارة المحتوى -->
 <div class="modal-overlay" id="manageModal">
   <div class="modal-box">
     <h3 id="manageTitle">إدارة محتوى</h3>
@@ -164,7 +156,7 @@
   </div>
 </div>
 
-<!-- مودال كتابة الكود (المطور) -->
+<!-- مودال كتابة الكود -->
 <div class="modal-overlay" id="codeModal">
   <div class="modal-box">
     <h3 id="codeTitle">إضافة كود</h3>
@@ -207,15 +199,15 @@ import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, serverTimestamp
 
 let treeData = [];
 const NODE_TYPES = {
-  year:    { label: 'سنة دراسية',  icon: 'fa-calendar-alt' },
-  program: { label: 'برنامج',       icon: 'fa-graduation-cap' },
-  subject: { label: 'مادة',         icon: 'fa-book' },
-  custom:  { label: 'تبويب مخصص',  icon: 'fa-folder' },
-  module_explain:   { label: 'شرح', icon: 'fa-file-alt' },
-  module_video:     { label: 'فيديو', icon: 'fa-video' },
+  year: { label: 'سنة دراسية', icon: 'fa-calendar-alt' },
+  program: { label: 'برنامج', icon: 'fa-graduation-cap' },
+  subject: { label: 'مادة', icon: 'fa-book' },
+  custom: { label: 'تبويب مخصص', icon: 'fa-folder' },
+  module_explain: { label: 'شرح', icon: 'fa-file-alt' },
+  module_video: { label: 'فيديو', icon: 'fa-video' },
   module_questions: { label: 'أسئلة', icon: 'fa-question-circle' },
-  module_summary:   { label: 'ملخص', icon: 'fa-clipboard-list' },
-  module_terms:     { label: 'مصطلحات', icon: 'fa-book' }
+  module_summary: { label: 'ملخص', icon: 'fa-clipboard-list' },
+  module_terms: { label: 'مصطلحات', icon: 'fa-book' }
 };
 
 onAuth((user, userData) => {
@@ -231,16 +223,15 @@ async function loadTree() {
     treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderTree();
   } catch (e) {
-    document.getElementById("treeContainer").innerHTML = `<p style="color:red; font-size:18px;">خطأ: ${e.message}</p>`;
+    document.getElementById("treeContainer").innerHTML = `<p style="color:red; font-size:1.2rem;">خطأ: ${e.message}</p>`;
   }
 }
 
 function renderTree() {
   const container = document.getElementById("treeContainer");
   const rootNodes = treeData.filter(n => n.parentId === "root");
-  
   if (rootNodes.length === 0) {
-    container.innerHTML = `<p style="text-align:center; color:var(--muted); padding: 20px; font-size:18px;">لا يوجد محتوى بعد. أضف سنة دراسية للبدء.</p>`;
+    container.innerHTML = `<p style="text-align:center; color:var(--muted); padding: 20px; font-size:1.2rem;">لا يوجد محتوى بعد. أضف سنة دراسية للبدء.</p>`;
     return;
   }
   container.innerHTML = buildHTML(rootNodes);
@@ -262,21 +253,20 @@ function buildHTML(nodes) {
     let actionsHtml = "";
     if (isModule) {
       actionsHtml = `
-        <button class="action-btn" onclick="editModule('${node.id}')" title="تعديل"><i class="fas fa-edit"></i></button>
-        <button class="action-btn danger" onclick="deleteNode('${node.id}')" title="حذف"><i class="fas fa-trash"></i></button>
+        <button class="action-btn" onclick="editModule('${node.id}')"><i class="fas fa-edit"></i></button>
+        <button class="action-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>
       `;
     } else {
       actionsHtml = `
-        <button class="action-btn manage" onclick="openManage('${node.id}', '${node.title}')" title="إدارة الأجزاء"><i class="fas fa-cog"></i></button>
-        <button class="action-btn" onclick="openAddModal('${node.id}', '${node.type}')" title="إضافة فرع"><i class="fas fa-plus"></i></button>
-        <button class="action-btn danger" onclick="deleteNode('${node.id}')" title="حذف"><i class="fas fa-trash"></i></button>
+        <button class="action-btn manage" onclick="openManage('${node.id}', '${node.title}')"><i class="fas fa-cog"></i></button>
+        <button class="action-btn" onclick="openAddModal('${node.id}', '${node.type}')"><i class="fas fa-plus"></i></button>
+        <button class="action-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>
       `;
     }
 
-    // نعرض الوصف والمصادر لو موجودين في الكارت (للموديولات)
     let extraInfo = "";
     if (isModule && node.description) {
-      extraInfo = `<div style="font-size:14px; color:var(--muted); margin-top:4px;">${node.description}</div>`;
+      extraInfo = `<div style="font-size:1rem; color:var(--muted); margin-top:5px;">${node.description}</div>`;
     }
 
     html += `
@@ -291,16 +281,12 @@ function buildHTML(nodes) {
                 ${extraInfo}
               </div>
             </div>
-            <div class="node-actions">
-              ${actionsHtml}
-            </div>
+            <div class="node-actions">${actionsHtml}</div>
           </div>
-          
           ${!isModule ? `
           <div class="children-area" id="children-${node.id}">
-            ${children.length > 0 ? buildHTML(children) : '<div style="text-align:center; color:#aaa; font-size:16px; padding:10px;">لا يوجد فروع</div>'}
-          </div>
-          ` : ''}
+            ${children.length > 0 ? buildHTML(children) : '<div style="text-align:center; color:#aaa; font-size:1rem; padding:10px;">لا يوجد فروع</div>'}
+          </div>` : ''}
         </div>
       </div>
     `;
@@ -314,8 +300,7 @@ window.toggleChildren = function(id) {
 };
 
 window.openAddModal = function(parentId, parentType) {
-  let newType = "custom"; let title = "إضافة تبويب فرعي"; let desc = "";
-  
+  let newType = "custom"; let title = "إضافة تبويب"; let desc = "";
   if (parentType === 'root') { newType = 'year'; title = "إضافة سنة"; desc = "مثل: الفرقة الأولى"; }
   else if (parentType === 'year') { newType = 'program'; title = "إضافة برنامج"; desc = "مثل: برنامج عام"; }
   else if (parentType === 'program') { newType = 'subject'; title = "إضافة مادة"; desc = "مثل: Anatomy"; }
@@ -332,12 +317,10 @@ window.saveNode = async function() {
   const parentId = document.getElementById("nodeParentId").value;
   const type = document.getElementById("nodeType").value;
   const title = document.getElementById("nodeTitle").value.trim();
-  
   if (!title) { showToast("أدخل العنوان", "error"); return; }
-  const data = { parentId, type, title, updatedAt: serverTimestamp(), createdAt: serverTimestamp() };
-
+  
   try {
-    await addDoc(collection(db, "content_tree"), data);
+    await addDoc(collection(db, "content_tree"), { parentId, type, title, updatedAt: serverTimestamp(), createdAt: serverTimestamp() });
     showToast("تمت الإضافة");
     closeModal('nodeModal');
     loadTree();
@@ -357,7 +340,6 @@ window.openCodeEditor = function(moduleKey, moduleTitle) {
   document.getElementById("currentModuleKey").value = moduleKey;
   
   const existing = treeData.find(n => n.parentId === nodeId && n.type === 'module_' + moduleKey);
-  
   document.getElementById("moduleTitleInput").value = existing ? existing.title : moduleTitle;
   document.getElementById("moduleDescInput").value = existing ? (existing.description || '') : '';
   document.getElementById("moduleSourcesInput").value = existing ? (existing.sources || '') : '';
@@ -371,7 +353,6 @@ window.openCodeEditor = function(moduleKey, moduleTitle) {
 window.saveModuleCode = async function() {
   const nodeId = document.getElementById("currentNodeId").value;
   const moduleKey = document.getElementById("currentModuleKey").value;
-  
   const title = document.getElementById("moduleTitleInput").value.trim();
   const description = document.getElementById("moduleDescInput").value.trim();
   const sources = document.getElementById("moduleSourcesInput").value.trim();
@@ -382,52 +363,32 @@ window.saveModuleCode = async function() {
 
   try {
     const existing = treeData.find(n => n.parentId === nodeId && n.type === 'module_' + moduleKey);
-    
-    const data = {
-      title: title,
-      description: description,
-      sources: sources,
-      access: access,
-      htmlContent: code,
-      updatedAt: serverTimestamp()
-    };
-
+    const data = { title, description, sources, access, htmlContent: code, updatedAt: serverTimestamp() };
     if (existing) {
       await updateDoc(doc(db, "content_tree", existing.id), data);
     } else {
-      data.parentId = nodeId;
-      data.type = 'module_' + moduleKey;
-      data.createdAt = serverTimestamp();
+      data.parentId = nodeId; data.type = 'module_' + moduleKey; data.createdAt = serverTimestamp();
       await addDoc(collection(db, "content_tree"), data);
     }
-    
-    showToast("تم حفظ المحتوى بنجاح");
+    showToast("تم الحفظ بنجاح");
     closeModal('codeModal');
-    setTimeout(() => {
-      const el = document.getElementById(`children-${nodeId}`);
-      if (el) el.classList.add('active');
-    }, 500);
+    setTimeout(() => { const el = document.getElementById(`children-${nodeId}`); if (el) el.classList.add('active'); }, 500);
     loadTree();
-  } catch (e) {
-    showToast("خطأ: " + e.message, "error");
-  }
+  } catch (e) { showToast("خطأ: " + e.message, "error"); }
 };
 
 window.editModule = async function(nodeId) {
   const node = treeData.find(n => n.id === nodeId);
   if (!node) return;
-  
   const moduleKey = node.type.replace('module_', '');
   document.getElementById("codeTitle").textContent = `تعديل ${node.title}`;
   document.getElementById("currentNodeId").value = node.parentId;
   document.getElementById("currentModuleKey").value = moduleKey;
-  
   document.getElementById("moduleTitleInput").value = node.title || '';
   document.getElementById("moduleDescInput").value = node.description || '';
   document.getElementById("moduleSourcesInput").value = node.sources || '';
   document.getElementById("moduleAccessInput").value = node.access || 'public';
   document.getElementById("moduleCode").value = node.htmlContent || '';
-  
   document.getElementById("codeModal").classList.add("active");
 };
 
