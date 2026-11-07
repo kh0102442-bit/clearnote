@@ -10,85 +10,85 @@
     --navy: #152741; --accent: #a8741a; --bg: #f4f6f8;
     --white: #ffffff; --text: #1a1a1a; --muted: #5b6472;
   }
-  body { background: var(--bg); margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); font-size: 16px; }
+  body { background: var(--bg); margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); font-size: 18px; }
 
-  /* شريط علوي أنيق ومكبر */
+  /* شريط علوي كبير */
   .app-navbar {
-    background: var(--navy); color: white; padding: 18px 20px;
+    background: var(--navy); color: white; padding: 20px;
     display: flex; justify-content: space-between; align-items: center;
     position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   }
-  .app-brand { font-family: Georgia, serif; font-size: 22px; letter-spacing: 2px; font-weight: bold; }
+  .app-brand { font-family: Georgia, serif; font-size: 24px; letter-spacing: 2px; font-weight: bold; }
   .app-brand span { color: var(--accent); }
   
-  .nav-user { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600; }
-  .avatar-badge {
-    width: 40px; height: 40px; border-radius: 50%; background: var(--accent);
-    display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size:18px;
-  }
-  .btn-logout {
-    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px;
-  }
+  .nav-user { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 600; }
+  .avatar-badge { width: 45px; height: 45px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size:20px; }
+  .btn-logout { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-size: 16px; }
 
   .container { max-width: 900px; margin: 25px auto; padding: 0 15px; }
   
   .breadcrumbs {
-    background: var(--white); padding: 14px 18px; border-radius: 12px;
-    font-size: 15px; color: var(--muted); margin-bottom: 20px;
+    background: var(--white); padding: 18px; border-radius: 14px;
+    font-size: 16px; color: var(--muted); margin-bottom: 25px;
     display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e9ecef;
   }
-  .breadcrumbs span { cursor: pointer; color: var(--navy); font-weight: 700; }
-  .breadcrumbs i { font-size: 12px; color: #ccc; }
+  .breadcrumbs span { cursor: pointer; color: var(--navy); font-weight: 800; }
+  .breadcrumbs i { font-size: 14px; color: #ccc; }
 
-  /* شبكة الكروت */
-  .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  /* شبكة الكروت الضخمة */
+  .grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
   .card-item {
-    background: var(--white); border: 2px solid #e9ecef; border-radius: 16px; padding: 20px;
-    cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 12px;
+    background: var(--white); border: 2px solid #e9ecef; border-radius: 18px; padding: 24px;
+    cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 14px;
     position: relative; overflow: hidden;
   }
   .card-item:hover { border-color: var(--navy); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(21,39,65,0.08); }
   .card-item::before {
-    content: ''; position: absolute; top: 0; right: 0; width: 6px; height: 100%; background: var(--accent);
+    content: ''; position: absolute; top: 0; right: 0; width: 8px; height: 100%; background: var(--accent);
   }
   
-  .card-title { font-size: 19px; font-weight: 800; color: var(--navy); margin: 0; }
-  .card-type { font-size: 12px; font-weight: 700; color: var(--accent); background: #fdfaf3; padding: 4px 12px; border-radius: 20px; width: max-content; }
+  .card-title { font-size: 22px; font-weight: 800; color: var(--navy); margin: 0; }
+  .card-type { font-size: 14px; font-weight: 800; color: var(--accent); background: #fdfaf3; padding: 6px 14px; border-radius: 20px; width: max-content; }
 
-  /* تخصيص كروت الأجزاء الأساسية */
+  /* ألوان الأجزاء */
   .card-item.module_explain::before { background: #27ae60; }
   .card-item.module_video::before { background: #e74c3c; }
   .card-item.module_questions::before { background: #3498db; }
   .card-item.module_summary::before { background: #9b59b6; }
   .card-item.module_terms::before { background: #e67e22; }
 
-  /* عارض المحتوى */
-  .content-viewer {
-    background: var(--white); border-radius: 16px; padding: 25px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.05); border: 1px solid #e9ecef;
-  }
-  .content-header {
-    display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
-  }
-  .content-header h2 { margin: 0; color: var(--navy); font-size: 22px; font-family: Georgia, serif; }
-  .btn-back {
-    background: var(--navy); color: white; border: none; padding: 12px 20px;
-    border-radius: 10px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 15px;
+  .loading { text-align: center; color: var(--muted); padding: 40px; font-size: 20px; font-weight: 600; }
+
+  /* ===== شاشة العرض الكاملة (Full Screen Viewer) ===== */
+  #contentView {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: #fff; z-index: 9999; display: none; flex-direction: column;
   }
   
-  .iframe-container { width: 100%; min-height: 60vh; border-radius: 12px; overflow: hidden; border: 1px solid #e9ecef; }
-  .iframe-container iframe { width: 100%; height: 100%; border: none; }
+  .fullscreen-header {
+    background: var(--navy); color: white; padding: 15px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 10;
+  }
+  .fullscreen-title { font-size: 20px; font-weight: bold; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  
+  .btn-close-fullscreen {
+    background: #b91c1c; color: white; border: none; padding: 10px 20px;
+    border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-close-fullscreen:active { background: #991b1b; }
+  
+  /* محتوى الـ iframe */
+  .iframe-wrapper { flex: 1; width: 100%; position: relative; background: #fafbfc; }
+  .iframe-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-  .loading { text-align: center; color: var(--muted); padding: 40px; font-size: 18px; font-weight: 600; }
-
-  /* تجاوب مع شاشات الكمبيوتر */
   @media (min-width: 600px) {
     .grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -96,7 +96,7 @@
   <div class="app-brand">CLEAR<span>NOTE</span></div>
   <div class="nav-user">
     <div class="avatar-badge" id="userAvatar">U</div>
-    <span id="userName">...</span>
+    <span id="userName" style="display:none;">...</span>
     <button class="btn-logout" onclick="doLogout()">خروج</button>
   </div>
 </div>
@@ -109,21 +109,20 @@
       <div class="loading">جاري تحميل المحتوى...</div>
     </div>
   </div>
-
-  <div id="contentView" style="display:none;">
-    <div class="content-viewer">
-      <div class="content-header">
-        <h2 id="viewerTitle">عنوان المحتوى</h2>
-        <button class="btn-back" onclick="closeViewer()"><i class="fas fa-arrow-right"></i> رجوع</button>
-      </div>
-      <div class="iframe-container">
-        <iframe id="contentFrame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin"></iframe>
-      </div>
-    </div>
-  </div>
 </div>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- شاشة العرض ملء الشاشة -->
+<div id="contentView">
+  <div class="fullscreen-header">
+    <h2 class="fullscreen-title" id="viewerTitle">عنوان المحتوى</h2>
+    <button class="btn-close-fullscreen" onclick="closeViewer()">
+      <i class="fas fa-times"></i> خروج
+    </button>
+  </div>
+  <div class="iframe-wrapper">
+    <iframe id="contentFrame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-modals"></iframe>
+  </div>
+</div>
 
 <script type="module">
 import { db, onAuth, isAdmin, goTo, showToast, signOutUser } from "./shared.js";
@@ -154,7 +153,7 @@ async function loadTreeData() {
 function renderLevel(parentId) {
   const container = document.getElementById("cardsContainer");
   document.getElementById("mainView").style.display = "block";
-  document.getElementById("contentView").style.display = "none";
+  document.getElementById("contentView").style.display = "none"; // نقفل الشاشة الكاملة لو كانت مفتوحة
   container.innerHTML = "";
 
   updateBreadcrumbs(parentId);
@@ -172,22 +171,25 @@ function renderLevel(parentId) {
     if (node.type === 'year') typeLabel = "سنة دراسية";
     else if (node.type === 'program') typeLabel = "برنامج";
     else if (node.type === 'subject') typeLabel = "مادة";
-    else if (node.type === 'module_explain') { typeLabel = "الشرح"; typeIcon = "<i class='fas fa-file-alt' style='color:#27ae60; margin-left:8px;'></i>"; }
-    else if (node.type === 'module_video') { typeLabel = "فيديو"; typeIcon = "<i class='fas fa-video' style='color:#e74c3c; margin-left:8px;'></i>"; }
-    else if (node.type === 'module_questions') { typeLabel = "أسئلة"; typeIcon = "<i class='fas fa-question-circle' style='color:#3498db; margin-left:8px;'></i>"; }
-    else if (node.type === 'module_summary') { typeLabel = "ملخص"; typeIcon = "<i class='fas fa-clipboard-list' style='color:#9b59b6; margin-left:8px;'></i>"; }
-    else if (node.type === 'module_terms') { typeLabel = "مصطلحات"; typeIcon = "<i class='fas fa-book' style='color:#e67e22; margin-left:8px;'></i>"; }
+    else if (node.type === 'module_explain') { typeLabel = "الشرح"; typeIcon = "<i class='fas fa-file-alt' style='color:#27ae60; margin-left:10px; font-size:24px;'></i>"; }
+    else if (node.type === 'module_video') { typeLabel = "فيديو"; typeIcon = "<i class='fas fa-video' style='color:#e74c3c; margin-left:10px; font-size:24px;'></i>"; }
+    else if (node.type === 'module_questions') { typeLabel = "أسئلة"; typeIcon = "<i class='fas fa-question-circle' style='color:#3498db; margin-left:10px; font-size:24px;'></i>"; }
+    else if (node.type === 'module_summary') { typeLabel = "ملخص"; typeIcon = "<i class='fas fa-clipboard-list' style='color:#9b59b6; margin-left:10px; font-size:24px;'></i>"; }
+    else if (node.type === 'module_terms') { typeLabel = "مصطلحات"; typeIcon = "<i class='fas fa-book' style='color:#e67e22; margin-left:10px; font-size:24px;'></i>"; }
 
     const card = document.createElement("div");
     card.className = `card-item ${node.type}`;
     card.onclick = () => handleNodeClick(node);
     
-    // لو ده جزء أساسي (module)، العنوان هيبقى فيه اللوجو
     const titleHtml = node.type.startsWith('module_') ? `${typeIcon} ${node.title}` : node.title;
+    
+    // نظهر الوصف لو موجود
+    let descHtml = node.description ? `<div style="font-size:16px; color:var(--muted); margin-top:5px;">${node.description}</div>` : "";
 
     card.innerHTML = `
       <div class="card-type">${typeLabel}</div>
       <h3 class="card-title">${titleHtml}</h3>
+      ${descHtml}
     `;
     container.appendChild(card);
   });
@@ -217,33 +219,49 @@ function updateBreadcrumbs(parentId) {
   });
 }
 
+// ===== فتح الشاشة الكاملة =====
 function openContentViewer(node) {
-  document.getElementById("mainView").style.display = "none";
-  document.getElementById("contentView").style.display = "block";
   document.getElementById("viewerTitle").textContent = node.title;
+  document.getElementById("contentView").style.display = "flex";
 
   const iframe = document.getElementById("contentFrame");
-  const htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px; font-family:sans-serif;'><h2>لا يوجد محتوى مرفق بهذا الجزء حتى الآن.</h2></div>";
+  let htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px; font-family:sans-serif;'><h2>لا يوجد محتوى مرفق بهذا الجزء حتى الآن.</h2></div>";
   
   const fullHTML = `
     <!DOCTYPE html>
     <html dir="rtl">
     <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
       <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; line-height: 1.8; font-size: 17px; color: #1a1a1a; }
-        img { max-width: 100%; height: auto; border-radius: 8px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; line-height: 1.8; font-size: 18px; color: #1a1a1a; background: #fff; margin: 0; }
+        img { max-width: 100%; height: auto; border-radius: 10px; }
+        /* سكريبت الحفظ المحلي */
+        if (window.localStorage) {
+           console.log("Local storage is available.");
+        }
       </style>
     </head>
-    <body>${htmlContent}</body>
+    <body>
+      ${htmlContent}
+      <script>
+        // حفظ حالة السكرول محلياً
+        window.addEventListener('scroll', () => {
+          localStorage.setItem('scrollPos_${node.id}', window.scrollY);
+        });
+        // استعادة حالة السكرول
+        window.addEventListener('load', () => {
+          const pos = localStorage.getItem('scrollPos_${node.id}');
+          if (pos) window.scrollTo(0, parseInt(pos));
+        });
+      <\/script>
+    </body>
     </html>
   `;
   iframe.srcdoc = fullHTML;
 }
 
 window.closeViewer = function() {
-  document.getElementById("mainView").style.display = "block";
   document.getElementById("contentView").style.display = "none";
   document.getElementById("contentFrame").srcdoc = "";
 };
