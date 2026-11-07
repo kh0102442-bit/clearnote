@@ -59,8 +59,8 @@
       <div class="info-row"><span>الدور:</span> <b id="welcomeRole">—</b></div>
       <div class="info-row"><span>البريد:</span> <b id="welcomeEmail">—</b></div>
     </div>
+        <button class="btn-primary" id="adminBtn" style="display:none; background:#1f6b45; margin-bottom:10px;" onclick="goTo('admin.html')">الدخول إلى لوحة التحكم</button>
     <button class="btn-primary" onclick="doLogout()">تسجيل الخروج</button>
-    <div class="auth-foot" style="color:rgba(255,255,255,.6);margin-top:20px">لوحة التحكم قيد الإنشاء…</div>
   </div>
 </div>
 
@@ -167,8 +167,9 @@ onAuth(async (user, userData) => {
   welcomeScreen.style.display = "flex";
   document.getElementById("welcomeName").textContent = userData?.name || user.email;
   document.getElementById("welcomeEmail").textContent = user.email;
-  document.getElementById("welcomeRole").textContent =
-    isAdmin(userData) ? "أدمن" : "طالب";
+   if (isAdmin(userData)) {
+    document.getElementById("adminBtn").style.display = "block";
+  }
 });
 </script>
 
