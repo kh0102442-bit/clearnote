@@ -300,4 +300,40 @@ window.saveNode = async function() {
 
   try {
     if (currentEditId) {
-      await updateDoc(doc(db
+      await updateDoc(doc(db, "content_tree", currentEditId), data);
+      showToast("تم التعديل");
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db, "content_tree"), data);
+      showToast("تمت الإضافة");
+    }
+    closeDrawer();
+    loadTree();
+  } catch (e) {
+    showToast("خطأ: " + e.message, "error");
+  }
+};
+
+// 6. Delete Logic
+window.deleteNode = async function(id) {
+  if (treeData.some(n => n.parentId === id)) {
+    showToast("احذف التبويبات الفرعية أولاً!", "error");
+    return;
+  }
+  if (!confirm("هل أنت متأكد من الحذف؟")) return;
+  try {
+    await deleteDoc(doc(db, "content_tree", id));
+    showToast("تم الحذف");
+    loadTree();
+  } catch (e) {
+    showToast("خطأ في الحذف", "error");
+  }
+};
+
+// 7. Tool Click
+window.editToolContent = function(nodeId, toolKey) {
+  showToast("هنا هتفتح صفحة إضافة المحتوى للأداة: " + TOOLS[toolKey].label, "success");
+};
+</script>
+</body>
+</html>
