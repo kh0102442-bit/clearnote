@@ -2,52 +2,108 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ClearNote — منصة المذاكرة</title>
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css">
 <style>
-  /* ستايلات واجهة الطالب */
-  body { background: #f4f6f8; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  /* ستايلات واجهة الطالب الفخمة */
+  :root {
+    --navy: #152741; --accent: #a8741a; --bg: #f4f6f8;
+    --white: #ffffff; --text: #1a1a1a; --muted: #5b6472;
+  }
+  body { background: var(--bg); margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; color: var(--text); }
   
+  /* شريط علوي أنيق */
   .app-navbar {
-    background: #152741; color: white; padding: 15px 30px;
+    background: var(--navy); color: white; padding: 16px 24px;
     display: flex; justify-content: space-between; align-items: center;
-    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   }
-  .app-brand { font-family: Georgia, serif; font-size: 22px; letter-spacing: 2px; font-weight: bold; }
-  .app-brand span { color: #a8741a; }
-  .nav-user { display: flex; align-items: center; gap: 15px; font-size: 14px; }
-  .btn-outline-light { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: #fff; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-  .btn-outline-light:hover { background: rgba(255,255,255,0.1); }
-
-  .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+  .app-brand { font-family: Georgia, serif; font-size: 24px; letter-spacing: 2px; font-weight: bold; }
+  .app-brand span { color: var(--accent); }
   
-  /* Breadcrumbs */
-  .breadcrumbs { font-size: 14px; color: #5b6472; margin-bottom: 20px; display: flex; gap: 8px; align-items: center; }
-  .breadcrumbs span { cursor: pointer; color: #152741; font-weight: 600; }
-  .breadcrumbs span:hover { text-decoration: underline; }
+  .nav-user { display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 600; }
+  .avatar-badge {
+    width: 35px; height: 35px; border-radius: 50%; background: var(--accent);
+    display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;
+  }
+  .btn-logout {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: white; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: inherit;
+    transition: 0.2s;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,0.2); }
 
-  /* Grid Cards */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+  /* الحاوية الرئيسية */
+  .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+  
+  /* Breadcrumbs (مسار التنقل) */
+  .breadcrumbs {
+    background: var(--white); padding: 12px 20px; border-radius: 10px;
+    font-size: 14px; color: var(--muted); margin-bottom: 25px;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e9ecef;
+  }
+  .breadcrumbs span { cursor: pointer; color: var(--navy); font-weight: 700; transition: 0.2s; }
+  .breadcrumbs span:hover { color: var(--accent); }
+  .breadcrumbs i { font-size: 10px; color: #ccc; }
+
+  /* شبكة الكروت */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
   .card-item {
-    background: #fff; border: 1px solid #e9ecef; border-radius: 10px; padding: 20px;
-    cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; gap: 10px;
+    background: var(--white); border: 1px solid #e9ecef; border-radius: 14px; padding: 22px;
+    cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 12px;
+    position: relative; overflow: hidden;
   }
-  .card-item:hover { border-color: #152741; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(21,39,65,0.1); }
-  .card-title { font-size: 16px; font-weight: bold; color: #152741; margin: 0; }
-  .card-type { font-size: 12px; color: #a8741a; background: #fdfaf3; padding: 2px 8px; border-radius: 4px; width: max-content; }
-
-  /* Content Viewer */
-  .content-viewer { background: #fff; border-radius: 10px; padding: 30px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
-  .content-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; margin-bottom: 20px; }
-  .content-header h2 { margin: 0; color: #152741; font-size: 22px; font-family: Georgia, serif; }
-  .btn-back { background: #e9ecef; color: #152741; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-  .btn-back:hover { background: #d1d5db; }
+  .card-item::before {
+    content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%;
+    background: var(--accent); opacity: 0; transition: 0.3s;
+  }
+  .card-item:hover { border-color: var(--navy); transform: translateY(-5px); box-shadow: 0 10px 25px rgba(21,39,65,0.08); }
+  .card-item:hover::before { opacity: 1; }
   
-  .iframe-container { width: 100%; min-height: 500px; border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden; }
+  .card-title { font-size: 18px; font-weight: 800; color: var(--navy); margin: 0; }
+  .card-type {
+    font-size: 11px; font-weight: 700; color: var(--accent); background: #fdfaf3;
+    padding: 4px 10px; border-radius: 20px; width: max-content; letter-spacing: 0.5px;
+  }
+
+  /* عارض المحتوى (Content Viewer) */
+  .content-viewer {
+    background: var(--white); border-radius: 14px; padding: 30px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.05); border: 1px solid #e9ecef;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .content-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;
+  }
+  .content-header h2 { margin: 0; color: var(--navy); font-size: 24px; font-family: Georgia, serif; }
+  .btn-back {
+    background: var(--navy); color: white; border: none; padding: 10px 20px;
+    border-radius: 8px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px;
+    transition: 0.2s;
+  }
+  .btn-back:hover { background: #0f1e33; }
+  
+  .iframe-container { width: 100%; min-height: 60vh; border-radius: 8px; overflow: hidden; border: 1px solid #e9ecef; }
   .iframe-container iframe { width: 100%; height: 100%; border: none; }
 
-  .loading { text-align: center; color: #5b6472; padding: 40px; }
+  .loading { text-align: center; color: var(--muted); padding: 50px; font-weight: 600; }
+
+  /* التجاوب مع الموبايل */
+  @media (max-width: 768px) {
+    .app-navbar { padding: 12px 16px; }
+    .app-brand { font-size: 20px; }
+    .nav-user span { display: none; } /* إخفاء الاسم في الموبايل لتوفير مساحة */
+    .container { margin: 15px auto; padding: 0 15px; }
+    .grid { grid-template-columns: 1fr; gap: 15px; }
+    .card-item { padding: 18px; }
+    .content-viewer { padding: 20px; }
+    .content-header h2 { font-size: 20px; }
+  }
 </style>
 </head>
 <body>
@@ -55,8 +111,9 @@
 <div class="app-navbar">
   <div class="app-brand">CLEAR<span>NOTE</span></div>
   <div class="nav-user">
-    <span>مرحباً، <b id="userName">...</b></span>
-    <button class="btn-outline-light" onclick="doLogout()">خروج</button>
+    <div class="avatar-badge" id="userAvatar">U</div>
+    <span id="userName">...</span>
+    <button class="btn-logout" onclick="doLogout()">خروج</button>
   </div>
 </div>
 
@@ -76,7 +133,7 @@
         <button class="btn-back" onclick="closeViewer()"><i class="fas fa-arrow-right"></i> رجوع</button>
       </div>
       <div class="iframe-container">
-        <iframe id="contentFrame" sandbox="allow-scripts allow-popups allow-forms"></iframe>
+        <iframe id="contentFrame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin"></iframe>
       </div>
     </div>
   </div>
@@ -86,18 +143,16 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <script type="module">
-import { db, onAuth, isAdmin, goTo, showToast, signOutUser } from "./shared.js?v=3";
+import { db, onAuth, isAdmin, goTo, showToast, signOutUser } from "./shared.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let currentUser = null;
 let treeData = [];
-let currentPath = []; // لتخزين مسار التنقل الحالي
 
-// ===== 1. Auth & Load =====
 onAuth((user, userData) => {
   if (!user) { goTo("index.html"); return; }
-  currentUser = userData;
-  document.getElementById("userName").textContent = userData.name || user.email;
+  const name = userData.name || user.email;
+  document.getElementById("userName").textContent = name;
+  document.getElementById("userAvatar").textContent = name.charAt(0).toUpperCase();
   loadTreeData();
 });
 
@@ -107,23 +162,19 @@ async function loadTreeData() {
   try {
     const snap = await getDocs(collection(db, "content_tree"));
     treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderLevel("root"); // نبدأ من الجذر
+    renderLevel("root");
   } catch (e) {
-    document.getElementById("cardsContainer").innerHTML = `<div class="loading">خطأ في التحميل: ${e.message}</div>`;
+    document.getElementById("cardsContainer").innerHTML = `<div class="loading" style="color:#b91c1c;">خطأ في التحميل: ${e.message}</div>`;
   }
 }
 
-// ===== 2. Render Levels =====
 function renderLevel(parentId) {
   const container = document.getElementById("cardsContainer");
   document.getElementById("mainView").style.display = "block";
   document.getElementById("contentView").style.display = "none";
   container.innerHTML = "";
 
-  // تحديث الـ Breadcrumbs
   updateBreadcrumbs(parentId);
-
-  // فلترة العناصر حسب الأب
   const nodes = treeData.filter(n => n.parentId === parentId);
 
   if (nodes.length === 0) {
@@ -132,7 +183,6 @@ function renderLevel(parentId) {
   }
 
   nodes.forEach(node => {
-    // تحديد نوع العنصر للعرض
     let typeLabel = "محتوى";
     if (node.type === 'year') typeLabel = "سنة دراسية";
     else if (node.type === 'program') typeLabel = "برنامج";
@@ -142,7 +192,6 @@ function renderLevel(parentId) {
     const card = document.createElement("div");
     card.className = "card-item";
     card.onclick = () => handleNodeClick(node);
-    
     card.innerHTML = `
       <div class="card-type">${typeLabel}</div>
       <h3 class="card-title">${node.title}</h3>
@@ -153,57 +202,50 @@ function renderLevel(parentId) {
 
 function handleNodeClick(node) {
   if (node.type === 'content') {
-    // لو ده محتوى نهائي، نفتحه في المشغل
     openContentViewer(node);
   } else {
-    // لو تصنيف، ننزل مستوى أعمق
     renderLevel(node.id);
   }
 }
 
-// ===== 3. Breadcrumbs =====
 function updateBreadcrumbs(parentId) {
   const bc = document.getElementById("breadcrumbs");
   bc.innerHTML = `<span onclick="renderLevel('root')"><i class="fas fa-home"></i> الرئيسية</span>`;
-  
   if (parentId === "root") return;
 
-  // نبني المسار من الأب لحد الجذر
   let path = [];
   let current = treeData.find(n => n.id === parentId);
   while (current) {
     path.unshift(current);
     current = treeData.find(n => n.id === current.parentId);
   }
-
   path.forEach(p => {
-    bc.innerHTML += ` <i class="fas fa-chevron-left" style="font-size:10px; color:#a8741a;"></i> <span onclick="renderLevel('${p.id}')">${p.title}</span>`;
+    bc.innerHTML += ` <i class="fas fa-chevron-left"></i> <span onclick="renderLevel('${p.id}')">${p.title}</span>`;
   });
 }
 
-// ===== 4. Content Viewer =====
 function openContentViewer(node) {
   document.getElementById("mainView").style.display = "none";
   document.getElementById("contentView").style.display = "block";
   document.getElementById("viewerTitle").textContent = node.title;
 
-  // تحميل كود الـ HTML اللي إنت لصقته في لوحة التحكم جوه الـ iframe المعزول
   const iframe = document.getElementById("contentFrame");
-  const htmlContent = node.htmlContent || "<h2 style='text-align:center; padding:50px; font-family:sans-serif;'>لا يوجد محتوى مرفق بهذه المحاضرة حتى الآن.</h2>";
+  const htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px; font-family:sans-serif;'><h2>لا يوجد محتوى مرفق بهذه المحاضرة حتى الآن.</h2></div>";
   
-  // بنغلف الكود بـ HTML كامل عشان يظهر صح
   const fullHTML = `
     <!DOCTYPE html>
     <html dir="rtl">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <style>body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; line-height: 1.6; }</style>
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; line-height: 1.8; color: #1a1a1a; }
+        img { max-width: 100%; height: auto; border-radius: 8px; }
+      </style>
     </head>
     <body>${htmlContent}</body>
     </html>
   `;
-  
   iframe.srcdoc = fullHTML;
 }
 
