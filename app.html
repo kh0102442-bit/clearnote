@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClearNote — منصة المذاكرة</title>
+<link rel="stylesheet" href="styles.css?v=3">
+<style>
+  /* ستايلات واجهة الطالب */
+  body { background: #f4f6f8; margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  
+  .app-navbar {
+    background: #152741; color: white; padding: 15px 30px;
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .app-brand { font-family: Georgia, serif; font-size: 22px; letter-spacing: 2px; font-weight: bold; }
+  .app-brand span { color: #a8741a; }
+  .nav-user { display: flex; align-items: center; gap: 15px; font-size: 14px; }
+  .btn-outline-light { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: #fff; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+  .btn-outline-light:hover { background: rgba(255,255,255,0.1); }
+
+  .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+  
+  /* Breadcrumbs */
+  .breadcrumbs { font-size: 14px; color: #5b6472; margin-bottom: 20px; display: flex; gap: 8px; align-items: center; }
+  .breadcrumbs span { cursor: pointer; color: #152741; font-weight: 600; }
+  .breadcrumbs span:hover { text-decoration: underline; }
+
+  /* Grid Cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+  .card-item {
+    background: #fff; border: 1px solid #e9ecef; border-radius: 10px; padding: 20px;
+    cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; gap: 10px;
+  }
+  .card-item:hover { border-color: #152741; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(21,39,65,0.1); }
+  .card-title { font-size: 16px; font-weight: bold; color: #152741; margin: 0; }
+  .card-type { font-size: 12px; color: #a8741a; background: #fdfaf3; padding: 2px 8px; border-radius: 4px; width: max-content; }
+
+  /* Content Viewer */
+  .content-viewer { background: #fff; border-radius: 10px; padding: 30px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
+  .content-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; margin-bottom: 20px; }
+  .content-header h2 { margin: 0; color: #152741; font-size: 22px; font-family: Georgia, serif; }
+  .btn-back { background: #e9ecef; color: #152741; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .btn-back:hover { background: #d1d5db; }
+  
+  .iframe-container { width: 100%; min-height: 500px; border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden; }
+  .iframe-container iframe { width: 100%; height: 100%; border: none; }
+
+  .loading { text-align: center; color: #5b6472; padding: 40px; }
+</style>
+</head>
+<body>
+
+<div class="app-navbar">
+  <div class="app-brand">CLEAR<span>NOTE</span></div>
+  <div class="nav-user">
+    <span>مرحباً، <b id="userName">...</b></span>
+    <button class="btn-outline-light" onclick="doLogout()">خروج</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="breadcrumbs" id="breadcrumbs"></div>
+  
+  <div id="mainView">
+    <div id="cardsContainer" class="grid">
+      <div class="loading">جاري تحميل المحتوى...</div>
+    </div>
+  </div>
+
+  <div id="contentView" style="display:none;">
+    <div class="content-viewer">
+      <div class="content-header">
+        <h2 id="viewerTitle">عنوان المحتوى</h2>
+        <button class="btn-back" onclick="closeViewer()"><i class="fas fa-arrow-right"></i> رجوع</button>
+      </div>
+      <div class="iframe-container">
+        <iframe id="contentFrame" sandbox="allow-scripts allow-popups allow-forms"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script type="module">
+import { db, onAuth, isAdmin, goTo, showToast, signOutUser } from "./shared.js?v=3";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let currentUser = null;
+let treeData = [];
+let currentPath = []; // لتخزين مسار التنقل الحالي
+
+// ===== 1. Auth & Load =====
+onAuth((user, userData) => {
+  if (!user) { goTo("index.html"); return; }
+  currentUser = userData;
+  document.getElementById("userName").textContent = userData.name || user.email;
+  loadTreeData();
+});
+
+window.doLogout = async () => { await signOutUser(); goTo("index.html"); };
+
+async function loadTreeData() {
+  try {
+    const snap = await getDocs(collection(db, "content_tree"));
+    treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderLevel("root"); // نبدأ من الجذر
+  } catch (e) {
+    document.getElementById("cardsContainer").innerHTML = `<div class="loading">خطأ في التحميل: ${e.message}</div>`;
+  }
+}
+
+// ===== 2. Render Levels =====
+function renderLevel(parentId) {
+  const container = document.getElementById("cardsContainer");
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("contentView").style.display = "none";
+  container.innerHTML = "";
+
+  // تحديث الـ Breadcrumbs
+  updateBreadcrumbs(parentId);
+
+  // فلترة العناصر حسب الأب
+  const nodes = treeData.filter(n => n.parentId === parentId);
+
+  if (nodes.length === 0) {
+    container.innerHTML = `<div class="loading">لا يوجد محتوى هنا حالياً.</div>`;
+    return;
+  }
+
+  nodes.forEach(node => {
+    // تحديد نوع العنصر للعرض
+    let typeLabel = "محتوى";
+    if (node.type === 'year') typeLabel = "سنة دراسية";
+    else if (node.type === 'program') typeLabel = "برنامج";
+    else if (node.type === 'subject') typeLabel = "مادة";
+    else if (node.type === 'lecture') typeLabel = "محاضرة / سكشن";
+
+    const card = document.createElement("div");
+    card.className = "card-item";
+    card.onclick = () => handleNodeClick(node);
+    
+    card.innerHTML = `
+      <div class="card-type">${typeLabel}</div>
+      <h3 class="card-title">${node.title}</h3>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function handleNodeClick(node) {
+  if (node.type === 'content') {
+    // لو ده محتوى نهائي، نفتحه في المشغل
+    openContentViewer(node);
+  } else {
+    // لو تصنيف، ننزل مستوى أعمق
+    renderLevel(node.id);
+  }
+}
+
+// ===== 3. Breadcrumbs =====
+function updateBreadcrumbs(parentId) {
+  const bc = document.getElementById("breadcrumbs");
+  bc.innerHTML = `<span onclick="renderLevel('root')"><i class="fas fa-home"></i> الرئيسية</span>`;
+  
+  if (parentId === "root") return;
+
+  // نبني المسار من الأب لحد الجذر
+  let path = [];
+  let current = treeData.find(n => n.id === parentId);
+  while (current) {
+    path.unshift(current);
+    current = treeData.find(n => n.id === current.parentId);
+  }
+
+  path.forEach(p => {
+    bc.innerHTML += ` <i class="fas fa-chevron-left" style="font-size:10px; color:#a8741a;"></i> <span onclick="renderLevel('${p.id}')">${p.title}</span>`;
+  });
+}
+
+// ===== 4. Content Viewer =====
+function openContentViewer(node) {
+  document.getElementById("mainView").style.display = "none";
+  document.getElementById("contentView").style.display = "block";
+  document.getElementById("viewerTitle").textContent = node.title;
+
+  // تحميل كود الـ HTML اللي إنت لصقته في لوحة التحكم جوه الـ iframe المعزول
+  const iframe = document.getElementById("contentFrame");
+  const htmlContent = node.htmlContent || "<h2 style='text-align:center; padding:50px; font-family:sans-serif;'>لا يوجد محتوى مرفق بهذه المحاضرة حتى الآن.</h2>";
+  
+  // بنغلف الكود بـ HTML كامل عشان يظهر صح
+  const fullHTML = `
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; line-height: 1.6; }</style>
+    </head>
+    <body>${htmlContent}</body>
+    </html>
+  `;
+  
+  iframe.srcdoc = fullHTML;
+}
+
+window.closeViewer = function() {
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("contentView").style.display = "none";
+  document.getElementById("contentFrame").srcdoc = "";
+};
+</script>
+</body>
+</html>
