@@ -1,8 +1,6 @@
 :root {
   --navy: #152741;
-  --navy-dark: #0f1e33;
   --accent: #a8741a;
-  --green: #1f6b45;
   --bg: #f4f6f8;
   --white: #ffffff;
   --text: #1a1a1a;
@@ -10,24 +8,20 @@
   --line: #e9ecef;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-/* أساسيات الموبايل */
 html {
-  font-size: 18px; /* الخط الأساسي الكبير */
+  font-size: 18px;
   -webkit-text-size-adjust: 100%;
 }
 
 html, body {
   margin: 0; padding: 0;
   max-width: 100vw; overflow-x: hidden;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--bg); color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.6;
 }
 
-/* شاشة الدخول */
+/* تنسيقات صفحة الدخول */
 .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0a0c0f 0%, #152741 100%); padding: 15px; }
 .auth-box { background: var(--white); border-radius: 20px; padding: 30px 20px; width: 100%; max-width: 420px; box-shadow: 0 10px 40px rgba(0,0,0,.4); }
 .brand { text-align: center; margin-bottom: 25px; }
@@ -36,22 +30,22 @@ html, body {
 .brand-sub { font-size: 0.9rem; letter-spacing: 3px; color: var(--muted); margin-top: 5px; }
 .auth-tabs { display: flex; gap: 5px; background: #f0f2f5; padding: 5px; border-radius: 14px; margin-bottom: 25px; }
 .auth-tab { flex: 1; padding: 12px; border: none; background: transparent; border-radius: 10px; font-size: 1.1rem; font-weight: 700; color: var(--muted); cursor: pointer; }
-.auth-tab.active { background: var(--navy); color: white; box-shadow: 0 4px 10px rgba(21,39,65,.2); }
+.auth-tab.active { background: var(--navy); color: white; }
 .auth-form { display: none; }
 .auth-form.active { display: block; }
 .auth-form label { display: block; font-size: 1rem; color: var(--navy); font-weight: 700; margin-bottom: 8px; margin-top: 15px; }
 .auth-form input { width: 100%; padding: 16px; border: 2px solid var(--line); border-radius: 10px; background: #fafbfc; font-size: 1rem; box-sizing: border-box; }
-.auth-form input:focus { outline: none; border-color: var(--navy); background: white; }
-.btn-primary { width: 100%; padding: 18px; background: var(--navy); color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold; margin-top: 25px; cursor: pointer; box-shadow: 0 4px 15px rgba(21,39,65,.2); }
+.auth-form input:focus { outline: none; border-color: var(--navy); }
+.btn-primary { width: 100%; padding: 18px; background: var(--navy); color: white; border: none; border-radius: 12px; font-size: 1.2rem; font-weight: bold; margin-top: 25px; cursor: pointer; }
 .status-msg { font-size: 1rem; min-height: 24px; margin: 10px 0; text-align: center; font-weight: 600; }
 .status-msg.err { color: #b91c1c; }
-.status-msg.ok { color: var(--green); }
+.status-msg.ok { color: #1f6b45; }
 .auth-foot { text-align: center; font-size: 0.9rem; color: var(--muted); margin-top: 25px; }
 
-/* شاشة الترحيب */
+/* تنسيقات شاشة الترحيب */
 .welcome-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #152741 0%, #0a0c0f 100%); padding: 15px; }
-.welcome-box { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.15); border-radius: 20px; padding: 30px 20px; width: 100%; max-width: 460px; color: white; text-align: center; backdrop-filter: blur(10px); }
-.welcome-box h2 { font-size: 1.6rem; margin: 0 0 8px; font-family: Georgia, serif; color: #fff; }
+.welcome-box { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.15); border-radius: 20px; padding: 30px 20px; width: 100%; max-width: 460px; color: white; text-align: center; }
+.welcome-box h2 { font-size: 1.6rem; margin: 0 0 8px; color: #fff; }
 .welcome-sub { color: rgba(255,255,255,.65); font-size: 1.1rem; margin: 0 0 25px; }
 .welcome-info { background: rgba(0,0,0,.25); border-radius: 12px; padding: 18px; margin-bottom: 25px; text-align: right; }
 .info-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,.08); }
