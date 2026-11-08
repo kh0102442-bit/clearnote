@@ -52,7 +52,7 @@
   <div class="breadcrumbs" id="breadcrumbs"></div>
   <div id="mainView">
     <div id="cardsContainer" class="grid">
-      <div class="loading" id="loadingText">جاري تحميل المحتوى...</div>
+      <div class="loading" id="loadingText">جاري الاتصال بقاعدة البيانات...</div>
     </div>
   </div>
 </div>
@@ -67,13 +67,11 @@
   </div>
 </div>
 
-<!-- تضمين مكتبة Firebase مباشرة -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
 <script>
-  // إعدادات Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCHspBBXBG8DmLPOfKcqE8H8SmAjw5HGpQ",
     authDomain: "clearnote-aefcb.firebaseapp.com",
@@ -89,6 +87,30 @@
 
   let treeData = [];
 
+  // مراقبة حالة الدخول
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = "index.html"; // لو مش مسجل دخول ارجع
+    } else {
+      document.getElementById("userAvatar").textContent = user.email.charAt(0).toUpperCase();
+      
+      // بدء جلب البيانات
+      db.collection("content_tree").get().then(snap => {
+        treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderLevel("root");
+      }).catch(err => {
+        // لو حصل خطأ، هنطبع رسالة حمراء في نص الشاشة
+        document.getElementById("cardsContainer").innerHTML = `
+          <div style="color:#b91c1c; background:#fbeaea; padding:20px; border-radius:12px; border:2px solid #b91c1c; text-align:center;">
+            <h3 style="margin-top:0;">فشل الاتصال بقاعدة البيانات!</h3>
+            <p style="font-family:monospace; direction:ltr; font-size:14px; background:#fff; padding:10px; border-radius:8px;">${err.message}</p>
+            <p>تأكد من قواعد الحماية (Rules) في Firebase.</p>
+          </div>
+        `;
+      });
+    }
+  });
+
   // دالة عرض المحتوى
   function renderLevel(parentId) {
     const container = document.getElementById("cardsContainer"); 
@@ -96,7 +118,6 @@
     document.getElementById("contentView").style.display = "none"; 
     container.innerHTML = "";
     
-    // تحديث المسار
     const bc = document.getElementById("breadcrumbs"); 
     bc.innerHTML = `<span onclick="renderLevel('root')"><i class="fas fa-home"></i> الرئيسية</span>`; 
     if (parentId !== "root") {
@@ -146,28 +167,6 @@
     document.getElementById("contentView").style.display = "none"; 
     document.getElementById("contentFrame").srcdoc = ""; 
   }
-
-  // مراقبة تسجيل الدخول وجلب البيانات
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = "index.html";
-    } else {
-      document.getElementById("userAvatar").textContent = user.email.charAt(0).toUpperCase();
-      
-      // جلب البيانات
-      db.collection("content_tree").get().then(snap => {
-        treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderLevel("root");
-      }).catch(err => {
-        document.getElementById("cardsContainer").innerHTML = `
-          <div style="color:red; background:#fbeaea; padding:20px; border-radius:10px; text-align:center;">
-            <h3>حدث خطأ في الاتصال بقاعدة البيانات:</h3>
-            <p style="direction:ltr;">${err.message}</p>
-          </div>
-        `;
-      });
-    }
-  });
 </script>
 </body>
 </html>
