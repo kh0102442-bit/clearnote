@@ -2,16 +2,172 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClearNote - اختبار</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ClearNote — منصة المذاكرة</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  body { background: #152741; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: sans-serif; flex-direction: column; }
-  h1 { font-size: 3rem; color: #a8741a; }
-  p { font-size: 1.5rem; }
+  :root { --navy: #152741; --accent: #a8741a; --bg: #f4f6f8; --white: #ffffff; --text: #1a1a1a; --muted: #5b6472; --line: #e9ecef; }
+  html { font-size: 18px; -webkit-text-size-adjust: 100%; }
+  html, body { margin: 0; padding: 0; max-width: 100vw; overflow-x: hidden; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; line-height: 1.6; padding-bottom: 50px; }
+  .app-navbar { background: var(--navy); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+  .app-brand { font-family: Georgia, serif; font-size: 1.6rem; letter-spacing: 2px; font-weight: bold; }
+  .app-brand span { color: var(--accent); }
+  .nav-user { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+  .avatar-badge { width: 52px; height: 52px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.4rem; }
+  .btn-logout { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px 20px; border-radius: 12px; font-size: 1rem; }
+  .container { max-width: 800px; margin: 25px auto; padding: 0 15px; }
+  .breadcrumbs { background: var(--white); padding: 20px; border-radius: 16px; color: var(--muted); margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border: 2px solid var(--line); }
+  .breadcrumbs span { cursor: pointer; color: var(--navy); font-weight: 800; font-size: 1.1rem; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .card-item { background: var(--white); border: 2px solid var(--line); border-radius: 20px; padding: 25px; display: flex; flex-direction: column; gap: 15px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.02); cursor: pointer; }
+  .card-item::before { content: ''; position: absolute; top: 0; right: 0; width: 8px; height: 100%; background: var(--accent); }
+  .card-title { font-size: 1.5rem; font-weight: 800; color: var(--navy); margin: 0; }
+  .card-type { font-size: 1rem; font-weight: 800; color: var(--accent); background: #fdfaf3; padding: 8px 16px; border-radius: 20px; width: max-content; }
+  .card-item.module_explain::before { background: #27ae60; }
+  .card-item.module_video::before { background: #e74c3c; }
+  .card-item.module_questions::before { background: #3498db; }
+  .card-item.module_summary::before { background: #9b59b6; }
+  .card-item.module_terms::before { background: #e67e22; }
+  .loading { text-align: center; color: var(--muted); padding: 40px; font-size: 1.4rem; font-weight: 600; }
+  #contentView { position: fixed; inset: 0; background: #fff; z-index: 9999; display: none; flex-direction: column; }
+  .fullscreen-header { background: var(--navy); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .fullscreen-title { font-size: 1.4rem; font-weight: bold; margin: 0; }
+  .btn-close-fullscreen { background: #b91c1c; color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
+  .iframe-wrapper { flex: 1; position: relative; background: #fafbfc; }
+  .iframe-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+  @media (min-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
-  <h1>أهلاً بك يا زعيم!</h1>
-  <p>الصفحة دي شغالة تمام ومفيش أي Firebase.</p>
+
+<div class="app-navbar">
+  <div class="app-brand">CLEAR<span>NOTE</span></div>
+  <div class="nav-user">
+    <div class="avatar-badge" id="userAvatar">U</div>
+    <button class="btn-logout" onclick="window.location.href='index.html'">خروج</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="breadcrumbs" id="breadcrumbs"></div>
+  <div id="mainView">
+    <div id="cardsContainer" class="grid">
+      <div class="loading" id="loadingText">جاري تحميل المحتوى...</div>
+    </div>
+  </div>
+</div>
+
+<div id="contentView">
+  <div class="fullscreen-header">
+    <h2 class="fullscreen-title" id="viewerTitle">المحتوى</h2>
+    <button class="btn-close-fullscreen" onclick="closeViewer()"><i class="fas fa-times"></i> خروج</button>
+  </div>
+  <div class="iframe-wrapper">
+    <iframe id="contentFrame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-modals"></iframe>
+  </div>
+</div>
+
+<!-- تضمين مكتبة Firebase مباشرة -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+<script>
+  // إعدادات Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyCHspBBXBG8DmLPOfKcqE8H8SmAjw5HGpQ",
+    authDomain: "clearnote-aefcb.firebaseapp.com",
+    projectId: "clearnote-aefcb",
+    storageBucket: "clearnote-aefcb.firebasestorage.app",
+    messagingSenderId: "909239922660",
+    appId: "1:909239922660:web:1db0fbc92c419aa13a21f1"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  let treeData = [];
+
+  // دالة عرض المحتوى
+  function renderLevel(parentId) {
+    const container = document.getElementById("cardsContainer"); 
+    document.getElementById("mainView").style.display = "block"; 
+    document.getElementById("contentView").style.display = "none"; 
+    container.innerHTML = "";
+    
+    // تحديث المسار
+    const bc = document.getElementById("breadcrumbs"); 
+    bc.innerHTML = `<span onclick="renderLevel('root')"><i class="fas fa-home"></i> الرئيسية</span>`; 
+    if (parentId !== "root") {
+      let path = []; let current = treeData.find(n => n.id === parentId); 
+      while (current) { path.unshift(current); current = treeData.find(n => n.id === current.parentId); }
+      path.forEach(p => { bc.innerHTML += ` <i class="fas fa-chevron-left"></i> <span onclick="renderLevel('${p.id}')">${p.title}</span>`; });
+    }
+
+    const nodes = treeData.filter(n => n.parentId === parentId);
+    if (nodes.length === 0) { container.innerHTML = `<div class="loading">لا يوجد محتوى هنا.</div>`; return; }
+    
+    nodes.forEach(node => {
+      let typeLabel = "تصنيف"; let typeIcon = "";
+      if (node.type === 'year') typeLabel = "سنة دراسية"; 
+      else if (node.type === 'program') typeLabel = "برنامج"; 
+      else if (node.type === 'subject') typeLabel = "مادة"; 
+      else if (node.type === 'module_explain') { typeLabel = "الشرح"; typeIcon = "<i class='fas fa-file-alt' style='color:#27ae60; margin-left:10px; font-size:1.8rem;'></i>"; } 
+      else if (node.type === 'module_video') { typeLabel = "فيديو"; typeIcon = "<i class='fas fa-video' style='color:#e74c3c; margin-left:10px; font-size:1.8rem;'></i>"; } 
+      else if (node.type === 'module_questions') { typeLabel = "أسئلة"; typeIcon = "<i class='fas fa-question-circle' style='color:#3498db; margin-left:10px; font-size:1.8rem;'></i>"; } 
+      else if (node.type === 'module_summary') { typeLabel = "ملخص"; typeIcon = "<i class='fas fa-clipboard-list' style='color:#9b59b6; margin-left:10px; font-size:1.8rem;'></i>"; } 
+      else if (node.type === 'module_terms') { typeLabel = "مصطلحات"; typeIcon = "<i class='fas fa-book' style='color:#e67e22; margin-left:10px; font-size:1.8rem;'></i>"; }
+      
+      const card = document.createElement("div"); 
+      card.className = `card-item ${node.type}`; 
+      card.onclick = () => handleNodeClick(node);
+      const titleHtml = node.type.startsWith('module_') ? `${typeIcon} ${node.title}` : node.title; 
+      let descHtml = node.description ? `<div style="font-size:1.1rem; color:var(--muted); margin-top:5px;">${node.description}</div>` : "";
+      card.innerHTML = `<div class="card-type">${typeLabel}</div><h3 class="card-title">${titleHtml}</h3>${descHtml}`; 
+      container.appendChild(card);
+    });
+  }
+
+  function handleNodeClick(node) { 
+    if (node.type === 'content' || node.type.startsWith('module_')) { 
+      document.getElementById("viewerTitle").textContent = node.title; 
+      document.getElementById("contentView").style.display = "flex"; 
+      const iframe = document.getElementById("contentFrame");
+      let htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px;'><h2>لا يوجد محتوى.</h2></div>";
+      const fullHTML = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body { font-family: sans-serif; padding: 20px; line-height: 1.8; font-size: 1.2rem; }</style></head><body>${htmlContent}</body></html>`;
+      iframe.srcdoc = fullHTML;
+    } else { 
+      renderLevel(node.id); 
+    } 
+  }
+
+  function closeViewer() { 
+    document.getElementById("contentView").style.display = "none"; 
+    document.getElementById("contentFrame").srcdoc = ""; 
+  }
+
+  // مراقبة تسجيل الدخول وجلب البيانات
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("userAvatar").textContent = user.email.charAt(0).toUpperCase();
+      
+      // جلب البيانات
+      db.collection("content_tree").get().then(snap => {
+        treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderLevel("root");
+      }).catch(err => {
+        document.getElementById("cardsContainer").innerHTML = `
+          <div style="color:red; background:#fbeaea; padding:20px; border-radius:10px; text-align:center;">
+            <h3>حدث خطأ في الاتصال بقاعدة البيانات:</h3>
+            <p style="direction:ltr;">${err.message}</p>
+          </div>
+        `;
+      });
+    }
+  });
+</script>
 </body>
 </html>
