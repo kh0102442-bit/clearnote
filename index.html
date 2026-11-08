@@ -1,1597 +1,270 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#2a3f5f">
-<title>Parasitology — Biodiversity, Flatworms &amp; Tapeworms Midterm Master</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ClearNote — منصة المذاكرة</title>
+<link rel="stylesheet" href="styles.css">
 <style>
-/* ===================== VARIABLES — Midnight Blue / Copper ===================== */
-:root{
-  --bg:#f6f4ef; --bg2:#ebe6db; --card:#ffffff; --ink:#1a2138; --muted:#6b6a63;
-  --line:#d9d3c4; --accent:#2a3f5f; --accent-soft:#dfe5ef; --accent2:#b87333;
-  --accent2-soft:#f4e7d5; --gold:#b8873a; --gold-soft:#faf0dc;
-  --danger:#b3261e; --danger-soft:#fbe8e6; --ok:#2e7d5b; --ok-soft:#e2f3ea;
-  --rose:#5c6b8a; --rose-soft:#e6ebf3; --mauve:#8a7d99; --mauve-soft:#efecf3;
-  --radius:18px; --shadow:0 6px 20px rgba(45,55,80,.10);
-}
-[data-theme="dark"]{
-  --bg:#080b12; --bg2:#101521; --card:#171e2c; --ink:#e6eef5; --muted:#a8b0bc;
-  --line:#28313f; --accent:#a8bcda; --accent-soft:#181f30; --accent2:#d9a87a;
-  --accent2-soft:#2a1e14; --gold:#e0b062; --gold-soft:#2a2113;
-  --danger:#ff8a80; --danger-soft:#2e1a18; --ok:#7ee2a8; --ok-soft:#12291c;
-  --rose:#b0c0dc; --rose-soft:#181f30; --mauve:#c0b4cc; --mauve-soft:#171e2c;
-  --shadow:0 6px 20px rgba(0,0,0,.55);
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{
-  margin:0;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.85;
-  font-family:"Segoe UI","Noto Naskh Arabic","Tahoma",system-ui,-apple-system,sans-serif;
-  transition:background .3s,color .3s;overflow-x:hidden;padding-bottom:20px;
-}
-.wrap{max-width:840px;margin:0 auto;padding:0 14px 130px}
+  :root {
+    --navy: #152741; --accent: #a8741a; --bg: #f4f6f8;
+    --white: #ffffff; --text: #1a1a1a; --muted: #5b6472;
+  }
+  body { background: var(--bg); margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); font-size: 18px; }
 
-header.top{
-  position:sticky;top:0;z-index:60;background:var(--bg);
-  border-bottom:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.04);
-}
-.top-in{max-width:840px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:10px}
-.logo{
-  width:40px;height:40px;border-radius:12px;flex:none;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  display:grid;place-items:center;color:#fff;font-weight:800;font-size:17px;
-}
-.titles{flex:1;min-width:0}
-.titles h1{margin:0;font-size:14px;font-weight:800;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.titles p{margin:0;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hbtns{display:flex;gap:6px;flex:none}
-.icon-btn{
-  border:1px solid var(--line);background:var(--card);color:var(--ink);
-  width:40px;height:40px;border-radius:12px;font-size:16px;cursor:pointer;flex:none;
-  display:grid;place-items:center;transition:.2s;
-}
-.icon-btn:active{transform:scale(.92)}
-.icon-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  /* شريط علوي كبير */
+  .app-navbar {
+    background: var(--navy); color: white; padding: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .app-brand { font-family: Georgia, serif; font-size: 24px; letter-spacing: 2px; font-weight: bold; }
+  .app-brand span { color: var(--accent); }
+  
+  .nav-user { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 600; }
+  .avatar-badge { width: 45px; height: 45px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size:20px; }
+  .btn-logout { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-size: 16px; }
 
-.card{
-  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-  padding:16px;margin:14px 0;box-shadow:var(--shadow);
-  overflow-wrap:break-word;word-wrap:break-word;
-}
-.card h2{
-  margin:0 0 12px;font-size:18px;font-weight:800;color:var(--accent);
-  display:flex;align-items:center;gap:9px;line-height:1.45;flex-wrap:wrap;
-}
-.card h2 .num{
-  background:var(--accent-soft);color:var(--accent);width:32px;height:32px;flex:none;
-  border-radius:10px;display:grid;place-items:center;font-size:14px;font-weight:800;
-}
-.card h3{margin:18px 0 8px;font-size:16px;font-weight:800;color:var(--accent2);line-height:1.5}
-.card h4{margin:14px 0 6px;font-size:15px;font-weight:800;color:var(--rose)}
-.card p{margin:8px 0}
-.card ul,.card ol{margin:8px 0;padding-inline-start:22px}
-.card li{margin:6px 0;line-height:1.75}
-.muted{color:var(--muted);font-size:14px}
+  .container { max-width: 900px; margin: 25px auto; padding: 0 15px; }
+  
+  .breadcrumbs {
+    background: var(--white); padding: 18px; border-radius: 14px;
+    font-size: 16px; color: var(--muted); margin-bottom: 25px;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e9ecef;
+  }
+  .breadcrumbs span { cursor: pointer; color: var(--navy); font-weight: 800; }
+  .breadcrumbs i { font-size: 14px; color: #ccc; }
 
-.box{border-radius:14px;padding:13px 15px;margin:12px 0;border:1px solid;font-size:15px;line-height:1.85}
-.box .bt{font-weight:800;display:block;margin-bottom:6px;font-size:14.5px}
-.box.def{background:var(--accent-soft);border-color:var(--accent)}
-.box.def .bt{color:var(--accent)}
-.box.tip{background:var(--gold-soft);border-color:var(--gold)}
-.box.tip .bt{color:var(--gold)}
-.box.warn{background:var(--danger-soft);border-color:var(--danger)}
-.box.warn .bt{color:var(--danger)}
-.box.ex{background:var(--accent2-soft);border-color:var(--accent2)}
-.box.ex .bt{color:var(--accent2)}
+  /* شبكة الكروت الضخمة */
+  .grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  .card-item {
+    background: var(--white); border: 2px solid #e9ecef; border-radius: 18px; padding: 24px;
+    cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 14px;
+    position: relative; overflow: hidden;
+  }
+  .card-item:hover { border-color: var(--navy); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(21,39,65,0.08); }
+  .card-item::before {
+    content: ''; position: absolute; top: 0; right: 0; width: 8px; height: 100%; background: var(--accent);
+  }
+  
+  .card-title { font-size: 22px; font-weight: 800; color: var(--navy); margin: 0; }
+  .card-type { font-size: 14px; font-weight: 800; color: var(--accent); background: #fdfaf3; padding: 6px 14px; border-radius: 20px; width: max-content; }
 
-.tw{overflow-x:auto;margin:14px 0;-webkit-overflow-scrolling:touch;border-radius:12px}
-table{width:100%;border-collapse:collapse;font-size:14px;min-width:460px}
-th,td{border:1px solid var(--line);padding:9px 10px;text-align:left;line-height:1.6}
-th{background:var(--accent-soft);color:var(--accent);font-weight:800;font-size:13.5px;text-align:center}
-tbody tr:nth-child(even){background:var(--bg2)}
+  /* ألوان الأجزاء */
+  .card-item.module_explain::before { background: #27ae60; }
+  .card-item.module_video::before { background: #e74c3c; }
+  .card-item.module_questions::before { background: #3498db; }
+  .card-item.module_summary::before { background: #9b59b6; }
+  .card-item.module_terms::before { background: #e67e22; }
 
-.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.toc a{
-  text-decoration:none;font-size:13px;background:var(--bg2);color:var(--ink);
-  border:1px solid var(--line);border-radius:20px;padding:6px 13px;transition:.2s;line-height:1.5;
-}
-.toc a:active{background:var(--accent-soft);border-color:var(--accent)}
+  .loading { text-align: center; color: var(--muted); padding: 40px; font-size: 20px; font-weight: 600; }
 
-nav.bottom{
-  position:fixed;bottom:0;left:0;right:0;z-index:70;background:var(--card);
-  border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));
-  display:flex;box-shadow:0 -4px 20px rgba(0,0,0,.07);
-}
-nav.bottom button{
-  flex:1;background:none;border:none;color:var(--muted);font-family:inherit;
-  font-size:10px;font-weight:700;padding:5px 2px;border-radius:12px;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:2px;transition:.2s;line-height:1.3;
-}
-nav.bottom button .ic{font-size:18px;line-height:1}
-nav.bottom button.on{color:var(--accent);background:var(--accent-soft)}
+  /* ===== شاشة العرض الكاملة (Full Screen Viewer) ===== */
+  #contentView {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: #fff; z-index: 9999; display: none; flex-direction: column;
+  }
+  
+  .fullscreen-header {
+    background: var(--navy); color: white; padding: 15px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 10;
+  }
+  .fullscreen-title { font-size: 20px; font-weight: bold; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  
+  .btn-close-fullscreen {
+    background: #b91c1c; color: white; border: none; padding: 10px 20px;
+    border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-close-fullscreen:active { background: #991b1b; }
+  
+  /* محتوى الـ iframe */
+  .iframe-wrapper { flex: 1; width: 100%; position: relative; background: #fafbfc; }
+  .iframe-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-.btn{
-  border:none;border-radius:14px;padding:12px 18px;font-family:inherit;font-size:15px;
-  font-weight:800;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;
-  justify-content:center;gap:7px;line-height:1.4;
-}
-.btn:active{transform:scale(.97)}
-.btn.p{background:var(--accent);color:#fff}
-.btn.g{background:var(--gold);color:#fff}
-.btn.o{background:var(--card);color:var(--ink);border:1.5px solid var(--line)}
-.btn.full{width:100%;margin:8px 0}
-.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-
-/* ============= EXAM STYLES ============= */
-.exam-card{
-  background:var(--card);border:1px solid var(--line);border-radius:16px;
-  padding:16px;margin:14px 0;box-shadow:var(--shadow);
-}
-.exam-title{
-  display:flex;align-items:center;gap:10px;margin-bottom:12px;
-  font-size:16px;font-weight:800;color:var(--accent);line-height:1.5;
-}
-.exam-title .badge{
-  background:var(--accent);color:#fff;width:36px;height:36px;border-radius:11px;flex:none;
-  display:grid;place-items:center;font-weight:800;font-size:14px;
-}
-.exam-meta{
-  background:var(--bg2);border-radius:12px;padding:10px 14px;margin-bottom:14px;
-  font-size:13px;color:var(--muted);line-height:1.7;
-  display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;
-}
-
-.timer{
-  font-family:"Consolas","Courier New",monospace;font-size:20px;font-weight:900;
-  color:var(--accent);letter-spacing:1px;padding:4px 12px;border-radius:10px;
-  background:var(--card);border:1.5px solid var(--line);
-}
-.timer.warn{color:var(--gold);border-color:var(--gold);animation:pulse 1s infinite}
-.timer.danger{color:var(--danger);border-color:var(--danger);animation:pulse .7s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
-
-.qblock{
-  padding:14px;margin:12px 0;border:1px solid var(--line);border-radius:14px;
-  background:var(--bg);scroll-margin-top:80px;
-}
-.qblock .qhead{
-  display:flex;align-items:center;gap:9px;margin-bottom:10px;flex-wrap:wrap;
-}
-.qblock .qnum{
-  background:var(--accent);color:#fff;width:30px;height:30px;border-radius:9px;
-  display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;
-}
-.qblock .qtext{font-size:15px;font-weight:700;line-height:1.8;margin:0 0 12px;overflow-wrap:break-word}
-.qblock .opts{display:flex;flex-direction:column;gap:7px}
-.qblock .opt{
-  border:1.5px solid var(--line);background:var(--card);border-radius:11px;
-  padding:10px 12px;font-size:14px;cursor:pointer;transition:.15s;display:flex;
-  gap:10px;align-items:flex-start;line-height:1.65;overflow-wrap:break-word;
-}
-.qblock .opt .mk{
-  width:19px;height:19px;border-radius:50%;border:2px solid var(--muted);flex:none;
-  margin-top:3px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;
-  transition:.15s;
-}
-.qblock .opt .otxt{flex:1;min-width:0}
-.qblock .opt.sel{border-color:var(--accent);background:var(--accent-soft)}
-.qblock .opt.sel .mk{border-color:var(--accent);background:var(--accent)}
-.qblock .opt.right{border-color:var(--ok);background:var(--ok-soft)}
-.qblock .opt.right .mk{border-color:var(--ok);background:var(--ok)}
-.qblock .opt.wrong{border-color:var(--danger);background:var(--danger-soft)}
-.qblock .opt.wrong .mk{border-color:var(--danger);background:var(--danger)}
-.qblock .opt.lock{cursor:default}
-
-.exam-actions{
-  display:grid;grid-template-columns:1fr;gap:10px;margin:18px 0;
-}
-.exam-score{
-  background:var(--accent-soft);border:1.5px solid var(--accent);border-radius:14px;
-  padding:16px;margin:14px 0;display:none;
-}
-.exam-score.show{display:block;animation:fade .3s}
-@keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-.exam-score .big{
-  font-size:38px;font-weight:900;color:var(--accent);line-height:1.1;text-align:center;
-}
-.exam-score .lbl{
-  text-align:center;color:var(--muted);font-size:13.5px;line-height:1.6;margin-top:4px;
-}
-.exam-score .fb{
-  margin-top:12px;padding:12px 14px;border-radius:10px;font-size:14px;line-height:1.8;
-}
-.exam-score .fb.ok{background:var(--ok-soft);border:1px solid var(--ok)}
-.exam-score .fb.no{background:var(--danger-soft);border:1px solid var(--danger)}
-.exam-score .fb .ttl{font-weight:800;display:block;margin-bottom:6px}
-.exam-score .fb .why{display:block;margin:5px 0;color:var(--ink)}
-.exam-score .fb .why b{color:var(--accent)}
-
-.essay-model{
-  background:var(--accent2-soft);border:1px solid var(--accent2);border-radius:10px;
-  padding:12px 14px;margin-top:12px;font-size:13.5px;line-height:1.85;display:none;
-}
-.essay-model.show{display:block;animation:fade .3s}
-.essay-model .ttl{font-weight:800;color:var(--accent2);display:block;margin-bottom:6px}
-.essay-model ul,.essay-model ol{margin:6px 0;padding-inline-start:20px}
-.essay-model li{margin:4px 0}
-
-.panel{display:none}
-.panel.on{display:block;animation:fade .3s}
-.footnote{text-align:center;color:var(--muted);font-size:12.5px;padding:28px 0 8px;line-height:1.9}
-
-::-webkit-scrollbar{height:8px;width:8px}
-::-webkit-scrollbar-track{background:var(--bg2)}
-::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
-
-@media (max-width:420px){
-  body{font-size:15.5px}
-  .card{padding:14px 13px}
-  .card h2{font-size:17px}
-  .titles h1{font-size:12.5px}
-  .titles p{font-size:10px}
-  .qblock .qtext{font-size:14.5px}
-  .btn{font-size:14px;padding:11px 14px}
-  table{font-size:13px;min-width:400px}
-  .timer{font-size:18px}
-  .exam-title{font-size:14.5px}
-}
+  @media (min-width: 600px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-<header class="top">
-  <div class="top-in">
-    <div class="logo">🪱</div>
-    <div class="titles">
-      <h1>Parasitology — Biodiversity &amp; Flatworms</h1>
-      <p>Planaria · Fasciola · Schistosoma · Taenia · 7 Exams × 15 min</p>
-    </div>
-    <div class="hbtns">
-      <button class="icon-btn" id="themeBtn" title="Toggle dark mode">🌙</button>
-    </div>
+<div class="app-navbar">
+  <div class="app-brand">CLEAR<span>NOTE</span></div>
+  <div class="nav-user">
+    <div class="avatar-badge" id="userAvatar">U</div>
+    <span id="userName" style="display:none;">...</span>
+    <button class="btn-logout" onclick="doLogout()">خروج</button>
   </div>
-</header>
-
-<div class="wrap">
-
-<!-- ============================================================ -->
-<!-- ==================== LESSON TAB ============================ -->
-<!-- ============================================================ -->
-<section class="panel on" id="tab-lesson">
-
-  <div class="card">
-    <h2><span class="num">✦</span> Lecture Map</h2>
-    <p class="muted">Everything from the midterm: biodiversity, taxonomy, and the three major flatworms (Planaria, Fasciola, Schistosoma) plus the tapeworms (Taenia). Every comparison table and exam trap highlighted.</p>
-    <div class="toc">
-      <a href="#p1">① Biodiversity &amp; Taxonomy</a>
-      <a href="#p2">② Planaria</a>
-      <a href="#p3">③ Fasciola</a>
-      <a href="#p4">④ Schistosoma</a>
-      <a href="#p5">⑤ Taenia</a>
-    </div>
-  </div>
-
-  <!-- 1 -->
-  <article class="card" id="p1">
-    <h2><span class="num">1</span> Biodiversity &amp; Animal Kingdom <button class="speak-btn icon-btn" data-speak="Biodiversity and Animal Kingdom. Biodiversity is the variety of life on Earth at all levels — genes, species, and ecosystems. Taxonomy history. Aristotle divided animals by blood, enaimia versus anaimia, and by movement. Carl Linnaeus is the Father of Taxonomy. He introduced Binomial Nomenclature — Genus plus species, like Homo sapiens — and the seven ranks: Kingdom, Phylum, Class, Order, Family, Genus, Species. Threats to biodiversity: habitat alteration, hunting, invasive species like leafy spurge, pollution like DDT, and climate change. Animal Kingdom classification. Symmetry: Radial like Cnidaria, Bilateral like Platyhelminthes to Chordata. Germ layers: Diploblastic with two layers, Triploblastic with three. Body cavity: Acoelomate with no cavity, like Platyhelminthes; Pseudocoelomate with false cavity, like Nematoda; Coelomate with true cavity, like Annelida to Chordata. Phyla highlights: Porifera are sponges with cellular level and choanocytes. Cnidaria are radial with nematocysts for stinging.">🔊</button></h2>
-
-    <div class="box def">
-      <span class="bt">Biodiversity Definition</span>
-      The variety of life on Earth at <b>all levels</b> — Genes, Species, Ecosystems.
-    </div>
-
-    <h3>Taxonomy History</h3>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Scientist</th><th>Contribution</th></tr></thead>
-        <tbody>
-          <tr><td><b>Aristotle</b></td><td>Divided animals by blood (enaimia/anaimia) and movement</td></tr>
-          <tr><td><b>Carl Linnaeus</b></td><td>Father of Taxonomy. Binomial Nomenclature (Genus + species) + 7 ranks</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>The 7 Taxonomic Ranks</h3>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Rank</th><th>Example (Human)</th></tr></thead>
-        <tbody>
-          <tr><td>Kingdom</td><td>Animalia</td></tr>
-          <tr><td>Phylum</td><td>Chordata</td></tr>
-          <tr><td>Class</td><td>Mammalia</td></tr>
-          <tr><td>Order</td><td>Primates</td></tr>
-          <tr><td>Family</td><td>Hominidae</td></tr>
-          <tr><td>Genus</td><td><i>Homo</i></td></tr>
-          <tr><td>Species</td><td><i>sapiens</i></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="box tip">
-      <span class="bt">Binomial Nomenclature Rules</span>
-      Genus = <b>capitalized</b> · species = <b>lowercase</b> · Both <b>italicized</b> (or underlined when handwritten).
-    </div>
-
-    <h3>Threats to Biodiversity</h3>
-    <ul>
-      <li><b>Habitat alteration/loss</b> (biggest threat).</li>
-      <li><b>Hunting</b>.</li>
-      <li><b>Invasive species</b> (e.g., leafy spurge).</li>
-      <li><b>Pollution</b> (e.g., DDT → thins bird eggshells).</li>
-      <li><b>Climate change</b>.</li>
-    </ul>
-
-    <h3>Animal Kingdom Classification</h3>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Feature</th><th>Types</th></tr></thead>
-        <tbody>
-          <tr><td><b>Symmetry</b></td><td>Radial (Cnidaria) vs Bilateral (Platyhelminthes → Chordata)</td></tr>
-          <tr><td><b>Germ layers</b></td><td>Diploblastic (2 layers) vs Triploblastic (3 layers)</td></tr>
-          <tr><td><b>Body cavity</b></td><td>Acoelomate (no cavity — Platyhelminthes), Pseudocoelomate (false cavity — Nematoda), Coelomate (true — Annelida → Chordata)</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Phyla Highlights</h3>
-    <ul>
-      <li><b>Porifera:</b> Sponges — cellular level, choanocytes.</li>
-      <li><b>Cnidaria:</b> Radial symmetry, nematocysts for stinging.</li>
-    </ul>
-  </article>
-
-  <!-- 2 -->
-  <article class="card" id="p2">
-    <h2><span class="num">2</span> Planaria — Free-Living Flatworm <button class="speak-btn icon-btn" data-speak="Planaria, the free-living flatworm. Classification: Phylum Platyhelminthes, Class Turbellaria. Habitat: freshwater, under rocks. Free-living, zoophagous — carnivorous. Digestion: incomplete, no anus. Muscular pharynx can be everted. Intestine has three branches, order Tricladida. Nervous system: ladder-like — bilobed cerebral ganglia plus two ventral nerve cords plus transverse commissures. Sense organs: ocelli for eyes, light detection, and auricles, ear-like chemoreceptors. Excretion: flame cells, solenocytes. Reproduction: hermaphrodite. Asexual by transverse fission and amazing regeneration. Sexual reproduction occurs, but organs are temporary — degenerate after breeding season. Life cycle: direct — no intermediate host, no larval stages.">🔊</button></h2>
-
-    <div class="tw">
-      <table>
-        <thead><tr><th>Feature</th><th>Details</th></tr></thead>
-        <tbody>
-          <tr><td><b>Phylum / Class</b></td><td>Platyhelminthes / Turbellaria</td></tr>
-          <tr><td><b>Habitat</b></td><td>Freshwater, under rocks</td></tr>
-          <tr><td><b>Feeding</b></td><td>Free-living, <b>zoophagous</b> (carnivorous)</td></tr>
-          <tr><td><b>Digestion</b></td><td><b>Incomplete</b> (no anus). Muscular pharynx can be everted. Intestine has <b>3 branches</b> (Tricladida)</td></tr>
-          <tr><td><b>Nervous system</b></td><td><b>Ladder-like</b> — bilobed cerebral ganglia + 2 ventral nerve cords + transverse commissures</td></tr>
-          <tr><td><b>Sense organs</b></td><td><b>Ocelli</b> (eyes, light detection) + <b>Auricles</b> (chemoreceptors)</td></tr>
-          <tr><td><b>Excretion</b></td><td><b>Flame cells</b> (solenocytes)</td></tr>
-          <tr><td><b>Reproduction</b></td><td>Hermaphrodite + asexual (transverse fission + regeneration)</td></tr>
-          <tr><td><b>Life cycle</b></td><td><b>Direct</b> — no intermediate host, no larvae</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="box tip">
-      <span class="bt">Memory Hook</span>
-      <b>O</b>celli = <b>O</b>bserving light. <b>A</b>uricles = <b>A</b>nalyzing chemicals.
-    </div>
-  </article>
-
-  <!-- 3 -->
-  <article class="card" id="p3">
-    <h2><span class="num">3</span> Fasciola — The Liver Fluke <button class="speak-btn icon-btn" data-speak="Fasciola, the liver fluke. Classification: Phylum Platyhelminthes, Class Digenea, Trematoda. Habitat: biliary ducts of the liver in sheep, cattle, occasionally humans. Morphology: leaf-like. Has oral sucker and ventral sucker, called acetabulum. Has a cephalic cone at the anterior end. Digestive system has two intestinal caeca, bifid. Reproduction: hermaphrodite, gonopore between suckers. Life cycle: indirect. Final host is sheep. Intermediate host is snail Lymnaea cailliaudi. Stages: egg, miracidium with eye spots, sporocyst, redia, cercaria with tail, then metacercaria — the infective stage on grass. Disease: Fascioliasis, liver rot. Halzoun disease — pharyngeal attachment in humans eating raw liver.">🔊</button></h2>
-
-    <div class="tw">
-      <table>
-        <thead><tr><th>Feature</th><th>Details</th></tr></thead>
-        <tbody>
-          <tr><td><b>Phylum / Class</b></td><td>Platyhelminthes / Digenea (Trematoda)</td></tr>
-          <tr><td><b>Habitat</b></td><td>Biliary ducts of the liver (sheep, cattle, occasionally humans)</td></tr>
-          <tr><td><b>Morphology</b></td><td>Leaf-like. Oral sucker + ventral sucker (acetabulum). <b>Cephalic cone</b> at anterior end</td></tr>
-          <tr><td><b>Digestion</b></td><td>2 intestinal caeca (bifid)</td></tr>
-          <tr><td><b>Reproduction</b></td><td><b>Hermaphrodite</b> (gonopore between suckers)</td></tr>
-          <tr><td><b>Final host</b></td><td>Sheep</td></tr>
-          <tr><td><b>Intermediate host</b></td><td><b>Lymnaea</b> snail (L. cailliaudi)</td></tr>
-          <tr><td><b>Infective stage</b></td><td><b>Metacercaria</b> (on grass)</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Life Cycle (Indirect)</h3>
-    <div class="box def">
-      Egg → <b>Miracidium</b> (has eye spots) → Sporocyst → Redia → <b>Cercaria</b> (has tail) → <b>Metacercaria</b> (infective, on grass) → ingested by sheep
-    </div>
-
-    <h3>Diseases</h3>
-    <ul>
-      <li><b>Fascioliasis</b> (Liver rot) — in sheep/cattle.</li>
-      <li><b>Halzoun disease</b> — pharyngeal attachment in humans eating raw liver.</li>
-    </ul>
-
-    <div class="box ex">
-      <span class="bt">Treatment of Choice</span>
-      <b>Triclabendazole</b> — effective against both immature and adult flukes.
-    </div>
-  </article>
-
-  <!-- 4 -->
-  <article class="card" id="p4">
-    <h2><span class="num">4</span> Schistosoma — The Blood Fluke (Exam Gold) <button class="speak-btn icon-btn" data-speak="Schistosoma, the blood fluke. Exam gold. Classification: Phylum Platyhelminthes, Class Digenea. General: separate sexes. Male is shorter, thick, has a gynaecophoric canal. Female is longer, thin, smooth. Lives in blood vessels. Comparison you MUST memorize. S. mansoni: Habitat is portal veins of large intestine. Male has coarse tubercles, six to nine testes in clusters, caeca join at anterior third. Female has short uterus, one to four eggs, ovary in anterior half. Snail is Biomphalaria. Egg has lateral spine. Disease is intestinal. S. haematobium: Habitat is vesicle plexus of urinary bladder. Male has fine tubercles, four to five testes in one line, caeca join at middle third. Female has long uterus, twenty to thirty eggs, ovary in posterior half. Snail is Bulinus. Egg has terminal spine. Disease is urinary. Life cycle: indirect. Egg, miracidium, sporocyst, furcocercous cercaria — the infective stage with bifurcated tail — penetrates skin. IMPORTANT: Redia and Metacercaria are ABSENT.">🔊</button></h2>
-
-    <div class="box def">
-      <span class="bt">The Exception to the Rule</span>
-      <b>Schistosoma</b> = separate sexes (male + female). All other Platyhelminthes are hermaphrodites.
-    </div>
-
-    <h3>Male vs Female</h3>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Feature</th><th>Male</th><th>Female</th></tr></thead>
-        <tbody>
-          <tr><td><b>Length</b></td><td>Shorter, thicker</td><td>Longer, thin</td></tr>
-          <tr><td><b>Tegument</b></td><td>Rough (tubercles)</td><td>Smooth</td></tr>
-          <tr><td><b>Gynaecophoric canal</b></td><td><b>Present</b> (holds female)</td><td>Absent</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Species Comparison — The Golden Table</h3>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Feature</th><th>S. mansoni</th><th>S. haematobium</th></tr></thead>
-        <tbody>
-          <tr><td><b>Habitat</b></td><td>Portal veins (large intestine)</td><td>Vesicle plexus (urinary bladder)</td></tr>
-          <tr><td><b>Intermediate host</b></td><td><b>Biomphalaria</b> snail</td><td><b>Bulinus</b> snail</td></tr>
-          <tr><td><b>Egg shape</b></td><td><b>Lateral spine</b></td><td><b>Terminal spine</b></td></tr>
-          <tr><td><b>Male tubercles</b></td><td>Coarse</td><td>Fine</td></tr>
-          <tr><td><b>Male testes</b></td><td>6–9 (in clusters)</td><td>4–5 (in one line)</td></tr>
-          <tr><td><b>Caeca join at</b></td><td>End of anterior third</td><td>End of middle third</td></tr>
-          <tr><td><b>Female ovary</b></td><td>Anterior half</td><td>Posterior half</td></tr>
-          <tr><td><b>Female uterus</b></td><td>Short (1–4 eggs)</td><td>Long (20–30 eggs)</td></tr>
-          <tr><td><b>Disease</b></td><td>Intestinal Schistosomiasis</td><td>Urinary Schistosomiasis</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Life Cycle</h3>
-    <div class="box def">
-      Egg → <b>Miracidium</b> → Sporocyst → <b>Furcocercous cercaria</b> (bifurcated tail, infective, penetrates skin) → Schistosomula → adults
-    </div>
-
-    <div class="box warn">
-      <span class="bt">Key Trap</span>
-      <b>Redia</b> and <b>Metacercaria</b> are <b>ABSENT</b> in Schistosoma (unlike Fasciola). Schistosoma has only: Egg → Miracidium → Sporocyst → Cercaria.
-    </div>
-  </article>
-
-  <!-- 5 -->
-  <article class="card" id="p5">
-    <h2><span class="num">5</span> Taenia — The Tapeworm <button class="speak-btn icon-btn" data-speak="Taenia, the tapeworm. Classification: Phylum Platyhelminthes, Class Cestoidea. General: NO digestive system — absorbs nutrients via tegument. Hermaphrodite. Body is scolex, head, plus neck, the most active part producing segments, plus strobila, segments or proglottids. Comparison — the holy grail of exams. Taenia saginata, beef tapeworm: 5 to 7 meters. Scolex is quadrate, NO rostellum, NO hooks. Gravid segments have 20 to 30 uterine branches, detach singly. Ovary is bilobed. Testes 300 to 400. Larva is Cysticercus bovis in cows. Taenia solium, pork tapeworm: 3 to 5 meters. Scolex is globular, HAS rostellum and hooks. Gravid segments have 8 to 12 branches, detach in groups. Ovary is trilobed. Testes 150 to 200. Larva is Cysticercus cellulosae in pigs. Causes cysticercosis and autoinfection in humans.">🔊</button></h2>
-
-    <div class="box def">
-      <span class="bt">Cestoidea Basics</span>
-      <b>NO digestive system</b> — absorbs nutrients via tegument. Hermaphrodite.<br>
-      Body = <b>Scolex</b> (head) + <b>Neck</b> (most active, produces segments) + <b>Strobila</b> (chain of proglottids).
-    </div>
-
-    <h3>The Holy Grail Comparison</h3>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Feature</th><th>T. saginata (Beef)</th><th>T. solium (Pork)</th></tr></thead>
-        <tbody>
-          <tr><td><b>Length</b></td><td>5–7 m</td><td>3–5 m</td></tr>
-          <tr><td><b>Scolex shape</b></td><td>Quadrate</td><td>Globular</td></tr>
-          <tr><td><b>Rostellum &amp; Hooks</b></td><td><b>Absent</b></td><td><b>Present</b> (2 circles of hooks)</td></tr>
-          <tr><td><b>Gravid segments</b></td><td>20–30 branches, detach <b>singly</b></td><td>8–12 branches, detach <b>in groups</b></td></tr>
-          <tr><td><b>Ovary</b></td><td><b>Bilobed</b></td><td><b>Trilobed</b></td></tr>
-          <tr><td><b>Testes</b></td><td>300–400</td><td>150–200</td></tr>
-          <tr><td><b>Intermediate host</b></td><td>Cow</td><td>Pig (and humans — cysticercosis)</td></tr>
-          <tr><td><b>Infective stage</b></td><td>Cysticercus bovis</td><td>Cysticercus cellulosae + Eggs</td></tr>
-          <tr><td><b>Autoinfection</b></td><td>Absent</td><td><b>Present</b> (very dangerous)</td></tr>
-          <tr><td><b>Severity</b></td><td>Mild</td><td>Serious (brain cysts)</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="box warn">
-      <span class="bt">The Egg vs Larva Trap</span>
-      Eat <b>LARVA</b> (Cysticercus cellulosae in pork) → <b>Intestinal taeniasis</b> (adult worm).<br>
-      Eat <b>EGG</b> (contaminated food/water, or autoinfection) → <b>Cysticercosis</b> (larvae in tissues, including brain → neurocysticercosis → epilepsy).
-    </div>
-
-    <h3>Key Fact</h3>
-    <div class="box tip">
-      <span class="bt">Stain Differentiation</span>
-      <b>T. saginata</b> eggs <b>stain</b> with Ziehl-Neelsen. <b>T. solium</b> eggs do <b>not</b> stain.
-    </div>
-
-    <h3>Treatment of Choice</h3>
-    <div class="box ex">
-      <span class="bt">Drug</span>
-      <b>Praziquantel</b> (or Niclosamide) for all Taenia species.
-    </div>
-  </article>
-
-  <button class="btn p full" id="toExamsBtn">📝 Go to the 7 Timed Exams (15 min each)</button>
-</section>
-
-<!-- ============================================================ -->
-<!-- ==================== EXAMS TAB ============================= -->
-<!-- ============================================================ -->
-<section class="panel" id="tab-exams">
-  <div class="card">
-    <h2><span class="num">📝</span> 7 Timed Mock Exams</h2>
-    <p class="muted">Each exam: <b>20 MCQs + 2 Essay questions</b> in <b>15 minutes</b>. No hints. Auto-graded for MCQs, model answers revealed for essays. Start the timer when you begin.</p>
-    <div class="box tip" style="margin-top:12px">
-      <span class="bt">How to take an exam</span>
-      1. Click <b>▶ Start Exam</b> to begin the timer.<br>
-      2. Answer all 20 MCQs (essays are open — write your own answer before revealing the model).<br>
-      3. Click <b>✓ Submit &amp; Grade</b> to see your score and detailed explanations.<br>
-      4. Timer turns <b>amber</b> at 5 minutes left and <b>red</b> at 2 minutes.
-    </div>
-  </div>
-
-  <div id="exam-list"></div>
-</section>
-
-<!-- ============================================================ -->
-<!-- ==================== SUMMARY TAB =========================== -->
-<!-- ============================================================ -->
-<section class="panel" id="tab-summary">
-  <div class="card">
-    <h2><span class="num">🎯</span> Golden Cheat Sheet &amp; Traps</h2>
-
-    <h3>The 7 Deadly Traps</h3>
-    <div class="box warn">
-      <span class="bt">1. Egg Spines</span>
-      <b>S. mansoni</b> = <b>Lateral spine</b>.<br>
-      <b>S. haematobium</b> = <b>Terminal spine</b>.
-    </div>
-    <div class="box warn">
-      <span class="bt">2. Missing Stages</span>
-      Fasciola life cycle has <b>Redia</b> + <b>Metacercaria</b>.<br>
-      <b>Schistosoma</b> does NOT have Redia or Metacercaria — only Egg → Miracidium → Sporocyst → Cercaria.
-    </div>
-    <div class="box warn">
-      <span class="bt">3. Ovary Lobes</span>
-      <b>T. saginata</b> = <b>Bilobed</b>. <b>T. solium</b> = <b>Trilobed</b>.
-    </div>
-    <div class="box warn">
-      <span class="bt">4. Uterine Branches</span>
-      <b>T. saginata</b> = <b>20–30</b> (many). <b>T. solium</b> = <b>8–12</b> (few).
-    </div>
-    <div class="box warn">
-      <span class="bt">5. Gomphosis</span>
-      NOT a true joint — teeth are not part of the skeleton.
-    </div>
-    <div class="box warn">
-      <span class="bt">6. Miracidium Eye Spots</span>
-      <b>Fasciola</b> miracidium = <b>HAS</b> eye spots.<br>
-      <b>Schistosoma</b> miracidium = <b>NO</b> eye spots.
-    </div>
-    <div class="box warn">
-      <span class="bt">7. Hermaphrodite Exception</span>
-      All Platyhelminthes = hermaphrodites EXCEPT <b>Schistosoma</b> (separate sexes).
-    </div>
-
-    <h3>Quick Comparison Table — Schistosoma</h3>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Feature</th><th>S. mansoni</th><th>S. haematobium</th></tr></thead>
-        <tbody>
-          <tr><td>Habitat</td><td>Portal veins (large intestine)</td><td>Vesicle plexus (urinary bladder)</td></tr>
-          <tr><td>Snail</td><td>Biomphalaria</td><td>Bulinus</td></tr>
-          <tr><td>Egg spine</td><td>Lateral</td><td>Terminal</td></tr>
-          <tr><td>Male tubercles</td><td>Coarse</td><td>Fine</td></tr>
-          <tr><td>Testes</td><td>6–9 in clusters</td><td>4–5 in one line</td></tr>
-          <tr><td>Caeca join</td><td>Anterior third</td><td>Middle third</td></tr>
-          <tr><td>Ovary</td><td>Anterior half</td><td>Posterior half</td></tr>
-          <tr><td>Uterus</td><td>Short (1–4)</td><td>Long (20–30)</td></tr>
-          <tr><td>Disease</td><td>Intestinal</td><td>Urinary</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Quick Comparison Table — Taenia</h3>
-    <div class="tw">
-      <table>
-        <thead><tr><th>Feature</th><th>T. saginata</th><th>T. solium</th></tr></thead>
-        <tbody>
-          <tr><td>Host</td><td>Cow</td><td>Pig (+ Human cysticercosis)</td></tr>
-          <tr><td>Scolex</td><td>Quadrate, no hooks</td><td>Globular, has hooks</td></tr>
-          <tr><td>Uterine branches</td><td>20–30</td><td>8–12</td></tr>
-          <tr><td>Detachment</td><td>Singly</td><td>In groups</td></tr>
-          <tr><td>Ovary</td><td>Bilobed</td><td>Trilobed</td></tr>
-          <tr><td>Larva</td><td>Cysticercus bovis</td><td>Cysticercus cellulosae</td></tr>
-          <tr><td>Autoinfection</td><td>Absent</td><td>Present</td></tr>
-          <tr><td>Severity</td><td>Mild</td><td>Serious</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Last-Minute One-Liners</h3>
-    <div class="box def">
-      <ul>
-        <li><b>Acoelomate:</b> No body cavity (Platyhelminthes). Space filled with mesenchyme.</li>
-        <li><b>Protonephridia / Flame cells:</b> Excretory organs of flatworms.</li>
-        <li><b>Zoophagous:</b> Carnivorous (Planaria).</li>
-        <li><b>Tegument:</b> Outer body covering of flatworms (syncytial).</li>
-        <li><b>Cysticercus:</b> Larval stage of Taenia (bladder worm).</li>
-        <li><b>Metacercaria:</b> Infective stage of Fasciola (encysted on grass).</li>
-        <li><b>Miracidium:</b> Ciliated first larval stage of flukes (penetrates snail).</li>
-        <li><b>Onchosphere (Hexacanth):</b> Six-hooked larva of Taenia inside the egg.</li>
-        <li><b>Operculated egg:</b> Has a "lid" (Fasciola).</li>
-        <li><b>Hermaphrodite:</b> Both sexes in one body.</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<div class="footnote">
-  Parasitology — Biodiversity &amp; Flatworms 🪱<br>
-  Timed exams · No hints · Auto-graded · Detailed feedback ✦
 </div>
 
-</div><!-- /wrap -->
+<div class="container">
+  <div class="breadcrumbs" id="breadcrumbs"></div>
+  
+  <div id="mainView">
+    <div id="cardsContainer" class="grid">
+      <div class="loading">جاري تحميل المحتوى...</div>
+    </div>
+  </div>
+</div>
 
-<nav class="bottom">
-  <button class="on" data-tab="lesson"><span class="ic">📖</span>Lesson</button>
-  <button data-tab="exams"><span class="ic">📝</span>Exams</button>
-  <button data-tab="summary"><span class="ic">🎯</span>Traps</button>
-</nav>
+<!-- شاشة العرض ملء الشاشة -->
+<div id="contentView">
+  <div class="fullscreen-header">
+    <h2 class="fullscreen-title" id="viewerTitle">عنوان المحتوى</h2>
+    <button class="btn-close-fullscreen" onclick="closeViewer()">
+      <i class="fas fa-times"></i> خروج
+    </button>
+  </div>
+  <div class="iframe-wrapper">
+    <iframe id="contentFrame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-modals"></iframe>
+  </div>
+</div>
 
-<script>
-/* ============================================================
-   0) STORAGE
-   ============================================================ */
-const STORE = {
-  get(k, def){
-    try{ const v = localStorage.getItem('parasit7-' + k); return v === null ? def : JSON.parse(v); }
-    catch(e){ return def; }
-  },
-  set(k, v){ try{ localStorage.setItem('parasit7-' + k, JSON.stringify(v)); }catch(e){} },
-  del(k){ try{ localStorage.removeItem('parasit7-' + k); }catch(e){} }
-};
+<script type="module">
+import { db, onAuth, isAdmin, goTo, showToast, signOutUser } from "./shared.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* ============================================================
-   1) TABS
-   ============================================================ */
-const panels = {
-  lesson:  document.getElementById('tab-lesson'),
-  exams:   document.getElementById('tab-exams'),
-  summary: document.getElementById('tab-summary')
-};
-const navBtns = document.querySelectorAll('nav.bottom button');
-function go(name){
-  Object.keys(panels).forEach(k => panels[k].classList.toggle('on', k === name));
-  navBtns.forEach(b => b.classList.toggle('on', b.dataset.tab === name));
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-navBtns.forEach(b => b.addEventListener('click', () => go(b.dataset.tab)));
-document.getElementById('toExamsBtn').addEventListener('click', () => go('exams'));
+let treeData = [];
 
-/* ============================================================
-   2) DARK MODE
-   ============================================================ */
-const themeBtn = document.getElementById('themeBtn');
-function setTheme(t){
-  document.documentElement.setAttribute('data-theme', t);
-  themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
-  STORE.set('theme', t);
-}
-setTheme(STORE.get('theme', 'light'));
-themeBtn.addEventListener('click', () => {
-  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+onAuth((user, userData) => {
+  if (!user) { goTo("index.html"); return; }
+  const name = userData.name || user.email;
+  document.getElementById("userName").textContent = name;
+  document.getElementById("userAvatar").textContent = name.charAt(0).toUpperCase();
+  loadTreeData();
 });
 
-/* ============================================================
-   3) SPEECH
-   ============================================================ */
-let speechOn = STORE.get('speechOn', true);
-function speak(text, btn){
-  if(!('speechSynthesis' in window)) return;
-  if(!speechOn){ window.speechSynthesis.cancel(); return; }
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US';
-  u.rate = 0.95;
-  window.speechSynthesis.speak(u);
-  if(btn){
-    btn.classList.add('on');
-    u.onend = () => btn.classList.remove('on');
-    u.onerror = () => btn.classList.remove('on');
+window.doLogout = async () => { await signOutUser(); goTo("index.html"); };
+
+async function loadTreeData() {
+  try {
+    const snap = await getDocs(collection(db, "content_tree"));
+    treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderLevel("root");
+  } catch (e) {
+    document.getElementById("cardsContainer").innerHTML = `<div class="loading" style="color:red;">خطأ: ${e.message}</div>`;
   }
 }
-document.addEventListener('click', e => {
-  const btn = e.target.closest('[data-speak]');
-  if(btn) speak(btn.dataset.speak, btn);
-});
 
-/* ============================================================
-   4) EXAMS DATA — 7 Exams × 20 MCQ + 2 Essays
-   ============================================================ */
-const EXAMS = {
-  1: {
-    title: 'Model 1 — Biodiversity &amp; Classification',
-    mcq: [
-      {n:1, q:'"Biodiversity" strictly refers to:',
-       options:['The number of humans on Earth','The variety of life forms on Earth at all levels (genes to ecosystems)','The study of plants only','The classification of animals'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> The complete definition includes all biological organization levels — genes, species, ecosystems.</span><span class="why"><b>Why others are wrong:</b> (A) Population concept. (C) Botany. (D) Taxonomy.</span><span class="trap"><b>⚠️ Trap:</b> "Species richness" is a MEASURE, not the full definition.</span>'},
-      {n:2, q:'Which is NOT a standard level of biodiversity?',
-       options:['Genetic diversity','Species diversity','Ecosystem diversity','Cellular diversity'],
-       ans:3,
-       explain:'<span class="why"><b>Why correct (D):</b> Standard three levels are Genetic, Species, Ecosystem.</span><span class="why"><b>Why others are wrong:</b> (A), (B), (C) All three standard levels.</span>'},
-      {n:3, q:'According to the lecture, how many species have been classified so far?',
-       options:['1.7 million','30 million','100 million','4,000'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> ~1.75 million identified.</span><span class="why"><b>Why others are wrong:</b> (B) Estimated undiscovered. (C) Upper estimate. (D) Just mammals.</span>'},
-      {n:4, q:'Aristotle classified animals based on:',
-       options:['DNA sequencing','Blood (enaimia/anaimia) and movement','Total morphology','Presence of a true nucleus'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Aristotle divided by blood (red-blooded vs bloodless) and movement.</span><span class="why"><b>Why others are wrong:</b> (C) John Ray. (A) Modern. (D) Whittaker.</span>'},
-      {n:5, q:'Who is the "Father of Taxonomy"?',
-       options:['Aristotle','John Ray','Carl Linnaeus','Darwin'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Linnaeus established Binomial Nomenclature and 7 ranks.</span><span class="why"><b>Why others are wrong:</b> (B) Identified species concept. (A) Pre-taxonomy.</span>'},
-      {n:6, q:'In "Homo sapiens", which is true?',
-       options:['Homo is species, sapiens is genus','Both capitalized','Homo is genus (capitalized), sapiens is species (lowercase)','It represents a family'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Genus = capitalized. Species = lowercase. Both italicized.</span><span class="why"><b>Why others are wrong:</b> (A) Reversed. (B) Wrong.</span>'},
-      {n:7, q:'Which kingdom has unicellular eukaryotes with no tissue differentiation?',
-       options:['Monera','Protista','Fungi','Animalia'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Protista = protozoa — eukaryotic, unicellular, no tissues.</span><span class="why"><b>Why others are wrong:</b> (A) Prokaryotic. (C), (D) Multicellular mostly.</span>'},
-      {n:8, q:'Presence/absence of a true nucleus classifies:',
-       options:['Species vs Genus','Prokaryotes vs Eukaryotes','Vertebrates vs Invertebrates','Plants vs Animals'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Whittaker used nucleus to separate Monera (prokaryotes) from 4 eukaryotic kingdoms.</span><span class="why"><b>Why others are wrong:</b> Different classification bases.</span>'},
-      {n:9, q:'A direct economic benefit of biodiversity:',
-       options:['Increased pollution','New food sources and medicines','Habitat destruction','Climate change'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Biodiversity provides food, medicine, ecosystem services.</span><span class="why"><b>Why others are wrong:</b> (A), (C), (D) All threats, not benefits.</span>'},
-      {n:10, q:'The greatest current threat to biodiversity:',
-       options:['Genetic diversity','Habitat loss/alteration','Conservation','Natural evolution'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Habitat destruction is the #1 cause of extinction.</span><span class="why"><b>Why others are wrong:</b> (A), (C) Not threats. (D) Natural process.</span>'},
-      {n:11, q:'An example of an invasive species:',
-       options:['Lymnaea snail','Leafy spurge','Amoeba proteus','Planaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Leafy spurge is a European weed in the Great Plains that displaces native species.</span><span class="why"><b>Why others are wrong:</b> (A), (C), (D) Native or non-invasive.</span>'},
-      {n:12, q:'In taxonomy, a "Tract" is:',
-       options:['Cells outside CNS','Fibers inside CNS','Fibers outside CNS','Cells inside CNS'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Tract = fibers + inside. Nerve = fibers + outside. Ganglion = cells + outside. Nucleus = cells + inside.</span><span class="why"><b>Why others are wrong:</b> Different combinations.</span>'},
-      {n:13, q:'Euglena is in Kingdom Protista because:',
-       options:['Cellulose cell wall','True nucleus and no tissue differentiation','Multicellular','Prokaryote'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Unicellular eukaryote. Pellicle (protein), not cellulose wall.</span><span class="why"><b>Why others are wrong:</b> (A) Has pellicle. (C) Unicellular. (D) Eukaryote.</span>'},
-      {n:14, q:'NOT a characteristic of Kingdom Animalia:',
-       options:['Heterotrophic nutrition','Cells lack cell walls','Multicellular eukaryotes','Presence of chlorophyll'],
-       ans:3,
-       explain:'<span class="why"><b>Why correct (D):</b> Animals lack chlorophyll — they don\'t photosynthesize.</span><span class="why"><b>Why others are wrong:</b> (A), (B), (C) All standard animal traits.</span>'},
-      {n:15, q:'Group of nerve cells INSIDE the CNS is called a:',
-       options:['Ganglion','Nerve','Nucleus','Plexus'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Nucleus = cells + inside. Ganglion = cells + outside.</span><span class="why"><b>Why others are wrong:</b> (A) Outside. (B) Fibers. (D) Intersection.</span>'},
-      {n:16, q:'The broadest taxonomic rank:',
-       options:['Phylum','Kingdom','Class','Order'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Kingdom is the highest. Order: Kingdom → Phylum → Class → Order → Family → Genus → Species.</span><span class="why"><b>Why others are wrong:</b> All are narrower.</span>'},
-      {n:17, q:'"Holozoic nutrition" means:',
-       options:['Photosynthesis','Ingesting and digesting food particles','Absorbing dissolved nutrients','Parasitism'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Holozoic = ingestion (Amoeba). Holophytic = photosynthesis. Saprozoic = absorbing dissolved.</span><span class="why"><b>Why others are wrong:</b> Different nutrition types.</span>'},
-      {n:18, q:'Correct order of taxonomic ranks (smallest → largest):',
-       options:['Species → Genus → Family → Order → Class → Phylum → Kingdom','Kingdom → Phylum → Class → Order → Family → Genus → Species','Species → Family → Genus → Order → Class → Phylum → Kingdom','Genus → Species → Family → Class → Order → Phylum → Kingdom'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Standard mnemonic "King Philip Came Over For Good Soup" reversed.</span><span class="why"><b>Why others are wrong:</b> (B) Largest first. (C), (D) Wrong order.</span>'},
-      {n:19, q:'DDT threatens birds by:',
-       options:['Killing instantly','Preventing healthy egg laying','Changing migration','Blinding them'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> DDT causes eggshell thinning — lecture explicitly states.</span><span class="why"><b>Why others are wrong:</b> Different mechanisms.</span>'},
-      {n:20, q:'"Ecological Hotspot" is:',
-       options:['Hottest place on Earth','Place where significant species are in immediate danger of extinction','Place with most invasive species','Place with no human activity'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Conservation biologists target these areas.</span><span class="why"><b>Why others are wrong:</b> Different definitions.</span>'}
-    ],
-    essays: [
-      {n:1, q:'Define Binomial Nomenclature. Rules + two examples.',
-       model:'<ul><li><b>Binomial Nomenclature:</b> Two-word scientific naming system by Carl Linnaeus.</li><li><b>Rules:</b> First word = Genus (capitalized). Second = species (lowercase). Both italicized (or underlined handwritten).</li><li><b>Examples:</b> <i>Homo sapiens</i> (human), <i>Musca domestica</i> (housefly).</li></ul>'},
-      {n:2, q:'Three major threats to biodiversity and their effects.',
-       model:'<ul><li><b>Habitat loss:</b> Deforestation → forest islands → reduced species diversity.</li><li><b>Invasive species:</b> Leafy spurge outcompetes native grasses.</li><li><b>Pollution:</b> DDT thins bird eggshells; ocean acidification threatens marine life.</li></ul>'}
-    ]
-  },
+function renderLevel(parentId) {
+  const container = document.getElementById("cardsContainer");
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("contentView").style.display = "none"; // نقفل الشاشة الكاملة لو كانت مفتوحة
+  container.innerHTML = "";
 
-  2: {
-    title: 'Model 2 — Protozoa &amp; Amoeba',
-    mcq: [
-      {n:1, q:'Protozoa are characterized by all EXCEPT:',
-       options:['Eukaryotic','Unicellular','Lack tissue differentiation','Prokaryotic'],
-       ans:3,
-       explain:'<span class="why"><b>Why correct (D):</b> Protozoa have true nucleus — eukaryotic, NOT prokaryotic.</span><span class="why"><b>Why others are wrong:</b> All are correct traits.</span>'},
-      {n:2, q:'Protozoan moving by pseudopodia:',
-       options:['Ciliophora','Mastigophora','Sarcodina','Apicomplexa'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Sarcodina (Amoeba) = pseudopodia.</span><span class="why"><b>Why others are wrong:</b> (A) Cilia. (B) Flagella. (D) None/gliding.</span>'},
-      {n:3, q:'Function of contractile vacuole in Amoeba:',
-       options:['Food digestion','Osmoregulation','Respiration','Reproduction'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Pumps out excess water to prevent bursting.</span><span class="why"><b>Why others are wrong:</b> Different functions.</span>'},
-      {n:4, q:'Entamoeba histolytica primarily inhabits:',
-       options:['Small intestine','Large intestine','Liver','Stomach'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Feeds on large intestine cells. Can spread to liver secondarily.</span><span class="why"><b>Why others are wrong:</b> Different sites.</span>'},
-      {n:5, q:'Infective stage of Entamoeba histolytica:',
-       options:['Trophozoite','Mature cyst with 4 nuclei','Immature cyst','Sporozoite'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Quadrinucleate cyst is the resistant stage.</span><span class="why"><b>Why others are wrong:</b> (A) Active stage. (C) Immature. (D) Different organism.</span>'},
-      {n:6, q:'Mode of transmission of E. histolytica:',
-       options:['Mosquito bite','Fecal-oral','Skin penetration','Inhalation'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Cysts in feces → contaminated food/water.</span><span class="why"><b>Why others are wrong:</b> Different routes.</span>'},
-      {n:7, q:'Patient with bloody diarrhea and colonic ulcers — likely organism?',
-       options:['Paramecium','Euglena','Entamoeba histolytica','Balantidium coli'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Classic amoebic dysentery. Balantidium also pathogenic but ulcer description in this curriculum belongs to Entamoeba.</span><span class="why"><b>Why others are wrong:</b> (A), (B) Free-living. (D) Different pathology.</span>'},
-      {n:8, q:'Which organism uses a flagellum?',
-       options:['Amoeba proteus','Euglena viridis','Paramecium','Plasmodium'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Euglena is a Mastigophora (flagellate).</span><span class="why"><b>Why others are wrong:</b> (A) Pseudopodia. (C) Cilia. (D) None.</span>'},
-      {n:9, q:'Outer covering of Euglena is:',
-       options:['Cell wall','Pellicle','Capsule','Cuticle'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Flexible protein pellicle, not rigid cellulose wall.</span><span class="why"><b>Why others are wrong:</b> Different structures.</span>'},
-      {n:10, q:'Euglena can behave like a plant because it has:',
-       options:['Pseudopodia','Chloroplasts','Cilia','Cell wall'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Chloroplasts with chlorophyll → photosynthesis.</span><span class="why"><b>Why others are wrong:</b> Different structures.</span>'},
-      {n:11, q:'Dormant resistant stage formed by protozoa:',
-       options:['Trophozoite','Cyst','Sporozoite','Merozoite'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Cyst survives harsh conditions.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:12, q:'Locomotory organs of Paramecium:',
-       options:['Flagella','Pseudopodia','Cilia','Undulating membrane'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Paramecium = Ciliophora, covered in cilia.</span><span class="why"><b>Why others are wrong:</b> Different organs.</span>'},
-      {n:13, q:'Reproduction in Paramecium involves:',
-       options:['Only binary fission','Only conjugation','Asexual transverse binary fission and sexual conjugation','Multiple fission'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Both types — asexual + sexual.</span><span class="why"><b>Why others are wrong:</b> (A), (B) Incomplete.</span>'},
-      {n:14, q:'Food intake structure in Paramecium:',
-       options:['Cytostome','Macronucleus','Contractile vacuole','Pellicle'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Cytostome = "cell mouth".</span><span class="why"><b>Why others are wrong:</b> Different structures.</span>'},
-      {n:15, q:'Pathogenic ciliate to humans:',
-       options:['Paramecium caudatum','Balantidium coli','Euglena viridis','Amoeba proteus'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Balantidium coli is the pathogenic ciliate — infects human intestine.</span><span class="why"><b>Why others are wrong:</b> Free-living.</span>'},
-      {n:16, q:'Large nucleus controlling cell activities in ciliates:',
-       options:['Micronucleus','Macronucleus','Kinetoplast','Endosome'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Macronucleus = non-reproductive, controls functions. Micronucleus = sexual.</span><span class="why"><b>Why others are wrong:</b> Different structures.</span>'},
-      {n:17, q:'Pathogenic trophozoite of E. histolytica contains:',
-       options:['Chloroplasts','Ingested RBCs in food vacuoles','Flagellum','Macronucleus'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> It feeds on RBCs → bloody diarrhea.</span><span class="why"><b>Why others are wrong:</b> (A) No chloroplasts. (C) No flagella. (D) No macronucleus.</span>'},
-      {n:18, q:'Protozoan causing "Amoebic liver abscess":',
-       options:['Euglena','Entamoeba histolytica','Trypanosoma','Plasmodium'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> E. histolytica can enter bloodstream from colon → liver.</span><span class="why"><b>Why others are wrong:</b> Different pathogens.</span>'},
-      {n:19, q:'Movement of Amoeba is powered by:',
-       options:['Flagellar beating','Ciliary beating','Cytoplasmic streaming into pseudopodia','Muscle contractions'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Cytoplasm flows into pseudopodium, pushing cell forward.</span><span class="why"><b>Why others are wrong:</b> Different mechanisms.</span>'},
-      {n:20, q:'Protozoan group lacking locomotory organelles:',
-       options:['Ciliophora','Sarcodina','Mastigophora','Apicomplexa'],
-       ans:3,
-       explain:'<span class="why"><b>Why correct (D):</b> Apicomplexa (Plasmodium) glide or are non-motile — no cilia/flagella/pseudopodia.</span><span class="why"><b>Why others are wrong:</b> All have locomotory organs.</span>'}
-    ],
-    essays: [
-      {n:1, q:'Structure and function of contractile vacuole in Amoeba.',
-       model:'<ul><li><b>Structure:</b> Star-shaped organelle.</li><li><b>Function:</b> Osmoregulation — collects excess water, expels it to prevent cell bursting.</li><li>Also regulates cell weight and pressure.</li></ul>'},
-      {n:2, q:'Compare Paramecium and Balantidium coli (habitat, pathogenicity, reproduction).',
-       model:'<ul><li><b>Paramecium:</b> Free-living (freshwater), non-pathogenic. Cilia. Binary fission + conjugation. Macro- and micronuclei.</li><li><b>Balantidium coli:</b> Parasitic (human large intestine), pathogenic (dysentery). Cilia. Binary fission + conjugation.</li></ul>'}
-    ]
-  },
+  updateBreadcrumbs(parentId);
+  const nodes = treeData.filter(n => n.parentId === parentId);
 
-  3: {
-    title: 'Model 3 — Platyhelminthes &amp; Planaria',
-    mcq: [
-      {n:1, q:'Platyhelminthes are "Acoelomate" because:',
-       options:['True body cavity','False body cavity','Lack body cavity; space filled with mesenchyme','Segmented body'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> "A" = without. Space = parenchyma/mesenchyme.</span><span class="why"><b>Why others are wrong:</b> (A) Coelomate. (B) Pseudocoelomate (Nematodes). (D) Annelids.</span>'},
-      {n:2, q:'Body wall of Platyhelminthes has:',
-       options:['One muscle layer','Two muscle layers (circular + longitudinal)','Three muscle layers','No muscle layers'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Standard two layers.</span><span class="why"><b>Why others are wrong:</b> Wrong counts.</span>'},
-      {n:3, q:'Excretion in Platyhelminthes by:',
-       options:['Nephridia','Flame cells','Malpighian tubules','Contractile vacuoles'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Flame cells (solenocytes) = excretory organs of flatworms.</span><span class="why"><b>Why others are wrong:</b> (A) Annelids. (C) Insects. (D) Protozoa.</span>'},
-      {n:4, q:'Exception to hermaphroditism in Platyhelminthes:',
-       options:['Planaria','Fasciola','Schistosoma','Taenia'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Schistosoma has separate sexes (dioecious).</span><span class="why"><b>Why others are wrong:</b> All hermaphrodites.</span>'},
-      {n:5, q:'Nervous system of Planaria:',
-       options:['Diffuse nerve net','Ladder-like','Dorsal hollow nerve cord','Absent'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Cerebral ganglia + 2 nerve cords + transverse nerves.</span><span class="why"><b>Why others are wrong:</b> (A) Cnidaria. (C) Chordata. (D) Not absent.</span>'},
-      {n:6, q:'Light-detecting structures in Planaria:',
-       options:['Auricles','Ocelli','Flame cells','Tentacles'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Ocelli = eyespots (photoreceptors). Auricles = chemoreceptors.</span><span class="why"><b>Why others are wrong:</b> Different structures.</span>'},
-      {n:7, q:'Planaria intestine branches:',
-       options:['One','Two','Three','Four'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Order Tricladida (3 branches) — one anterior, two posterior.</span><span class="why"><b>Why others are wrong:</b> Wrong counts.</span>'},
-      {n:8, q:'Planaria is:',
-       options:['Herbivorous','Carnivorous (zoophagous)','Parasitic','Saprophytic'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Feed on small invertebrates via muscular pharynx.</span><span class="why"><b>Why others are wrong:</b> Different nutrition.</span>'},
-      {n:9, q:'Life cycle of Planaria:',
-       options:['Direct','Indirect','Complex','Two hosts'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Direct — no intermediate host, no larval stages.</span><span class="why"><b>Why others are wrong:</b> Different patterns.</span>'},
-      {n:10, q:'Asexual reproduction in Planaria:',
-       options:['Binary fission','Transverse fission + regeneration','Budding','Spore formation'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Cut into pieces, each regenerates.</span><span class="why"><b>Why others are wrong:</b> Different modes.</span>'},
-      {n:11, q:'Mouth of Planaria located:',
-       options:['Anterior end','Posterior end','Mid-ventrally','Mid-dorsally'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Middle of ventral surface, leading to pharynx.</span><span class="why"><b>Why others are wrong:</b> Wrong locations.</span>'},
-      {n:12, q:'Function of auricles in Planaria:',
-       options:['Vision','Detecting chemicals and touch','Excretion','Movement'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Chemoreceptors (chemical detection). Ocelli for light.</span><span class="why"><b>Why others are wrong:</b> Different functions.</span>'},
-      {n:13, q:'TRUE about Platyhelminthes digestive system:',
-       options:['Mouth + anus','Incomplete (mouth, no anus)','Completely absent','Has gizzard'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Blind sac. Exception: Cestoda has none at all.</span><span class="why"><b>Why others are wrong:</b> Wrong anatomy.</span>'},
-      {n:14, q:'Tissue filling space between body wall and gut:',
-       options:['Coelom','Mesenchyme (parenchyma)','Hemocoel','Blastocoel'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Mesenchyme acts as hydrostatic skeleton, transports nutrients.</span><span class="why"><b>Why others are wrong:</b> Different cavity types.</span>'},
-      {n:15, q:'Entirely free-living class of Platyhelminthes:',
-       options:['Turbellaria','Trematoda','Cestoda','Digenea'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Turbellaria (Planaria) are free-living. Trematoda and Cestoda are parasitic.</span><span class="why"><b>Why others are wrong:</b> All parasitic.</span>'},
-      {n:16, q:'Order of Planaria:',
-       options:['Tricladida','Digenea','Cyclophyllidea','Trematoda'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Tri = three (3 intestinal branches).</span><span class="why"><b>Why others are wrong:</b> Different orders/classes.</span>'},
-      {n:17, q:'Brain of Planaria:',
-       options:['Single ganglion','Bilobed cerebral ganglia (inverted V)','Nerve ring','No brain'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Bilobed cerebral ganglia at anterior end.</span><span class="why"><b>Why others are wrong:</b> Different structures.</span>'},
-      {n:18, q:'NOT a characteristic of Phylum Platyhelminthes:',
-       options:['Triploblastic','Bilaterally symmetrical','True coelom','Dorsoventrally flattened'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> They are Acoelomate — no true coelom.</span><span class="why"><b>Why others are wrong:</b> All standard traits.</span>'},
-      {n:19, q:'Excretory pore in Planaria opens on:',
-       options:['Dorsal surface','Ventral surface','Anterior end','Posterior end'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Flame cells → ducts → nephridiopores on ventral surface.</span><span class="why"><b>Why others are wrong:</b> Wrong locations.</span>'},
-      {n:20, q:'Planaria moves using:',
-       options:['Cilia on ventral surface','Pseudopodia','Flagella','Muscular contractions'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Turbellarians glide on slime trail via cilia (also use muscles).</span><span class="why"><b>Why others are wrong:</b> Different mechanisms.</span>'}
-    ],
-    essays: [
-      {n:1, q:'Describe Planaria digestive system + feeding mechanism.',
-       model:'<ul><li>Incomplete (mouth, no anus).</li><li>Ventral mouth → muscular protrusible pharynx (everted for prey capture).</li><li>3-branched intestine (1 anterior, 2 posterior).</li><li>Extracellular + intracellular digestion. Egested via mouth.</li></ul>'},
-      {n:2, q:'General characteristics of Phylum Platyhelminthes.',
-       model:'<ul><li>Bilaterally symmetrical, triploblastic.</li><li>Acoelomate (mesenchyme-filled).</li><li>Dorsoventrally flattened.</li><li>Incomplete digestive system (except Cestoda).</li><li>Excretion by flame cells.</li><li>Ladder-like nervous system.</li><li>Mostly hermaphroditic (except Schistosoma).</li><li>Respiration by diffusion.</li></ul>'}
-    ]
-  },
-
-  4: {
-    title: 'Model 4 — Fasciola (Liver Fluke)',
-    mcq: [
-      {n:1, q:'Intermediate host of Fasciola:',
-       options:['Cow','Lymnaea snail','Pig','Biomphalaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Lymnaea (freshwater snail). Biomphalaria is for S. mansoni.</span><span class="why"><b>Why others are wrong:</b> Different hosts.</span>'},
-      {n:2, q:'Infective stage of Fasciola for definitive host:',
-       options:['Miracidium','Cercaria','Metacercaria','Redia'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Metacercaria is encysted on grass — eaten by sheep.</span><span class="why"><b>Why others are wrong:</b> (A) Infects snail. (B) Leaves snail. (D) Inside snail.</span>'},
-      {n:3, q:'Correct life cycle sequence of Fasciola:',
-       options:['Egg → Miracidium → Snail → Sporocyst → Redia → Cercaria → Metacercaria','Egg → Miracidium → Cercaria → Metacercaria','Egg → Redia → Sporocyst → Cercaria','Egg → Cercaria → Snail → Miracidium'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Miracidium → Sporocyst → Redia → Cercaria → Metacercaria.</span><span class="why"><b>Why others are wrong:</b> Incomplete or scrambled.</span>'},
-      {n:4, q:'Drug of choice for Fasciola:',
-       options:['Praziquantel','Triclabendazole','Metronidazole','Albendazole'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Triclabendazole (Fasinex) — effective against both immature and adult flukes.</span><span class="why"><b>Why others are wrong:</b> Praziquantel for Schistosoma/Taenia.</span>'},
-      {n:5, q:'Where do adult Fasciola reside:',
-       options:['Small intestine','Biliary ducts of the liver','Lungs','Blood vessels'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Bile ducts → liver rot.</span><span class="why"><b>Why others are wrong:</b> Different sites.</span>'},
-      {n:6, q:'Infective stage of Fasciola for intermediate host:',
-       options:['Egg','Metacercaria','Miracidium','Cercaria'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Ciliated Miracidium hatches, penetrates snail.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:7, q:'Which Fasciola stage has a tail and leaves snail?',
-       options:['Metacercaria','Cercaria','Redia','Sporocyst'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Cercaria has tail. Attaches to grass, loses tail, encysts.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:8, q:'Diagnostic stage of Fasciola in feces:',
-       options:['Miracidium','Cercaria','Metacercaria','Eggs'],
-       ans:3,
-       explain:'<span class="why"><b>Why correct (D):</b> Eggs in feces — oval, operculated, yellowish-brown.</span><span class="why"><b>Why others are wrong:</b> Not in feces.</span>'},
-      {n:9, q:'Halzoun disease in humans acquired by:',
-       options:['Swimming in contaminated water','Eating raw liver or contaminated aquatic plants','Mosquito bite','Walking barefoot'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Metacercariae on plants/in liver. Halzoun = adult flukes in pharynx.</span><span class="why"><b>Why others are wrong:</b> Different routes.</span>'},
-      {n:10, q:'Cause of "Liver Rot" in sheep:',
-       options:['Schistosoma','Fasciola','Taenia','Planaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Fasciola causes extensive liver damage → liver rot.</span><span class="why"><b>Why others are wrong:</b> Different diseases.</span>'},
-      {n:11, q:'Which Fasciola stage has eye spots and primitive gut:',
-       options:['Metacercaria','Miracidium','Redia','Cercaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Miracidium = free-swimming, eye spots, penetration glands.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:12, q:'Shape of adult Fasciola:',
-       options:['Segmented','Leaf-like','Cylindrical','Spherical'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Flatworm, leaf-like. Tapeworms are ribbon-like.</span><span class="why"><b>Why others are wrong:</b> Different shapes.</span>'},
-      {n:13, q:'Distinguishing feature of F. gigantica vs F. hepatica:',
-       options:['Smaller and broader','Longer and narrower, less prominent shoulders','No suckers','Not a flatworm'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Gigantica = longer, narrower. Hepatica = shorter, broader, prominent shoulders.</span><span class="why"><b>Why others are wrong:</b> Wrong traits.</span>'},
-      {n:14, q:'Asexual multiplication in snail host occurs in:',
-       options:['Miracidium','Sporocyst and Redia','Cercaria','Metacercaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Sporocysts and rediae multiply parthenogenetically → hundreds of cercariae.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:15, q:'Human disease where flukes attach to pharynx:',
-       options:['Schistosomiasis','Taeniasis','Halzoun','Fasciolopsiasis'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Halzoun = parasitic pharyngitis from eating raw infected liver.</span><span class="why"><b>Why others are wrong:</b> Different diseases.</span>'},
-      {n:16, q:'Fasciola adults are:',
-       options:['Unisexual','Hermaphrodite','Parthenogenic','Asexual'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Both male and female reproductive organs.</span><span class="why"><b>Why others are wrong:</b> Wrong reproduction type.</span>'},
-      {n:17, q:'Cercaria loses its tail to become:',
-       options:['Miracidium','Metacercaria','Redia','Sporocyst'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Attaches to grass, loses tail, encysts as Metacercaria.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:18, q:'First stage hatched from Fasciola egg in water:',
-       options:['Cercaria','Miracidium','Redia','Metacercaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Eggs must be in water → hatch into ciliated Miracidium.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:19, q:'Definitive host of Fasciola:',
-       options:['Snail','Cow','Fish','Insect'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Cows, sheep, goats (harbor adults).</span><span class="why"><b>Why others are wrong:</b> Different hosts.</span>'},
-      {n:20, q:'Main pathological effect of chronic Fascioliasis:',
-       options:['Brain cysts','Bile duct obstruction and fibrosis','Destruction of RBCs','Muscle pain'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Adults in bile ducts → inflammation, obstruction, fibrosis.</span><span class="why"><b>Why others are wrong:</b> Different pathologies.</span>'}
-    ],
-    essays: [
-      {n:1, q:'Describe the life cycle of Fasciola.',
-       model:'<ul><li>Adults in bile ducts → eggs in feces.</li><li>Eggs in water → hatch into Miracidia.</li><li>Miracidia penetrate Lymnaea snail (IH).</li><li>In snail: Sporocyst → Redia → Cercaria.</li><li>Cercariae leave, swim to plants, encyst as Metacercaria (infective).</li><li>Definitive host ingests Metacercaria → excysts in duodenum → migrate to liver → become adults.</li></ul>'},
-      {n:2, q:'Compare Fasciola gigantica and Fasciola hepatica.',
-       model:'<ul><li><b>F. gigantica:</b> Giant liver fluke. Longer, narrower (2-7 cm), less prominent shoulders. Lymnaea cailliaudi.</li><li><b>F. hepatica:</b> Common liver fluke. Shorter, broader (2-3 cm), prominent shoulders. Lymnaea truncatula.</li></ul>'}
-    ]
-  },
-
-  5: {
-    title: 'Model 5 — Schistosoma Morphology &amp; Species',
-    mcq: [
-      {n:1, q:'Schistosoma differs from other trematodes because:',
-       options:['Has suckers','Hermaphroditic','Separate sexes (dioecious)','Lives in bile ducts'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> All other flukes hermaphroditic; Schistosoma has distinct male and female.</span><span class="why"><b>Why others are wrong:</b> Different traits.</span>'},
-      {n:2, q:'Male Schistosoma holds female in:',
-       options:['Rostellum','Gynaecophoric canal','Scolex','Acetabulum'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Gynaecophoric canal — groove on male\'s ventral surface.</span><span class="why"><b>Why others are wrong:</b> (A) Tapeworm structure. (C) Tapeworm. (D) Sucker.</span>'},
-      {n:3, q:'Intermediate host of S. mansoni:',
-       options:['Bulinus','Biomphalaria','Lymnaea','Pig'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Biomphalaria = mansoni. Bulinus = haematobium.</span><span class="why"><b>Why others are wrong:</b> Different snails.</span>'},
-      {n:4, q:'S. haematobium egg characteristic:',
-       options:['Large lateral spine','Terminal spine','Operculum','No spine'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Terminal (at the end) = haematobium. Lateral (on side) = mansoni.</span><span class="why"><b>Why others are wrong:</b> Different traits.</span>'},
-      {n:5, q:'S. mansoni adults reside in:',
-       options:['Vesical plexus','Portal veins draining large intestine','Biliary ducts','Lungs'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Intestinal schistosomiasis. S. haematobium = vesical.</span><span class="why"><b>Why others are wrong:</b> Different sites.</span>'},
-      {n:6, q:'Causes Urinary Schistosomiasis:',
-       options:['S. mansoni','S. haematobium','S. japonicum','Fasciola hepatica'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Urinary = bladder = S. haematobium.</span><span class="why"><b>Why others are wrong:</b> Different diseases.</span>'},
-      {n:7, q:'Infective stage of Schistosoma for humans:',
-       options:['Metacercaria','Miracidium','Furcocercous cercaria','Sporocyst'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Cercaria with forked (bifurcated) tail → penetrates skin.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:8, q:'Male S. mansoni tubercles:',
-       options:['Fine','Coarse','Absent','Spiny'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Mansoni = Coarse. Haematobium = Fine.</span><span class="why"><b>Why others are wrong:</b> Wrong trait.</span>'},
-      {n:9, q:'Male S. haematobium testes:',
-       options:['6-9 in mass','4-5 in one line','150 in number','Absent'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Haematobium: 4-5 in line. Mansoni: 6-9 in clusters.</span><span class="why"><b>Why others are wrong:</b> Wrong count.</span>'},
-      {n:10, q:'Female S. mansoni uterus contains:',
-       options:['20-30 eggs','1-4 eggs','No eggs','Hundreds'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Short uterus = 1-4 eggs (mansoni). Long = 20-30 (haematobium).</span><span class="why"><b>Why others are wrong:</b> Wrong count.</span>'},
-      {n:11, q:'Male S. mansoni caeca join at end of:',
-       options:['Anterior third','Middle third','Posterior third','Tail'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Anterior third (mansoni). Middle third (haematobium).</span><span class="why"><b>Why others are wrong:</b> Wrong location.</span>'},
-      {n:12, q:'Female S. haematobium ovary located in:',
-       options:['Anterior half','Posterior half','Middle','Tail'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Posterior half. Mansoni is anterior half.</span><span class="why"><b>Why others are wrong:</b> Wrong location.</span>'},
-      {n:13, q:'Schistosoma species with Baboons as reservoir:',
-       options:['S. mansoni','S. haematobium','S. japonicum','None'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Baboons = reservoir for S. mansoni. S. haematobium has no stated reservoir.</span><span class="why"><b>Why others are wrong:</b> Wrong species.</span>'},
-      {n:14, q:'Diagnostic stage for S. haematobium:',
-       options:['Eggs in feces','Eggs in urine','Cercaria in blood','Adults in stool'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Bladder → urine. Mansoni → feces.</span><span class="why"><b>Why others are wrong:</b> Wrong site.</span>'},
-      {n:15, q:'Terminal haematuria (blood at end of urination) caused by:',
-       options:['S. mansoni','S. haematobium','Fasciola','Taenia'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Bladder wall damage by terminal-spined eggs of S. haematobium.</span><span class="why"><b>Why others are wrong:</b> Different pathology.</span>'},
-      {n:16, q:'Stage penetrating snail host in Schistosoma:',
-       options:['Cercaria','Miracidium','Sporocyst','Metacercaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Miracidium hatches from egg → swims to snail.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:17, q:'Inside snail, Schistosoma miracidium develops into:',
-       options:['Redia + Metacercaria','Sporocyst → Cercaria','Onchosphere','Cysticercus'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Sporocyst → Cercaria. Redia and Metacercaria ABSENT (unlike Fasciola).</span><span class="why"><b>Why others are wrong:</b> Wrong stages.</span>'},
-      {n:18, q:'Male S. haematobium body surface:',
-       options:['Rough with coarse tubercles','Covered with fine tubercles','Smooth','Segmented'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Fine tubercles. Mansoni = coarse.</span><span class="why"><b>Why others are wrong:</b> Wrong trait.</span>'},
-      {n:19, q:'Drug of choice for Schistosoma:',
-       options:['Triclabendazole','Praziquantel','Niclosamide','Metronidazole'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Praziquantel — broad-spectrum for schistosomiasis.</span><span class="why"><b>Why others are wrong:</b> Triclabendazole = Fasciola.</span>'},
-      {n:20, q:'Cercaria penetrates human skin and transforms into:',
-       options:['Metacercaria','Schistosomula','Redia','Miracidium'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Loses tail, enters skin → Schistosomula. Migrates via lungs to liver, then final veins.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'}
-    ],
-    essays: [
-      {n:1, q:'Compare male and female Schistosoma morphology.',
-       model:'<ul><li><b>Male:</b> Shorter, thicker. Rough tegument with tubercles. Has gynaecophoric canal. Testes 4-5 or 6-9.</li><li><b>Female:</b> Longer, cylindrical, narrower. Smooth tegument. No gynaecophoric canal. Has ovary and uterus.</li></ul>'},
-      {n:2, q:'Differentiate S. mansoni and S. haematobium (habitat, IH, egg, disease).',
-       model:'<ul><li><b>S. mansoni:</b> Portal veins of large intestine. Biomphalaria snail. Lateral spine egg. Intestinal schistosomiasis.</li><li><b>S. haematobium:</b> Vesicle plexus of urinary bladder. Bulinus snail. Terminal spine egg. Urinary schistosomiasis (haematuria).</li></ul>'}
-    ]
-  },
-
-  6: {
-    title: 'Model 6 — Schistosoma Life Cycle + Tapeworms Intro',
-    mcq: [
-      {n:1, q:'S. mansoni eggs pass with:',
-       options:['Urine','Feces','Sputum','Blood'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Mesenteric veins → large intestine → stool.</span><span class="why"><b>Why others are wrong:</b> Wrong route.</span>'},
-      {n:2, q:'Granuloma formation in chronic schistosomiasis mainly from:',
-       options:['Adult worms eating tissue','Cercaria penetrating skin','Eggs trapped in tissues triggering immune response','Miracidia in blood'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Major pathology = inflammatory reaction (granuloma) around trapped eggs.</span><span class="why"><b>Why others are wrong:</b> Different mechanisms.</span>'},
-      {n:3, q:'"Swimmer\'s Itch" (cercarial dermatitis) from:',
-       options:['Schistosomula','Cercaria','Adult worm','Miracidium'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Cercaria penetrating skin → local dermatitis.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:4, q:'FALSE about Taenia:',
-       options:['Has digestive system','Segmented tapeworm','Hermaphroditic','Absorbs nutrients via tegument'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Tapeworms have NO digestive system.</span><span class="why"><b>Why others are wrong:</b> All TRUE traits.</span>'},
-      {n:5, q:'Head of tapeworm is:',
-       options:['Proglottid','Scolex','Strobila','Rostellum'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Scolex = head. Strobila = body chain. Proglottid = segment.</span><span class="why"><b>Why others are wrong:</b> Different parts.</span>'},
-      {n:6, q:'Produces new segments in tapeworm:',
-       options:['Scolex','Neck','Gravid proglottid','Mature proglottid'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Neck = most active, generates new immature segments.</span><span class="why"><b>Why others are wrong:</b> Different parts.</span>'},
-      {n:7, q:'Gravid proglottid characterized by:',
-       options:['Being smallest segment','Fully developed organs','Full of eggs (uterus)','Hooks and suckers'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Gravid = pregnant/full of eggs.</span><span class="why"><b>Why others are wrong:</b> Different features.</span>'},
-      {n:8, q:'Intermediate host of T. saginata:',
-       options:['Pig','Cow','Snail','Human'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Saginata = beef tapeworm. IH = cow.</span><span class="why"><b>Why others are wrong:</b> Different hosts.</span>'},
-      {n:9, q:'T. solium scolex characterized by:',
-       options:['4 suckers, no hooks','4 suckers, rostellum, and hooks','Completely round','No suckers'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Solium = "armed" (has hooks). Saginata = "unarmed".</span><span class="why"><b>Why others are wrong:</b> Wrong features.</span>'},
-      {n:10, q:'Human cysticercosis caused by ingestion of:',
-       options:['T. saginata larvae in beef','T. solium eggs','Fasciola metacercariae','Schistosoma cercariae'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> T. solium eggs → larvae migrate to human tissues.</span><span class="why"><b>Why others are wrong:</b> Different pathogens.</span>'},
-      {n:11, q:'Uterine branches in gravid T. saginata:',
-       options:['8-12','20-30','1-4','50-100'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Saginata: 20-30 branches. Solium: 8-12.</span><span class="why"><b>Why others are wrong:</b> Wrong count.</span>'},
-      {n:12, q:'Ovary of T. solium is:',
-       options:['Bilobed','Trilobed','Horseshoe','Absent'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Solium = Trilobed. Saginata = Bilobed.</span><span class="why"><b>Why others are wrong:</b> Wrong lobe count.</span>'},
-      {n:13, q:'Tapeworm with NO rostellum or hooks:',
-       options:['T. solium','T. saginata','Echinococcus','T. asiatica'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Unarmed scolex (no hooks).</span><span class="why"><b>Why others are wrong:</b> Different species.</span>'},
-      {n:14, q:'Autoinfection is a serious complication associated with:',
-       options:['T. saginata','T. solium','Schistosoma','Fasciola'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Adult T. solium in intestine → eggs back to stomach (or ingested) → hatch → cysticercosis.</span><span class="why"><b>Why others are wrong:</b> Different species.</span>'},
-      {n:15, q:'Infective stage of T. saginata for humans:',
-       options:['Egg','Cysticercus bovis','Metacercaria','Cercaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Ingesting cyst (bladder worm) in undercooked beef.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:16, q:'Taenia egg contains:',
-       options:['Miracidium','Onchosphere (hexacanth embryo) with 6 hooks','Cercaria','Cysticercus'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Hexacanth (6-hooked) embryo inside egg.</span><span class="why"><b>Why others are wrong:</b> Different larvae.</span>'},
-      {n:17, q:'Eating undercooked pork with Cysticercus cellulosae causes:',
-       options:['Intestinal taeniasis','Cysticercosis in brain','Liver rot','Urinary schistosomiasis'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Eat LARVA → adult worm in intestine. Eat EGG → cysticercosis.</span><span class="why"><b>Why others are wrong:</b> Different outcomes.</span>'},
-      {n:18, q:'Drug of choice for Taenia:',
-       options:['Praziquantel','Triclabendazole','Penicillin','Metronidazole'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Praziquantel (or Niclosamide).</span><span class="why"><b>Why others are wrong:</b> Triclabendazole = Fasciola.</span>'},
-      {n:19, q:'Differentiates T. solium from T. saginata using Ziehl-Neelsen stain:',
-       options:['T. solium does NOT stain, T. saginata stains','T. solium stains, T. saginata does not','Both stain equally','Neither stains'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Saginata eggs STAIN; Solium eggs do NOT stain.</span><span class="why"><b>Why others are wrong:</b> Wrong way around.</span>'},
-      {n:20, q:'Major complication of T. solium cysts in brain:',
-       options:['Blindness','Epilepsy (seizures)','Leg paralysis','Deafness'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Neurocysticercosis → increased intracranial pressure → seizures.</span><span class="why"><b>Why others are wrong:</b> Different effects.</span>'}
-    ],
-    essays: [
-      {n:1, q:'Compare T. saginata and T. solium (scolex, IH, uterine branches, complications).',
-       model:'<ul><li><b>Scolex:</b> Saginata = quadrate, no hooks (unarmed). Solium = globular, has rostellum + hooks (armed).</li><li><b>IH:</b> Saginata = cow. Solium = pig.</li><li><b>Uterine branches:</b> Saginata = 20-30. Solium = 8-12.</li><li><b>Complications:</b> Saginata = mild. Solium = human cysticercosis (neurocysticercosis), autoinfection.</li></ul>'},
-      {n:2, q:'Describe life cycle of T. solium and how humans get cysticercosis.',
-       model:'<ul><li>Adults in human small intestine. Gravid proglottids in feces.</li><li>Pigs ingest eggs → eggs hatch → onchospheres migrate → Cysticercus cellulosae in muscles.</li><li>Human intestinal taeniasis: eat undercooked pork with cysts.</li><li>Human cysticercosis: ingest EGGS (contaminated food/water or autoinfection) → larvae migrate to tissues (brain, muscles, eyes) → encyst.</li></ul>'}
-    ]
-  },
-
-  7: {
-    title: 'Model 7 — Mixed Comprehensive Review (Final Boss)',
-    mcq: [
-      {n:1, q:'Which has "ladder-like" nervous system:',
-       options:['Ascaris','Taenia','Planaria','Schistosoma'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Planaria — cerebral ganglia + 2 nerve cords + transverse nerves.</span><span class="why"><b>Why others are wrong:</b> Different patterns.</span>'},
-      {n:2, q:'Patient with liver damage + enlarged spleen — which parasite stage directly causes liver granuloma:',
-       options:['Adult Schistosoma','Schistosoma eggs','Fasciola cercaria','Taenia cysticercus'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> EGGS trapped in liver → granuloma. Fasciola adults cause bile duct damage.</span><span class="why"><b>Why others are wrong:</b> Different mechanisms.</span>'},
-      {n:3, q:'Parasite with furcocercous cercaria as infective stage:',
-       options:['Fasciola','Schistosoma','Taenia','Planaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Furcocercous (forked tail) = Schistosoma, penetrates skin.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:4, q:'Presence of operculum on egg is characteristic of:',
-       options:['Schistosoma','Fasciola','Taenia','Planaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Fasciola eggs are operculated (have lid).</span><span class="why"><b>Why others are wrong:</b> (A) Spines. (C) Thick radially striated shell.</span>'},
-      {n:5, q:'Definitive host of T. saginata:',
-       options:['Cow','Pig','Human','Snail'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Humans harbor the adult tapeworm.</span><span class="why"><b>Why others are wrong:</b> (A) IH. (B) IH for solium.</span>'},
-      {n:6, q:'Body cavity not lined by mesoderm is called:',
-       options:['Coelomate','Acoelomate','Pseudocoelomate','Diploblastic'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Pseudocoelomate (e.g., Nematodes). Acoelomate = no cavity.</span><span class="why"><b>Why others are wrong:</b> Different cavity types.</span>'},
-      {n:7, q:'Parasite causing "Halzoun" (pharyngeal attachment):',
-       options:['S. mansoni','Fasciola adults','T. solium','E. histolytica'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Fasciola adults escape from raw liver → attach to human pharynx.</span><span class="why"><b>Why others are wrong:</b> Different parasites.</span>'},
-      {n:8, q:'Best description of Planaria digestive system:',
-       options:['Complete (mouth + anus)','Incomplete, 3-branched intestine','Absent','Simple straight tube'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Incomplete (no anus), tri-cladida (3 branches).</span><span class="why"><b>Why others are wrong:</b> Different anatomies.</span>'},
-      {n:9, q:'"Onchosphere" is:',
-       options:['Larval stage in snail','Hexacanth embryo inside Taenia egg','Infective stage of Schistosoma','Adult stage of Fasciola'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Onchosphere = Hexacanth (6 hooks) embryo.</span><span class="why"><b>Why others are wrong:</b> Different stages.</span>'},
-      {n:10, q:'Drug effective against immature AND adult Fasciola:',
-       options:['Praziquantel','Albendazole','Triclabendazole','Niclosamide'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Triclabendazole (Fasinex) — unique for both stages.</span><span class="why"><b>Why others are wrong:</b> Praziquantel for Schistosoma/Taenia.</span>'},
-      {n:11, q:'"False suture" (Harmonia) in skull is:',
-       options:['Serrated','Squamous','Plane','Foliate'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Plane suture (smooth edges) = harmonia or false suture.</span><span class="why"><b>Why others are wrong:</b> Different suture types.</span>'},
-      {n:12, q:'Brachial plexus roots:',
-       options:['C1-C5','C6, C7, C8, T1, T2','L1-L5','T3-T10'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Exact brachial roots: C6, C7, C8, T1, T2.</span><span class="why"><b>Why others are wrong:</b> Different roots.</span>'},
-      {n:13, q:'"High" radial nerve injury causes:',
-       options:['Knuckling over','Dropped elbow','Loss of tail movement','Biceps paralysis'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> High = proximal to triceps → triceps paralyzed → dropped elbow.</span><span class="why"><b>Why others are wrong:</b> Low radial = knuckling.</span>'},
-      {n:14, q:'Characteristic of somatic nervous system:',
-       options:['2 neurons, involuntary','1 neuron, voluntary','Only smooth muscle','Only cardiac muscle'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Somatic = 1 neuron, voluntary. Visceral = 2 neurons, involuntary.</span><span class="why"><b>Why others are wrong:</b> Different traits.</span>'},
-      {n:15, q:'Muscle innervated by Musculocutaneous nerve is a:',
-       options:['Flexor of elbow','Extensor of elbow','Flexor of digits','Extensor of carpus'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Musculocutaneous = Biceps brachii (flexor of elbow).</span><span class="why"><b>Why others are wrong:</b> Different functions.</span>'},
-      {n:16, q:'Which is NOT part of the skeleton:',
-       options:['Femur','Patella','Tooth','Tibia'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Teeth not part of skeleton → Gomphosis not a true joint.</span><span class="why"><b>Why others are wrong:</b> All real bones.</span>'},
-      {n:17, q:'Synovial membrane does NOT cover:',
-       options:['Inner joint capsule','Ligaments','Articular cartilage','Meniscus'],
-       ans:2,
-       explain:'<span class="why"><b>Why correct (C):</b> Covers everything except articular cartilage.</span><span class="why"><b>Why others are wrong:</b> All covered.</span>'},
-      {n:18, q:'Intermediate host of S. haematobium:',
-       options:['Biomphalaria','Bulinus','Lymnaea','Pig'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Bulinus for haematobium. Biomphalaria for mansoni.</span><span class="why"><b>Why others are wrong:</b> Wrong snail.</span>'},
-      {n:19, q:'Causes "Liver Rot" in sheep:',
-       options:['S. japonicum','F. gigantica','T. solium','Planaria'],
-       ans:1,
-       explain:'<span class="why"><b>Why correct (B):</b> Fasciola causes Fascioliasis (liver rot).</span><span class="why"><b>Why others are wrong:</b> Different parasites.</span>'},
-      {n:20, q:'Structure connecting parietal and visceral tendon sheath layers:',
-       options:['Mesotendon','Retinaculum','Aponeurosis','Raphe'],
-       ans:0,
-       explain:'<span class="why"><b>Why correct (A):</b> Mesotendon connects both layers, carries vessels/nerves.</span><span class="why"><b>Why others are wrong:</b> Different structures.</span>'}
-    ],
-    essays: [
-      {n:1, q:'A 25-year-old patient has epilepsy and brain cysts. Ate undercooked pork. Identify parasite, stage, and route.',
-       model:'<ul><li><b>Parasite:</b> <i>Taenia solium</i>.</li><li><b>Stage:</b> Cysticercus cellulosae (larval).</li><li><b>Route:</b> Patient ingested <b>eggs</b> (not larvae — that would only give intestinal taeniasis). Eggs hatch in intestine → onchospheres penetrate wall → bloodstream → brain → encyst → neurocysticercosis.</li></ul>'},
-      {n:2, q:'Compare somatic and visceral nervous systems (target, control, pathway, damage).',
-       model:'<ul><li><b>Target:</b> Somatic (skin, skeletal muscle, bone). Visceral (smooth muscle, cardiac, glands, gut).</li><li><b>Control:</b> Somatic = voluntary. Visceral = involuntary.</li><li><b>Pathway:</b> Somatic = 1 neuron. Visceral = 2 neurons (preganglionic + postganglionic).</li><li><b>Damage:</b> Somatic = complete paralysis. Visceral = functional disturbance.</li></ul>'}
-    ]
+  if (nodes.length === 0) {
+    container.innerHTML = `<div class="loading">لا يوجد محتوى هنا حالياً.</div>`;
+    return;
   }
-};
 
-/* ============================================================
-   5) BUILD EXAM LIST
-   ============================================================ */
-function buildExamList(){
-  const list = document.getElementById('exam-list');
-  list.innerHTML = '';
-  Object.keys(EXAMS).forEach(num => {
-    const exam = EXAMS[num];
-    const card = document.createElement('div');
-    card.className = 'exam-card';
-    card.id = 'exam-' + num;
-    card.dataset.exam = num;
+  nodes.forEach(node => {
+    let typeLabel = "تصنيف";
+    let typeIcon = "";
+    
+    if (node.type === 'year') typeLabel = "سنة دراسية";
+    else if (node.type === 'program') typeLabel = "برنامج";
+    else if (node.type === 'subject') typeLabel = "مادة";
+    else if (node.type === 'module_explain') { typeLabel = "الشرح"; typeIcon = "<i class='fas fa-file-alt' style='color:#27ae60; margin-left:10px; font-size:24px;'></i>"; }
+    else if (node.type === 'module_video') { typeLabel = "فيديو"; typeIcon = "<i class='fas fa-video' style='color:#e74c3c; margin-left:10px; font-size:24px;'></i>"; }
+    else if (node.type === 'module_questions') { typeLabel = "أسئلة"; typeIcon = "<i class='fas fa-question-circle' style='color:#3498db; margin-left:10px; font-size:24px;'></i>"; }
+    else if (node.type === 'module_summary') { typeLabel = "ملخص"; typeIcon = "<i class='fas fa-clipboard-list' style='color:#9b59b6; margin-left:10px; font-size:24px;'></i>"; }
+    else if (node.type === 'module_terms') { typeLabel = "مصطلحات"; typeIcon = "<i class='fas fa-book' style='color:#e67e22; margin-left:10px; font-size:24px;'></i>"; }
+
+    const card = document.createElement("div");
+    card.className = `card-item ${node.type}`;
+    card.onclick = () => handleNodeClick(node);
+    
+    const titleHtml = node.type.startsWith('module_') ? `${typeIcon} ${node.title}` : node.title;
+    
+    // نظهر الوصف لو موجود
+    let descHtml = node.description ? `<div style="font-size:16px; color:var(--muted); margin-top:5px;">${node.description}</div>` : "";
+
     card.innerHTML = `
-      <div class="exam-title">
-        <span class="badge">${num}</span>
-        ${exam.title}
-      </div>
-      <div class="exam-meta">
-        <span>🕒 15 min · 20 MCQ + 2 Essay</span>
-        <span class="timer" id="timer-${num}">15:00</span>
-      </div>
-      <div class="exam-actions">
-        <button class="btn p" data-start="${num}">▶ Start Exam</button>
-      </div>
-      <div id="examBody${num}"></div>
-      <div class="exam-actions">
-        <button class="btn g" data-submit="${num}" style="display:none">✓ Submit &amp; Grade</button>
-      </div>
-      <div class="exam-score" id="score-${num}"></div>
+      <div class="card-type">${typeLabel}</div>
+      <h3 class="card-title">${titleHtml}</h3>
+      ${descHtml}
     `;
-    list.appendChild(card);
-  });
-
-  document.querySelectorAll('[data-start]').forEach(btn => {
-    btn.addEventListener('click', () => startExam(+btn.dataset.start));
-  });
-  document.querySelectorAll('[data-submit]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const examNum = +btn.dataset.submit;
-      if(confirm('Submit and grade this exam? You cannot change answers after this.')){
-        submitExam(examNum, false);
-      }
-    });
+    container.appendChild(card);
   });
 }
 
-/* ============================================================
-   6) EXAM ENGINE
-   ============================================================ */
-const examState = {};
-
-function buildExam(examNum){
-  const exam = EXAMS[examNum];
-  const body = document.getElementById('examBody' + examNum);
-  let html = '';
-
-  exam.mcq.forEach(item => {
-    html += `
-      <div class="qblock" id="q-${examNum}-${item.n}">
-        <div class="qhead">
-          <div class="qnum">${item.n}</div>
-          <span style="font-size:11px;font-weight:800;background:var(--bg2);color:var(--muted);border:1px solid var(--line);border-radius:20px;padding:3px 11px">MCQ</span>
-        </div>
-        <p class="qtext">${item.q}</p>
-        <div class="opts">
-          ${item.options.map((op, i) => `<div class="opt" data-exam="${examNum}" data-q="${item.n}" data-i="${i}">
-            <span class="mk"></span><span class="otxt">${op}</span></div>`).join('')}
-        </div>
-      </div>
-    `;
-  });
-
-  exam.essays.forEach(item => {
-    html += `
-      <div class="qblock" id="e-${examNum}-${item.n}">
-        <div class="qhead">
-          <div class="qnum" style="background:var(--accent2)">${item.n}</div>
-          <span style="font-size:11px;font-weight:800;background:var(--accent2-soft);color:var(--accent2);border:1px solid var(--accent2);border-radius:20px;padding:3px 11px">Essay</span>
-        </div>
-        <p class="qtext">${item.q}</p>
-        <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px">
-          <button class="btn o" data-reveal-essay="${examNum}-${item.n}">📖 Reveal Model Answer</button>
-        </div>
-        <div class="essay-model" id="model-${examNum}-${item.n}">
-          <span class="ttl">Model Answer:</span>
-          ${item.model}
-        </div>
-      </div>
-    `;
-  });
-
-  body.innerHTML = html;
-  attachExamEvents(examNum);
-}
-
-function attachExamEvents(examNum){
-  const body = document.getElementById('examBody' + examNum);
-  body.querySelectorAll('.opt').forEach(el => {
-    el.addEventListener('click', () => {
-      const st = examState[examNum];
-      if(!st || st.submitted) return;
-      const qn = +el.dataset.q;
-      const i = +el.dataset.i;
-      const siblings = el.parentElement.querySelectorAll('.opt');
-      siblings.forEach(s => s.classList.remove('sel'));
-      el.classList.add('sel');
-      st.mcqAnswers[qn] = i;
-    });
-  });
-  body.querySelectorAll('[data-reveal-essay]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.revealEssay;
-      const box = document.getElementById('model-' + id);
-      box.classList.toggle('show');
-    });
-  });
-}
-
-function startExam(examNum){
-  if(examState[examNum] && examState[examNum].timerId){
-    if(!confirm('An exam is already running. Restart?')) return;
-    clearInterval(examState[examNum].timerId);
+function handleNodeClick(node) {
+  if (node.type === 'content' || node.type.startsWith('module_')) {
+    openContentViewer(node);
+  } else {
+    renderLevel(node.id);
   }
-  const body = document.getElementById('examBody' + examNum);
-  body.innerHTML = '';
-  const scoreBox = document.getElementById('score-' + examNum);
-  scoreBox.className = 'exam-score';
-  scoreBox.innerHTML = '';
-
-  examState[examNum] = {
-    submitted: false,
-    mcqAnswers: {},
-    timeLeft: 15 * 60,
-    timerId: null
-  };
-  buildExam(examNum);
-
-  const submitBtn = document.querySelector(`[data-submit="${examNum}"]`);
-  submitBtn.style.display = 'inline-flex';
-
-  const startBtn = document.querySelector(`[data-start="${examNum}"]`);
-  startBtn.textContent = '↺ Restart Exam';
-  startBtn.classList.remove('p');
-  startBtn.classList.add('o');
-
-  const timerEl = document.getElementById('timer-' + examNum);
-  timerEl.className = 'timer';
-  timerEl.textContent = '15:00';
-
-  examState[examNum].timerId = setInterval(() => {
-    const st = examState[examNum];
-    if(!st || st.submitted){ clearInterval(st.timerId); return; }
-    st.timeLeft--;
-    const m = Math.floor(st.timeLeft / 60);
-    const s = st.timeLeft % 60;
-    timerEl.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-    timerEl.className = 'timer';
-    if(st.timeLeft <= 120) timerEl.classList.add('danger');
-    else if(st.timeLeft <= 300) timerEl.classList.add('warn');
-    if(st.timeLeft <= 0){
-      clearInterval(st.timerId);
-      submitExam(examNum, true);
-    }
-  }, 1000);
-
-  document.getElementById('exam-' + examNum).scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-function submitExam(examNum, autoSubmit){
-  const st = examState[examNum];
-  if(!st || st.submitted) return;
-  st.submitted = true;
-  if(st.timerId) clearInterval(st.timerId);
+function updateBreadcrumbs(parentId) {
+  const bc = document.getElementById("breadcrumbs");
+  bc.innerHTML = `<span onclick="renderLevel('root')"><i class="fas fa-home"></i> الرئيسية</span>`;
+  if (parentId === "root") return;
 
-  const exam = EXAMS[examNum];
-  let correct = 0;
-
-  exam.mcq.forEach(item => {
-    const userAns = st.mcqAnswers[item.n];
-    const qBlock = document.getElementById(`q-${examNum}-${item.n}`);
-    const opts = qBlock.querySelectorAll('.opt');
-    opts.forEach(o => {
-      const i = +o.dataset.i;
-      o.classList.add('lock');
-      if(i === item.ans) o.classList.add('right');
-      if(i === userAns && i !== item.ans) o.classList.add('wrong');
-    });
-    if(userAns === item.ans) correct++;
+  let path = [];
+  let current = treeData.find(n => n.id === parentId);
+  while (current) {
+    path.unshift(current);
+    current = treeData.find(n => n.id === current.parentId);
+  }
+  path.forEach(p => {
+    bc.innerHTML += ` <i class="fas fa-chevron-left"></i> <span onclick="renderLevel('${p.id}')">${p.title}</span>`;
   });
-
-  const pct = Math.round(correct / exam.mcq.length * 100);
-  const scoreBox = document.getElementById('score-' + examNum);
-  scoreBox.className = 'exam-score show';
-
-  let grade, color;
-  if(pct >= 90){ grade = 'Excellent 🏆'; color = 'var(--ok)'; }
-  else if(pct >= 75){ grade = 'Very Good ⭐'; color = 'var(--accent)'; }
-  else if(pct >= 60){ grade = 'Good 👍'; color = 'var(--gold)'; }
-  else if(pct >= 40){ grade = 'Needs Review 📖'; color = 'var(--gold)'; }
-  else { grade = 'Review from the Start 🔁'; color = 'var(--danger)'; }
-
-  let html = `
-    <div class="big" style="color:${color}">${pct}%</div>
-    <div class="lbl">
-      You answered <b>${correct}</b> of <b>${exam.mcq.length}</b> MCQs correctly · Grade: <b style="color:${color}">${grade}</b>
-      ${autoSubmit ? '<br><span style="color:var(--danger)">⏰ Time is up — auto-submitted.</span>' : ''}
-    </div>
-  `;
-
-  html += '<h4 style="margin-top:16px;font-size:15px;color:var(--accent);font-weight:800">📖 Detailed Explanation per Question</h4>';
-  exam.mcq.forEach(item => {
-    const userAns = st.mcqAnswers[item.n];
-    const isCorrect = userAns === item.ans;
-    const userText = userAns !== undefined ? item.options[userAns] : '— not answered —';
-    const correctText = item.options[item.ans];
-
-    html += `
-      <div class="fb ${isCorrect ? 'ok' : 'no'}" style="margin-top:10px">
-        <span class="ttl">Q${item.n} — ${isCorrect ? '✅ Correct' : '❌ Incorrect'}</span>
-        <span class="why"><b>Your answer:</b> ${userText}</span>
-        <span class="why"><b>Correct answer:</b> ${correctText}</span>
-        ${item.explain}
-      </div>
-    `;
-  });
-
-  html += `
-    <div class="fb" style="margin-top:14px;background:var(--accent2-soft);border:1px solid var(--accent2);color:var(--ink)">
-      <span class="ttl" style="color:var(--accent2)">📝 Essay Questions</span>
-      Review your essay answers by clicking <b>Reveal Model Answer</b> under each essay above.
-    </div>
-  `;
-
-  scoreBox.innerHTML = html;
-
-  const submitBtn = document.querySelector(`[data-submit="${examNum}"]`);
-  if(submitBtn) submitBtn.style.display = 'none';
-
-  scoreBox.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-/* ============================================================
-   7) INIT
-   ============================================================ */
-buildExamList();
+// ===== فتح الشاشة الكاملة =====
+function openContentViewer(node) {
+  document.getElementById("viewerTitle").textContent = node.title;
+  document.getElementById("contentView").style.display = "flex";
+
+  const iframe = document.getElementById("contentFrame");
+  let htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px; font-family:sans-serif;'><h2>لا يوجد محتوى مرفق بهذا الجزء حتى الآن.</h2></div>";
+  
+  const fullHTML = `
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; line-height: 1.8; font-size: 18px; color: #1a1a1a; background: #fff; margin: 0; }
+        img { max-width: 100%; height: auto; border-radius: 10px; }
+        /* سكريبت الحفظ المحلي */
+        if (window.localStorage) {
+           console.log("Local storage is available.");
+        }
+      </style>
+    </head>
+    <body>
+      ${htmlContent}
+      <script>
+        // حفظ حالة السكرول محلياً
+        window.addEventListener('scroll', () => {
+          localStorage.setItem('scrollPos_${node.id}', window.scrollY);
+        });
+        // استعادة حالة السكرول
+        window.addEventListener('load', () => {
+          const pos = localStorage.getItem('scrollPos_${node.id}');
+          if (pos) window.scrollTo(0, parseInt(pos));
+        });
+      <\/script>
+    </body>
+    </html>
+  `;
+  iframe.srcdoc = fullHTML;
+}
+
+window.closeViewer = function() {
+  document.getElementById("contentView").style.display = "none";
+  document.getElementById("contentFrame").srcdoc = "";
+};
 </script>
 </body>
 </html>
