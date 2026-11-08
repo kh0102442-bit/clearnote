@@ -6,7 +6,6 @@
 <title>ClearNote — لوحة التحكم</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  /* التصميم مدموج هنا عشان نكسر الكاش */
   :root {
     --navy: #152741; --accent: #a8741a; --bg: #f4f6f8;
     --white: #ffffff; --text: #1a1a1a; --muted: #5b6472; --line: #e9ecef;
@@ -19,16 +18,14 @@
     line-height: 1.6; padding-bottom: 50px;
   }
 
-  /* الهيدر */
   .admin-header { background: var(--navy); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
   .admin-brand { font-family: Georgia, serif; font-size: 1.6rem; font-weight: bold; }
   .admin-brand span { color: var(--accent); }
-  .btn-add-main { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: bold; }
-  .btn-logout { background: rgba(255,255,255,0.1); color: white; border: none; width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+  .btn-add-main { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+  .btn-logout { background: rgba(255,255,255,0.1); color: white; border: none; width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; }
 
   .admin-container { padding: 20px 15px; width: 100%; box-sizing: border-box; max-width: 800px; margin: 0 auto; }
 
-  /* الكروت */
   .tree-group { margin-bottom: 20px; }
   .node-card { background: var(--white); border: 2px solid var(--line); border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); overflow: hidden; }
   .node-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: var(--white); }
@@ -44,14 +41,12 @@
   .children-area { display: none; padding: 15px 20px 20px 20px; background: #fafbfc; border-top: 2px solid var(--line); }
   .children-area.active { display: block; }
 
-  /* ألوان الأجزاء */
   .node-card[data-type="module_explain"] .node-icon { background: #e8f5e9; color: #27ae60; }
   .node-card[data-type="module_video"] .node-icon { background: #ffebee; color: #e74c3c; }
   .node-card[data-type="module_questions"] .node-icon { background: #e3f2fd; color: #3498db; }
   .node-card[data-type="module_summary"] .node-icon { background: #f3e5f5; color: #9b59b6; }
   .node-card[data-type="module_terms"] .node-icon { background: #fff3e0; color: #e67e22; }
 
-  /* المودال */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: flex-end; z-index: 1000; }
   .modal-overlay.active { display: flex; }
   .modal-box { background: var(--white); border-radius: 24px 24px 0 0; width: 100%; padding: 30px 20px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
@@ -61,10 +56,9 @@
   .form-group label { display: block; font-size: 1.1rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
   .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 18px; border: 2px solid var(--line); background: #fafbfc; box-sizing: border-box; border-radius: 10px; font-size: 1rem; }
   .modal-actions { display: flex; gap: 15px; margin-top: 30px; }
-  .btn-save { flex: 1; background: var(--navy); color: white; border: none; padding: 18px; font-size: 1.2rem; border-radius: 12px; font-weight: bold; }
-  .btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 18px; font-size: 1.2rem; border-radius: 12px; font-weight: bold; }
+  .btn-save { flex: 1; background: var(--navy); color: white; border: none; padding: 18px; font-size: 1.2rem; border-radius: 12px; font-weight: bold; cursor: pointer; }
+  .btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 18px; font-size: 1.2rem; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
-  /* الأزرار الـ 5 الكبيرة */
   .modules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
   .module-item { background: #f8f9fa; border: 2px solid var(--line); border-radius: 16px; padding: 30px 10px; display: flex; flex-direction: column; align-items: center; gap: 15px; cursor: pointer; }
   .module-icon { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; }
@@ -92,7 +86,6 @@
   </div>
 </div>
 
-<!-- مودال الإضافة -->
 <div class="modal-overlay" id="nodeModal">
   <div class="modal-box">
     <h3 id="modalTitle">إضافة</h3>
@@ -110,7 +103,6 @@
   </div>
 </div>
 
-<!-- مودال إدارة المحتوى -->
 <div class="modal-overlay" id="manageModal">
   <div class="modal-box">
     <h3 id="manageTitle">إدارة محتوى</h3>
@@ -126,7 +118,6 @@
   </div>
 </div>
 
-<!-- مودال كتابة الكود -->
 <div class="modal-overlay" id="codeModal">
   <div class="modal-box">
     <h3 id="codeTitle">إضافة كود</h3>
