@@ -112,4 +112,27 @@ function renderLevel(parentId) {
     let typeLabel = "تصنيف"; let typeIcon = "";
     if (node.type === 'year') typeLabel = "سنة دراسية"; else if (node.type === 'program') typeLabel = "برنامج"; else if (node.type === 'subject') typeLabel = "مادة"; else if (node.type === 'module_explain') { typeLabel = "الشرح"; typeIcon = "<i class='fas fa-file-alt' style='color:#27ae60; margin-left:10px; font-size:1.8rem;'></i>"; } else if (node.type === 'module_video') { typeLabel = "فيديو"; typeIcon = "<i class='fas fa-video' style='color:#e74c3c; margin-left:10px; font-size:1.8rem;'></i>"; } else if (node.type === 'module_questions') { typeLabel = "أسئلة"; typeIcon = "<i class='fas fa-question-circle' style='color:#3498db; margin-left:10px; font-size:1.8rem;'></i>"; } else if (node.type === 'module_summary') { typeLabel = "ملخص"; typeIcon = "<i class='fas fa-clipboard-list' style='color:#9b59b6; margin-left:10px; font-size:1.8rem;'></i>"; } else if (node.type === 'module_terms') { typeLabel = "مصطلحات"; typeIcon = "<i class='fas fa-book' style='color:#e67e22; margin-left:10px; font-size:1.8rem;'></i>"; }
     const card = document.createElement("div"); card.className = `card-item ${node.type}`; card.onclick = () => handleNodeClick(node);
-    const titleHtml = node.type.startsWith('module
+    const titleHtml = node.type.startsWith('module_') ? `${typeIcon} ${node.title}` : node.title; let descHtml = node.description ? `<div style="font-size:1.1rem; color:var(--muted); margin-top:5px;">${node.description}</div>` : "";
+    card.innerHTML = `<div class="card-type">${typeLabel}</div><h3 class="card-title">${titleHtml}</h3>${descHtml}`; container.appendChild(card);
+  });
+}
+
+function handleNodeClick(node) { if (node.type === 'content' || node.type.startsWith('module_')) { openContentViewer(node); } else { renderLevel(node.id); } }
+
+function updateBreadcrumbs(parentId) {
+  const bc = document.getElementById("breadcrumbs"); bc.innerHTML = `<span onclick="renderLevel('root')"><i class="fas fa-home"></i> الرئيسية</span>`; if (parentId === "root") return;
+  let path = []; let current = treeData.find(n => n.id === parentId); while (current) { path.unshift(current); current = treeData.find(n => n.id === current.parentId); }
+  path.forEach(p => { bc.innerHTML += ` <i class="fas fa-chevron-left"></i> <span onclick="renderLevel('${p.id}')">${p.title}</span>`; });
+}
+
+function openContentViewer(node) {
+  document.getElementById("viewerTitle").textContent = node.title; document.getElementById("contentView").style.display = "flex"; const iframe = document.getElementById("contentFrame");
+  let htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px; font-family:sans-serif;'><h2>لا يوجد محتوى مرفق بهذا الجزء حتى الآن.</h2></div>";
+  const fullHTML = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; line-height: 1.8; font-size: 1.2rem; color: #1a1a1a; background: #fff; margin: 0; } img { max-width: 100%; height: auto; border-radius: 10px; }</style></head><body>${htmlContent}<script>window.addEventListener('scroll', () => { localStorage.setItem('scrollPos_${node.id}', window.scrollY); }); window.addEventListener('load', () => { const pos = localStorage.getItem('scrollPos_${node.id}'); if (pos) window.scrollTo(0, parseInt(pos)); });<\/script></body></html>`;
+  iframe.srcdoc = fullHTML;
+}
+
+window.closeViewer = function() { document.getElementById("contentView").style.display = "none"; document.getElementById("contentFrame").srcdoc = ""; };
+</script>
+</body>
+</html>
