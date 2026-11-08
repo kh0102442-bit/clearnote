@@ -2,44 +2,55 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
 <title>ClearNote — منصة المذاكرة</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  /* التصميم مدموج هنا عشان نكسر الكاش */
+  /* التصميم الجديد - خطوط عملاقة ومريحة */
   :root {
     --navy: #152741; --accent: #a8741a; --bg: #f4f6f8;
     --white: #ffffff; --text: #1a1a1a; --muted: #5b6472; --line: #e9ecef;
   }
-  html { font-size: 18px; -webkit-text-size-adjust: 100%; }
+  
+  /* إجبار المتصفح على العرض الصحيح */
+  html {
+    font-size: 20px; /* خط ضخم جداً */
+    -webkit-text-size-adjust: 100%;
+  }
+  
   html, body {
-    margin: 0; padding: 0; max-width: 100vw; overflow-x: hidden;
+    margin: 0; padding: 0; 
+    width: 100%; max-width: 100vw; overflow-x: hidden;
     background: var(--bg); color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6; padding-bottom: 50px;
   }
 
-  /* شريط التنقل العلوي */
+  /* الهيدر */
   .app-navbar { background: var(--navy); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-  .app-brand { font-family: Georgia, serif; font-size: 1.6rem; letter-spacing: 2px; font-weight: bold; }
+  .app-brand { font-family: Georgia, serif; font-size: 1.8rem; letter-spacing: 2px; font-weight: bold; }
   .app-brand span { color: var(--accent); }
   .nav-user { display: flex; align-items: center; gap: 12px; font-weight: 600; }
-  .avatar-badge { width: 52px; height: 52px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.4rem; }
-  .btn-logout { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px 20px; border-radius: 12px; font-size: 1rem; }
+  .avatar-badge { width: 50px; height: 50px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.4rem; }
+  .btn-logout { background: rgba(255,255,255,0.15); border: none; color: white; padding: 12px 20px; border-radius: 12px; font-size: 1rem; font-weight: bold; }
 
   .container { max-width: 800px; margin: 25px auto; padding: 0 15px; }
   
   /* شريط المسار */
-  .breadcrumbs { background: var(--white); padding: 20px; border-radius: 16px; color: var(--muted); margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border: 2px solid var(--line); }
-  .breadcrumbs span { cursor: pointer; color: var(--navy); font-weight: 800; font-size: 1.1rem; }
-  .breadcrumbs i { font-size: 1rem; color: #ccc; }
+  .breadcrumbs { background: var(--white); padding: 20px; border-radius: 20px; color: var(--muted); margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border: 2px solid var(--line); box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+  .breadcrumbs span { cursor: pointer; color: var(--navy); font-weight: 800; font-size: 1.2rem; }
+  .breadcrumbs i { font-size: 1.2rem; color: #ccc; }
 
-  /* شبكة الكروت الضخمة */
+  /* الكروت الضخمة */
   .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-  .card-item { background: var(--white); border: 2px solid var(--line); border-radius: 20px; padding: 25px; display: flex; flex-direction: column; gap: 15px; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.02); cursor: pointer; }
-  .card-item::before { content: ''; position: absolute; top: 0; right: 0; width: 8px; height: 100%; background: var(--accent); }
-  .card-title { font-size: 1.5rem; font-weight: 800; color: var(--navy); margin: 0; }
-  .card-type { font-size: 1rem; font-weight: 800; color: var(--accent); background: #fdfaf3; padding: 8px 16px; border-radius: 20px; width: max-content; }
+  .card-item { 
+    background: var(--white); border: 2px solid var(--line); border-radius: 24px; padding: 30px; 
+    display: flex; flex-direction: column; gap: 15px; position: relative; overflow: hidden; 
+    box-shadow: 0 6px 15px rgba(0,0,0,0.03); cursor: pointer;
+  }
+  .card-item::before { content: ''; position: absolute; top: 0; right: 0; width: 10px; height: 100%; background: var(--accent); }
+  .card-title { font-size: 1.6rem; font-weight: 800; color: var(--navy); margin: 0; }
+  .card-type { font-size: 1.1rem; font-weight: 800; color: var(--accent); background: #fdfaf3; padding: 8px 20px; border-radius: 25px; width: max-content; }
 
   /* ألوان الأجزاء */
   .card-item.module_explain::before { background: #27ae60; }
@@ -54,7 +65,7 @@
   #contentView { position: fixed; inset: 0; background: #fff; z-index: 9999; display: none; flex-direction: column; }
   .fullscreen-header { background: var(--navy); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
   .fullscreen-title { font-size: 1.4rem; font-weight: bold; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .btn-close-fullscreen { background: #b91c1c; color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .btn-close-fullscreen { background: #b91c1c; color: white; border: none; padding: 15px 25px; border-radius: 12px; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; cursor: pointer; }
   .iframe-wrapper { flex: 1; width: 100%; position: relative; background: #fafbfc; }
   .iframe-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
 
@@ -84,7 +95,7 @@
 <div id="contentView">
   <div class="fullscreen-header">
     <h2 class="fullscreen-title" id="viewerTitle">المحتوى</h2>
-    <button class="btn-close-fullscreen" onclick="closeViewer()"><i class="fas fa-times"></i> خروج</button>
+    <button class="btn-close-fullscreen" onclick="closeViewer()"><i class="fas fa-times"></i> إغلاق</button>
   </div>
   <div class="iframe-wrapper">
     <iframe id="contentFrame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-modals"></iframe>
@@ -97,42 +108,119 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/
 
 let treeData = [];
 
-onAuth((user, userData) => { if (!user) { goTo("index.html"); return; } document.getElementById("userAvatar").textContent = (userData.name || user.email).charAt(0).toUpperCase(); loadTreeData(); });
+onAuth((user, userData) => { 
+  if (!user) { goTo("index.html"); return; } 
+  document.getElementById("userAvatar").textContent = (userData.name || user.email).charAt(0).toUpperCase(); 
+  loadTreeData(); 
+});
+
 window.doLogout = async () => { await signOutUser(); goTo("index.html"); };
 
 async function loadTreeData() {
-  try { const snap = await getDocs(collection(db, "content_tree")); treeData = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderLevel("root"); } catch (e) { document.getElementById("cardsContainer").innerHTML = `<div class="loading" style="color:red;">خطأ: ${e.message}</div>`; }
+  try { 
+    const snap = await getDocs(collection(db, "content_tree")); 
+    treeData = snap.docs.map(d => ({ id: d.id, ...d.data() })); 
+    renderLevel("root"); 
+  } catch (e) { 
+    document.getElementById("cardsContainer").innerHTML = `<div class="loading" style="color:red;">خطأ: ${e.message}</div>`; 
+  }
 }
 
 function renderLevel(parentId) {
-  const container = document.getElementById("cardsContainer"); document.getElementById("mainView").style.display = "block"; document.getElementById("contentView").style.display = "none"; container.innerHTML = "";
-  updateBreadcrumbs(parentId); const nodes = treeData.filter(n => n.parentId === parentId);
-  if (nodes.length === 0) { container.innerHTML = `<div class="loading">لا يوجد محتوى هنا.</div>`; return; }
+  const container = document.getElementById("cardsContainer"); 
+  document.getElementById("mainView").style.display = "block"; 
+  document.getElementById("contentView").style.display = "none"; 
+  container.innerHTML = "";
+  
+  updateBreadcrumbs(parentId); 
+  const nodes = treeData.filter(n => n.parentId === parentId);
+  
+  if (nodes.length === 0) { 
+    container.innerHTML = `<div class="loading">لا يوجد محتوى هنا.</div>`; 
+    return; 
+  }
+  
   nodes.forEach(node => {
     let typeLabel = "تصنيف"; let typeIcon = "";
-    if (node.type === 'year') typeLabel = "سنة دراسية"; else if (node.type === 'program') typeLabel = "برنامج"; else if (node.type === 'subject') typeLabel = "مادة"; else if (node.type === 'module_explain') { typeLabel = "الشرح"; typeIcon = "<i class='fas fa-file-alt' style='color:#27ae60; margin-left:10px; font-size:1.8rem;'></i>"; } else if (node.type === 'module_video') { typeLabel = "فيديو"; typeIcon = "<i class='fas fa-video' style='color:#e74c3c; margin-left:10px; font-size:1.8rem;'></i>"; } else if (node.type === 'module_questions') { typeLabel = "أسئلة"; typeIcon = "<i class='fas fa-question-circle' style='color:#3498db; margin-left:10px; font-size:1.8rem;'></i>"; } else if (node.type === 'module_summary') { typeLabel = "ملخص"; typeIcon = "<i class='fas fa-clipboard-list' style='color:#9b59b6; margin-left:10px; font-size:1.8rem;'></i>"; } else if (node.type === 'module_terms') { typeLabel = "مصطلحات"; typeIcon = "<i class='fas fa-book' style='color:#e67e22; margin-left:10px; font-size:1.8rem;'></i>"; }
-    const card = document.createElement("div"); card.className = `card-item ${node.type}`; card.onclick = () => handleNodeClick(node);
-    const titleHtml = node.type.startsWith('module_') ? `${typeIcon} ${node.title}` : node.title; let descHtml = node.description ? `<div style="font-size:1.1rem; color:var(--muted); margin-top:5px;">${node.description}</div>` : "";
-    card.innerHTML = `<div class="card-type">${typeLabel}</div><h3 class="card-title">${titleHtml}</h3>${descHtml}`; container.appendChild(card);
+    if (node.type === 'year') typeLabel = "سنة دراسية"; 
+    else if (node.type === 'program') typeLabel = "برنامج"; 
+    else if (node.type === 'subject') typeLabel = "مادة"; 
+    else if (node.type === 'module_explain') { typeLabel = "الشرح"; typeIcon = "<i class='fas fa-file-alt' style='color:#27ae60; margin-left:10px; font-size:1.8rem;'></i>"; } 
+    else if (node.type === 'module_video') { typeLabel = "فيديو"; typeIcon = "<i class='fas fa-video' style='color:#e74c3c; margin-left:10px; font-size:1.8rem;'></i>"; } 
+    else if (node.type === 'module_questions') { typeLabel = "أسئلة"; typeIcon = "<i class='fas fa-question-circle' style='color:#3498db; margin-left:10px; font-size:1.8rem;'></i>"; } 
+    else if (node.type === 'module_summary') { typeLabel = "ملخص"; typeIcon = "<i class='fas fa-clipboard-list' style='color:#9b59b6; margin-left:10px; font-size:1.8rem;'></i>"; } 
+    else if (node.type === 'module_terms') { typeLabel = "مصطلحات"; typeIcon = "<i class='fas fa-book' style='color:#e67e22; margin-left:10px; font-size:1.8rem;'></i>"; }
+    
+    const card = document.createElement("div"); 
+    card.className = `card-item ${node.type}`; 
+    card.onclick = () => handleNodeClick(node);
+    
+    const titleHtml = node.type.startsWith('module_') ? `${typeIcon} ${node.title}` : node.title; 
+    let descHtml = node.description ? `<div style="font-size:1.2rem; color:var(--muted); margin-top:8px;">${node.description}</div>` : "";
+    
+    card.innerHTML = `<div class="card-type">${typeLabel}</div><h3 class="card-title">${titleHtml}</h3>${descHtml}`; 
+    container.appendChild(card);
   });
 }
 
-function handleNodeClick(node) { if (node.type === 'content' || node.type.startsWith('module_')) { openContentViewer(node); } else { renderLevel(node.id); } }
+function handleNodeClick(node) { 
+  if (node.type === 'content' || node.type.startsWith('module_')) { 
+    openContentViewer(node); 
+  } else { 
+    renderLevel(node.id); 
+  } 
+}
 
 function updateBreadcrumbs(parentId) {
-  const bc = document.getElementById("breadcrumbs"); bc.innerHTML = `<span onclick="renderLevel('root')"><i class="fas fa-home"></i> الرئيسية</span>`; if (parentId === "root") return;
-  let path = []; let current = treeData.find(n => n.id === parentId); while (current) { path.unshift(current); current = treeData.find(n => n.id === current.parentId); }
-  path.forEach(p => { bc.innerHTML += ` <i class="fas fa-chevron-left"></i> <span onclick="renderLevel('${p.id}')">${p.title}</span>`; });
+  const bc = document.getElementById("breadcrumbs"); 
+  bc.innerHTML = `<span onclick="renderLevel('root')"><i class="fas fa-home"></i> الرئيسية</span>`; 
+  if (parentId === "root") return;
+  
+  let path = []; 
+  let current = treeData.find(n => n.id === parentId); 
+  while (current) { 
+    path.unshift(current); 
+    current = treeData.find(n => n.id === current.parentId); 
+  }
+  path.forEach(p => { 
+    bc.innerHTML += ` <i class="fas fa-chevron-left"></i> <span onclick="renderLevel('${p.id}')">${p.title}</span>`; 
+  });
 }
 
 function openContentViewer(node) {
-  document.getElementById("viewerTitle").textContent = node.title; document.getElementById("contentView").style.display = "flex"; const iframe = document.getElementById("contentFrame");
-  let htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px; font-family:sans-serif;'><h2>لا يوجد محتوى مرفق بهذا الجزء حتى الآن.</h2></div>";
-  const fullHTML = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; line-height: 1.8; font-size: 1.2rem; color: #1a1a1a; background: #fff; margin: 0; } img { max-width: 100%; height: auto; border-radius: 10px; }</style></head><body>${htmlContent}<script>window.addEventListener('scroll', () => { localStorage.setItem('scrollPos_${node.id}', window.scrollY); }); window.addEventListener('load', () => { const pos = localStorage.getItem('scrollPos_${node.id}'); if (pos) window.scrollTo(0, parseInt(pos)); });<\/script></body></html>`;
+  document.getElementById("viewerTitle").textContent = node.title; 
+  document.getElementById("contentView").style.display = "flex"; 
+  const iframe = document.getElementById("contentFrame");
+  
+  let htmlContent = node.htmlContent || "<div style='text-align:center; padding:50px; font-family:sans-serif; font-size:24px;'><h2>لا يوجد محتوى مرفق بهذا الجزء حتى الآن.</h2></div>";
+  
+  const fullHTML = `
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; line-height: 1.8; font-size: 22px; color: #1a1a1a; background: #fff; margin: 0; }
+        img { max-width: 100%; height: auto; border-radius: 10px; }
+      </style>
+    </head>
+    <body>
+      ${htmlContent}
+      <script>
+        window.addEventListener('scroll', () => { localStorage.setItem('scrollPos_${node.id}', window.scrollY); });
+        window.addEventListener('load', () => { const pos = localStorage.getItem('scrollPos_${node.id}'); if (pos) window.scrollTo(0, parseInt(pos)); });
+      <\/script>
+    </body>
+    </html>
+  `;
   iframe.srcdoc = fullHTML;
 }
 
-window.closeViewer = function() { document.getElementById("contentView").style.display = "none"; document.getElementById("contentFrame").srcdoc = ""; };
+window.closeViewer = function() { 
+  document.getElementById("contentView").style.display = "none"; 
+  document.getElementById("contentFrame").srcdoc = ""; 
+};
 </script>
 </body>
 </html>
