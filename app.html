@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ClearNote — منصة المذاكرة</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  .device-lock-overlay { position: fixed; inset: 0; background: var(--navy); z-index: 99999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; color: white; }
+  .device-lock-overlay.active { display: flex; }
+  .lock-icon { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--accent); margin-bottom: 20px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(168,116,26,.4); } 70% { box-shadow: 0 0 0 20px rgba(168,116,26,0); } 100% { box-shadow: 0 0 0 0 rgba(168,116,26,0); } }
+  .device-lock-overlay h2 { font-size: 22px; margin: 0 0 10px; }
+  .device-lock-overlay p { color: rgba(255,255,255,.7); font-size: 15px; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
+  .btn-logout-lock { background: rgba(255,255,255,.1); color: white; border: 1px solid rgba(255,255,255,.3); padding: 12px 24px; border-radius: 10px; font-family: inherit; font-size: 16px; cursor: pointer; }
+
+  /* مودال الاشتراك */
+  .sub-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .sub-overlay.active { display: flex; }
+  .sub-box { background: var(--card); border-radius: var(--r-lg); padding: 24px; width: 100%; max-width: 400px; text-align: center; box-shadow: var(--sh-lg); }
+  .sub-box h3 { margin: 0 0 10px; color: var(--navy); }
+  .sub-box p { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .sub-box input { width: 100%; padding: 12px; border: 2px solid var(--line); border-radius: var(--r-md); margin-bottom: 15px; font-family: inherit; font-size: 15px; }
+  
+  /* شكل القفل */
+  .lock-badge { position: absolute; top: 12px; left: 12px; font-size: 18px; z-index: 10; color: var(--red); }
+
+  /* التلوين الأحمر للمحتوى */
+  .card-item.module_explain, .card-item.module_video, .card-item.module_questions, .card-item.module_summary, .card-item.module_terms {
+    background-color: #fff5f5 !important;
+    border-color: #feb2b2 !important;
+  }
+</style>
+</head>
+<body>
+
+<div class="device-lock-overlay" id="deviceLock">
+  <div class="lock-icon"><i class="fas fa-shield-alt"></i></div>
+  <h2>جهاز جديد!</h2>
+  <p>لقد حاولت الدخول من جهاز جديد. تم إرسال طلب للإدارة للموافقة عليه.<br>حاول الدخول مرة أخرى لاحقاً.</p>
+  <button class="btn-logout-lock" onclick="doLogout()">تسجيل الخروج</button>
+</div>
+
+<nav class="top-navbar">
+  <div class="brand">CLEAR<span>NOTE</span></div>
+  <div class="spacer"></div>
+  <button class="icon-btn" onclick="showNotifications()"><i class="far fa-bell"></i></button>
+  <div class="top-avatar" id="topAvatar" onclick="switchView('profile')">U</div>
+</nav>
+
+<aside class="side-nav">
+  <button class="nav-item active" data-view="home" onclick="switchView('home')"><i class="fas fa-home"></i><span>الرئيسية</span></button>
+  <button class="nav-item" data-view="content" onclick="switchView('content')"><i class="fas fa-book-open"></i><span>المحتوى</span></button>
+  <button class="nav-item" data-view="chats" onclick="switchView('chats')"><i class="fas fa-comments"></i><span>الدردشات</span></button>
+  <button class="nav-item" data-view="pomodoro" onclick="switchView('pomodoro')"><i class="fas fa-clock"></i><span>بومودورو</span></button>
+  <button class="nav-item" data-view="profile" onclick="switchView('profile')"><i class="fas fa-user"></i><span>حسابي</span></button>
+</aside>
+
+<main class="app-main" id="appMain">
+  <section class="view active" id="homeView">
+    <div class="content-wrap">
+      <div class="greeting-card">
+        <div class="greet-small" id="greetSmall">صباح الخير ☀️</div>
+        <h1 class="greet-name">أهلاً، <span id="greetName">...</span></h1>
+        <p class="greet-sub">جاهز تكمل مذاكرتك النهاردة؟</p>
+        <button class="greet-cta" onclick="switchView('content')"><i class="fas fa-play"></i> ابدأ المذاكرة</button>
+      </div>
+      <div class="section">
+        <h2 class="section-title"><i class="fas fa-chart-line"></i> إحصائياتك</h2>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon pts"><i class="fas fa-star"></i></div><div class="stat-value" id="statPoints">0</div><div class="stat-label">نقطة</div></div>
+          <div class="stat-card"><div class="stat-icon days"><i class="fas fa-calendar"></i></div><div class="stat-value" id="statDays">0</div><div class="stat-label">يوم معانا</div></div>
+          <div class="stat-card"><div class="stat-icon lessons"><i class="fas fa-check-circle"></i></div><div class="stat-value" id="statLessons">0</div><div class="stat-label">درس مكتمل</div></div>
+          <div class="stat-card"><div class="stat-icon available"><i class="fas fa-book"></i></div><div class="stat-value" id="statAvailable">0</div><div class="stat-label">درس متاح</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <h2 class="section-title"><i class="fas fa-bolt"></i> إجراءات سريعة</h2>
+        <div class="quick-grid">
+          <div class="quick-card" onclick="switchView('content')"><div class="quick-icon" style="background:linear-gradient(135deg,#2980b9,#5dade2)"><i class="fas fa-book-open"></i></div><div class="quick-label">تصفح المحتوى</div></div>
+          <div class="quick-card" onclick="alert('قريباً')"><div class="quick-icon" style="background:linear-gradient(135deg,#d35400,#e67e22)"><i class="fas fa-magic"></i></div><div class="quick-label">طلب مخصوص</div></div>
+          <div class="quick-card" onclick="switchView('pomodoro')"><div class="quick-icon" style="background:linear-gradient(135deg,#8e44ad,#9b59b6)"><i class="fas fa-clock"></i></div><div class="quick-label">بومودورو</div></div>
+          <div class="quick-card" onclick="switchView('chats')"><div class="quick-icon" style="background:linear-gradient(135deg,#1f6b45,#27ae60)"><i class="fas fa-comments"></i></div><div class="quick-label">الدردشات</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <h2 class="section-title"><i class="fas fa-lightbulb"></i> مقترح ليك <span class="see-all" onclick="switchView('content')">عرض الكل ←</span></h2>
+        <div class="content-grid" id="suggestedGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="contentView">
+    <div class="content-wrap">
+      <div class="breadcrumbs" id="breadcrumbs"></div>
+      <div class="content-grid" id="cardsContainer"></div>
+    </div>
+  </section>
+
+  <section class="view" id="chatsView"><div class="content-wrap"><div class="empty-state"><i class="fas fa-comments"></i><h3>الدردشات قريباً</h3></div></div></section>
+  <section class="view" id="pomodoroView"><div class="content-wrap"><div class="empty-state"><i class="fas fa-clock"></i><h3>بومودورو قريباً</h3></div></div></section>
+
+  <section class="view" id="profileView">
+    <div class="content-wrap">
+      <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatar">U</div>
+        <h2 class="profile-name" id="profileName">...</h2>
+        <div class="profile-email" id="profileEmail">...</div>
+        <span class="profile-role-badge" id="profileRole">طالب</span>
+      </div>
+      <div class="profile-list">
+        <div class="profile-item" onclick="alert('قريباً')"><div class="pi-icon"><i class="fas fa-cog"></i></div><div class="pi-text">الإعدادات</div><i class="fas fa-chevron-left pi-arrow"></i></div>
+        <div class="profile-item" onclick="alert('قريباً')"><div class="pi-icon"><i class="fas fa-user-edit"></i></div><div class="pi-text">تعديل الملف</div><i class="fas fa-chevron-left pi-arrow"></i></div>
+        <div class="profile-item" onclick="alert('قريباً')"><div class="pi-icon" style="background:#fdfaf3;color:var(--accent)"><i class="fas fa-crown"></i></div><div class="pi-text">اشتراكاتي</div><i class="fas fa-chevron-left pi-arrow"></i></div>
+        <div class="profile-item" onclick="alert('قريباً')"><div class="pi-icon"><i class="fas fa-mobile-alt"></i></div><div class="pi-text">أجهزتي</div><i class="fas fa-chevron-left pi-arrow"></i></div>
+        <div class="profile-item danger" onclick="doLogout()"><div class="pi-icon"><i class="fas fa-sign-out-alt"></i></div><div class="pi-text">تسجيل الخروج</div><i class="fas fa-chevron-left pi-arrow"></i></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-item active" data-view="home" onclick="switchView('home')"><i class="fas fa-home"></i><span>الرئيسية</span></button>
+  <button class="nav-item" data-view="content" onclick="switchView('content')"><i class="fas fa-book-open"></i><span>المحتوى</span></button>
+  <button class="nav-item" data-view="chats" onclick="switchView('chats')"><i class="fas fa-comments"></i><span>دردشات</span></button>
+  <button class="nav-item" data-view="pomodoro" onclick="switchView('pomodoro')"><i class="fas fa-clock"></i><span>بومودورو</span></button>
+  <button class="nav-item" data-view="profile" onclick="switchView('profile')"><i class="fas fa-user"></i><span>حسابي</span></button>
+</nav>
+
+<div id="lessonPlayer">
+  <div class="player-header">
+    <h2 class="player-title" id="playerTitle">المحتوى</h2>
+    <button class="player-close" onclick="closePlayer()"><i class="fas fa-times"></i> خروج</button>
+  </div>
+  <iframe id="playerFrame" class="player-frame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-modals"></iframe>
+</div>
+
+<!-- مودال الاشتراك -->
+<div class="sub-overlay" id="subModal">
+  <div class="sub-box">
+    <h3>تفعيل الاشتراك</h3>
+    <p id="subSubjectName"></p>
+    <p style="margin-bottom:10px; font-weight:bold; color:var(--navy)">سعر الاشتراك: 40 جنيه / شهر</p>
+    <p style="font-size:12px">قم بتحويل المبلغ على رقم المحفظة (01xxxxxxxxx) ثم أدخل رقم المحفظة التي حولت منها لتأكيد الطلب.</p>
+    <input type="text" id="subNotes" placeholder="رقم المحفظة أو ملاحظات...">
+    <div style="display:flex; gap:10px;">
+      <button class="btn-primary" style="margin-top:0" onclick="submitSubRequest()">إرسال الطلب</button>
+      <button class="btn-primary" style="margin-top:0; background:#e9ecef; color:var(--muted)" onclick="document.getElementById('subModal').classList.remove('active')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { db, onAuth, goTo, showToast, signOutUser, checkDeviceStatus, requestSubscription } from "./shared.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let currentUserData = null;
+let treeData = [];
+
+onAuth(async (user, userData) => {
+  if (!user) { goTo("index.html"); return; }
+  currentUserData = userData;
+  
+  try {
+    const dev = await checkDeviceStatus(user.uid);
+    if (dev.status === 'pending') {
+      document.getElementById('deviceLock').classList.add('active');
+      document.getElementById('appMain').style.display = 'none';
+      return;
+    }
+  } catch(e) { console.error("Device error", e); }
+
+  document.getElementById('deviceLock').classList.remove('active');
+  document.getElementById('appMain').style.display = 'block';
+
+  const displayName = userData?.name || user.email.split('@')[0];
+  const initial = displayName.charAt(0).toUpperCase();
+  document.getElementById("topAvatar").textContent = initial;
+  document.getElementById("profileAvatar").textContent = initial;
+  document.getElementById("greetName").textContent = displayName;
+  document.getElementById("profileName").textContent = displayName;
+  document.getElementById("profileEmail").textContent = user.email;
+  
+  try { await loadTreeData(); } catch(e) { console.error("Tree error", e); }
+  
+  renderHome();
+});
+
+window.doLogout = async () => {
+  if (confirm('تسجيل الخروج؟')) { await signOutUser(); goTo("index.html"); }
+};
+
+window.switchView = function(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(view + 'View').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === view));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (view === 'home') renderHome();
+  if (view === 'content') renderLevel('root');
+};
+
+function renderHome() {
+  const hour = new Date().getHours();
+  document.getElementById('greetSmall').textContent = hour < 12 ? 'صباح الخير ☀️' : (hour < 18 ? 'مساء النور 🌤️' : 'مساء الخير 🌙');
+  document.getElementById('statPoints').textContent = currentUserData?.totalPoints || 0;
+  document.getElementById('statDays').textContent = currentUserData?.createdAt ? Math.floor((Date.now() - new Date(currentUserData.createdAt).getTime()) / 86400000) + 1 : 1;
+  document.getElementById('statLessons').textContent = currentUserData?.completedLessons ? Object.keys(currentUserData.completedLessons).length : 0;
+  document.getElementById('statAvailable').textContent = treeData.filter(n => n.type.startsWith('module_')).length;
+  renderSuggested();
+}
+
+function renderSuggested() {
+  const grid = document.getElementById('suggestedGrid');
+  const modules = treeData.filter(n => n.type.startsWith('module_'));
+  if (modules.length === 0) { grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>لا يوجد محتوى بعد</p></div>`; return; }
+  const shuffled = [...modules].sort(() => 0.5 - Math.random()).slice(0, 4);
+  
+  grid.innerHTML = shuffled.map(node => renderCard(node)).join('');
+  grid.querySelectorAll('[data-node]').forEach(el => {
+    el.onclick = () => handleNodeClick(treeData.find(n => n.id === el.dataset.node));
+  });
+}
+
+async function loadTreeData() {
+  const snap = await getDocs(collection(db, "content_tree"));
+  treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+function renderLevel(parentId) {
+  const container = document.getElementById('cardsContainer');
+  container.innerHTML = '';
+  updateBreadcrumbs(parentId);
+  const nodes = treeData.filter(n => n.parentId === parentId);
+  if (nodes.length === 0) { container.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i><h3>فارغ</h3></div>`; return; }
+  
+  container.innerHTML = nodes.map(node => renderCard(node)).join('');
+  container.querySelectorAll('[data-node]').forEach(el => {
+    el.onclick = () => handleNodeClick(nodes.find(n => n.id === el.dataset.node));
+  });
+}
+
+// رسم الكارت: أي حاجة بتتضاف هنا هتتقفل وتتلون
+function renderCard(node) {
+  let typeLabel = 'تبويب';
+  let icon = '';
+  let isModule = false;
+
+  if (node.type === 'year') typeLabel = 'سنة دراسية';
+  else if (node.type === 'program') typeLabel = 'برنامج';
+  else if (node.type === 'subject') typeLabel = 'مادة';
+  else if (node.type.startsWith('module_')) {
+    isModule = true;
+    if (node.type === 'module_explain') { typeLabel = 'الشرح'; icon = '<i class="fas fa-file-alt" style="color:#27ae60;margin-left:6px"></i>'; }
+    else if (node.type === 'module_video') { typeLabel = 'فيديو'; icon = '<i class="fas fa-video" style="color:#e74c3c;margin-left:6px"></i>'; }
+    else if (node.type === 'module_questions') { typeLabel = 'أسئلة'; icon = '<i class="fas fa-question-circle" style="color:#2980b9;margin-left:6px"></i>'; }
+    else if (node.type === 'module_summary') { typeLabel = 'ملخص'; icon = '<i class="fas fa-clipboard-list" style="color:#8e44ad;margin-left:6px"></i>'; }
+    else if (node.type === 'module_terms') { typeLabel = 'مصطلحات'; icon = '<i class="fas fa-book" style="color:#d35400;margin-left:6px"></i>'; }
+  }
+
+  // لو العنصر ده محتوى (فيه كود HTML)، هنحط عليه القفل
+  const lockIcon = isModule ? '<span class="lock-badge"><i class="fas fa-lock"></i></span>' : '';
+
+  const titleHtml = `${icon}${node.title}`;
+  const descHtml = node.description ? `<div class="card-desc">${node.description}</div>` : '';
+
+  return `
+    <div class="card-item ${node.type || 'custom'}" data-node="${node.id}" style="position:relative;">
+      ${lockIcon}
+      <div class="card-type">${typeLabel}</div>
+      <h3 class="card-title">${titleHtml}</h3>
+      ${descHtml}
+    </div>
+  `;
+}
+
+function handleNodeClick(node) {
+  if (node.type === 'content' || node.type.startsWith('module_')) {
+    // نفتح المودال على طول من غير ما نبحث عن المادة
+    document.getElementById('subSubjectName').textContent = `المحتوى المطلوب: ${node.title}`;
+    
+    // بناخد ID العنصر كـ SubjectId مؤقتاً عشان لما نوافق من لوحة التحكم نعرف نفتحه
+    document.getElementById('subModal').dataset.subjectId = node.id;
+    document.getElementById('subNotes').value = '';
+    document.getElementById('subModal').classList.add('active');
+  } else {
+    renderLevel(node.id);
+  }
+}
+
+window.submitSubRequest = async function() {
+  const itemId = document.getElementById('subModal').dataset.subjectId;
+  const notes = document.getElementById('subNotes').value.trim();
+  if (!notes) { showToast('يرجى إدخال رقم المحفظة أو أي ملاحظات', 'error'); return; }
+  
+  const btn = document.querySelector('#subModal .btn-primary');
+  btn.disabled = true; btn.textContent = 'جاري الإرسال...';
+
+  try {
+    // هنبعت الطلب بالـ ID بتاع العنصر نفسه
+    await requestSubscription(currentUserData.uid, currentUserData.name, itemId, 'طلب فتح محتوى', notes);
+    showToast('تم إرسال الطلب بنجاح. سيتم تفعيله بعد المراجعة.');
+    document.getElementById('subModal').classList.remove('active');
+  } catch(e) { showToast('حدث خطأ', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'إرسال الطلب'; }
+};
+
+function updateBreadcrumbs(parentId) {
+  const bc = document.getElementById('breadcrumbs'); bc.innerHTML = '';
+  const homeSpan = document.createElement('span'); homeSpan.className = 'crumb'; homeSpan.innerHTML = '<i class="fas fa-home"></i> الرئيسية'; homeSpan.onclick = () => renderLevel('root'); bc.appendChild(homeSpan);
+  if (parentId === 'root') return;
+  let path = []; let current = treeData.find(n => n.id === parentId);
+  while (current) { path.unshift(current); current = treeData.find(n => n.id === current.parentId); }
+  path.forEach(p => {
+    const arrow = document.createElement('i'); arrow.className = 'fas fa-chevron-left'; bc.appendChild(arrow);
+    const crumb = document.createElement('span'); crumb.className = 'crumb'; crumb.textContent = p.title; crumb.onclick = () => renderLevel(p.id); bc.appendChild(crumb);
+  });
+}
+
+function openPlayer(node) {
+  document.getElementById('playerTitle').textContent = node.title;
+  document.getElementById('lessonPlayer').classList.add('active');
+  const iframe = document.getElementById('playerFrame');
+  const htmlContent = node.htmlContent || '<div style="text-align:center;padding:50px;"><h2>لا يوجد محتوى</h2></div>';
+  iframe.srcdoc = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>body{font-family:'Cairo',sans-serif;padding:16px;line-height:1.8}</style></head><body>${htmlContent}</body></html>`;
+}
+
+window.closePlayer = function() { document.getElementById('lessonPlayer').classList.remove('active'); document.getElementById('playerFrame').srcdoc = ''; };
+window.showNotifications = function() { alert('قريباً'); };
+</script>
+</body>
+</html>
