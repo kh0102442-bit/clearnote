@@ -228,11 +228,28 @@ async function loadTreeData() {
   treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
+// ====== الحل العبقري هنا: الاعتماد على العمق وليس النوع ======
 function getSubjectIdFromNode(nodeId) {
   let current = treeData.find(n => n.id === nodeId);
+  let path = [];
+  
+  // نمشي مع الشجرة لفوق لحد ما نوصل للجذر
   while(current) {
-    if(current.type === 'subject') return current.id;
+    path.unshift(current);
+    if (current.parentId === "root") break; // وقفنا عند السنة الدراسية
     current = treeData.find(n => n.id === current.parentId);
+  }
+  
+  // path[0] = السنة الدراسية
+  // path[1] = البرنامج
+  // path[2] = المادة (أو أول حاجة تحت البرنامج)
+  
+  if (path.length >= 3) {
+    return path[2].id; // المادة هي المستوى الثالث
+  } else if (path.length === 2) {
+    return path[1].id; // لو مفيش مادة، نستخدم البرنامج
+  } else if (path.length === 1) {
+    return path[0].id; // لو مفيش برنامج، نستخدم السنة
   }
   return null;
 }
@@ -306,24 +323,20 @@ function renderCard(node) {
   `;
 }
 
-// دالة الفتح الذكية (بتتأكد من الداتابيز لحظة الضغط)
 async function handleNodeClick(node) {
   if (node.type === 'content' || node.type.startsWith('module_')) {
     if (node.access === 'paid' || node.access === undefined) {
       const subjectId = getSubjectIdFromNode(node.id);
       
       if (subjectId) {
-        // لو مش في الذاكرة، نسأل قاعدة البيانات
         if (!userSubs[subjectId]) {
            const docRef = doc(db, "subscriptions", `${currentUserData.uid}_${subjectId}`);
            const docSnap = await getDoc(docRef);
            
            if (docSnap.exists() && docSnap.data().status === 'active') {
-               // الأدمن وافق بالفعل! نحدث الذاكرة ونفتح
                userSubs[subjectId] = docSnap.data();
                showToast("تم تفعيل اشتراكك! جاري فتح الملف...", "success");
                
-               // نغير شكل الكارت في الشاشة فوراً
                const cardEl = document.querySelector(`[data-node="${node.id}"]`);
                if(cardEl) {
                    cardEl.classList.remove('locked-card');
@@ -334,9 +347,8 @@ async function handleNodeClick(node) {
                openPlayer(node);
                return;
            } else {
-               // لسه مفيش اشتراك، نفتح مودال الدفع
-               const subject = treeData.find(n => n.id === subjectId);
-               document.getElementById('subSubjectName').textContent = `المادة المطلوبة: ${subject?.title || 'غير معروفة'}`;
+               const subjectNode = treeData.find(n => n.id === subjectId);
+               document.getElementById('subSubjectName').textContent = `المادة المطلوبة: ${subjectNode?.title || 'غير معروفة'}`;
                document.getElementById('subModal').dataset.subjectId = subjectId;
                document.getElementById('subNotes').value = '';
                document.getElementById('subModal').classList.add('active');
@@ -349,7 +361,6 @@ async function handleNodeClick(node) {
       }
     }
     
-    // لو الملف عام، يفتح على طول
     openPlayer(node);
   } else {
     renderLevel(node.id);
