@@ -15,7 +15,6 @@
   .device-lock-overlay p { color: rgba(255,255,255,.7); font-size: 15px; line-height: 1.6; max-width: 300px; margin-bottom: 30px; }
   .btn-logout-lock { background: rgba(255,255,255,.1); color: white; border: 1px solid rgba(255,255,255,.3); padding: 12px 24px; border-radius: 10px; font-family: inherit; font-size: 16px; cursor: pointer; }
 
-  /* مودال الاشتراك */
   .sub-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
   .sub-overlay.active { display: flex; }
   .sub-box { background: var(--card); border-radius: var(--r-lg); padding: 24px; width: 100%; max-width: 400px; text-align: center; box-shadow: var(--sh-lg); }
@@ -23,11 +22,10 @@
   .sub-box p { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
   .sub-box input { width: 100%; padding: 12px; border: 2px solid var(--line); border-radius: var(--r-md); margin-bottom: 15px; font-family: inherit; font-size: 15px; }
   
-  /* شكل القفل */
-  .lock-badge { position: absolute; top: 12px; left: 12px; font-size: 18px; z-index: 10; color: var(--red); }
+  .lock-badge { position: absolute; top: 12px; left: 12px; font-size: 18px; z-index: 10; }
+  .lock-badge.locked { color: var(--red); }
 
-  /* التلوين الأحمر للمحتوى */
-  .card-item.module_explain, .card-item.module_video, .card-item.module_questions, .card-item.module_summary, .card-item.module_terms {
+  .locked-card {
     background-color: #fff5f5 !important;
     border-color: #feb2b2 !important;
   }
@@ -136,7 +134,6 @@
   <iframe id="playerFrame" class="player-frame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-modals"></iframe>
 </div>
 
-<!-- مودال الاشتراك -->
 <div class="sub-overlay" id="subModal">
   <div class="sub-box">
     <h3>تفعيل الاشتراك</h3>
@@ -153,10 +150,11 @@
 
 <script type="module">
 import { db, onAuth, goTo, showToast, signOutUser, checkDeviceStatus, requestSubscription } from "./shared.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUserData = null;
 let treeData = [];
+let userSubs = {}; 
 
 onAuth(async (user, userData) => {
   if (!user) { goTo("index.html"); return; }
@@ -182,7 +180,10 @@ onAuth(async (user, userData) => {
   document.getElementById("profileName").textContent = displayName;
   document.getElementById("profileEmail").textContent = user.email;
   
-  try { await loadTreeData(); } catch(e) { console.error("Tree error", e); }
+  try { 
+    await loadTreeData(); 
+    await loadMySubscriptions(); 
+  } catch(e) { console.error("Data load error", e); }
   
   renderHome();
 });
@@ -227,6 +228,28 @@ async function loadTreeData() {
   treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
+function getSubjectIdFromNode(nodeId) {
+  let current = treeData.find(n => n.id === nodeId);
+  while(current) {
+    if(current.type === 'subject') return current.id;
+    current = treeData.find(n => n.id === current.parentId);
+  }
+  return null;
+}
+
+async function loadMySubscriptions() {
+  userSubs = {};
+  const q = query(collection(db, "subscriptions"), where("uid", "==", currentUserData.uid));
+  const snap = await getDocs(q);
+  
+  snap.forEach(d => {
+    const data = d.data();
+    if (data.status === 'active') {
+      userSubs[data.subjectId] = data; 
+    }
+  });
+}
+
 function renderLevel(parentId) {
   const container = document.getElementById('cardsContainer');
   container.innerHTML = '';
@@ -240,32 +263,41 @@ function renderLevel(parentId) {
   });
 }
 
-// رسم الكارت: أي حاجة بتتضاف هنا هتتقفل وتتلون
 function renderCard(node) {
   let typeLabel = 'تبويب';
   let icon = '';
-  let isModule = false;
+  let isLocked = false;
 
   if (node.type === 'year') typeLabel = 'سنة دراسية';
   else if (node.type === 'program') typeLabel = 'برنامج';
   else if (node.type === 'subject') typeLabel = 'مادة';
   else if (node.type.startsWith('module_')) {
-    isModule = true;
     if (node.type === 'module_explain') { typeLabel = 'الشرح'; icon = '<i class="fas fa-file-alt" style="color:#27ae60;margin-left:6px"></i>'; }
     else if (node.type === 'module_video') { typeLabel = 'فيديو'; icon = '<i class="fas fa-video" style="color:#e74c3c;margin-left:6px"></i>'; }
     else if (node.type === 'module_questions') { typeLabel = 'أسئلة'; icon = '<i class="fas fa-question-circle" style="color:#2980b9;margin-left:6px"></i>'; }
     else if (node.type === 'module_summary') { typeLabel = 'ملخص'; icon = '<i class="fas fa-clipboard-list" style="color:#8e44ad;margin-left:6px"></i>'; }
     else if (node.type === 'module_terms') { typeLabel = 'مصطلحات'; icon = '<i class="fas fa-book" style="color:#d35400;margin-left:6px"></i>'; }
+    
+    if (node.access === 'paid' || node.access === undefined) {
+      const subjectId = getSubjectIdFromNode(node.id);
+      if (subjectId) {
+        if (!userSubs[subjectId]) {
+          isLocked = true; 
+        }
+      } else {
+        isLocked = true; 
+      }
+    }
   }
 
-  // لو العنصر ده محتوى (فيه كود HTML)، هنحط عليه القفل
-  const lockIcon = isModule ? '<span class="lock-badge"><i class="fas fa-lock"></i></span>' : '';
+  const lockIcon = isLocked ? '<span class="lock-badge locked"><i class="fas fa-lock"></i></span>' : '';
+  const cardClass = isLocked ? `card-item ${node.type || 'custom'} locked-card` : `card-item ${node.type || 'custom'}`;
 
   const titleHtml = `${icon}${node.title}`;
   const descHtml = node.description ? `<div class="card-desc">${node.description}</div>` : '';
 
   return `
-    <div class="card-item ${node.type || 'custom'}" data-node="${node.id}" style="position:relative;">
+    <div class="${cardClass}" data-node="${node.id}" style="position:relative;">
       ${lockIcon}
       <div class="card-type">${typeLabel}</div>
       <h3 class="card-title">${titleHtml}</h3>
@@ -274,31 +306,67 @@ function renderCard(node) {
   `;
 }
 
-function handleNodeClick(node) {
+// دالة الفتح الذكية (بتتأكد من الداتابيز لحظة الضغط)
+async function handleNodeClick(node) {
   if (node.type === 'content' || node.type.startsWith('module_')) {
-    // نفتح المودال على طول من غير ما نبحث عن المادة
-    document.getElementById('subSubjectName').textContent = `المحتوى المطلوب: ${node.title}`;
+    if (node.access === 'paid' || node.access === undefined) {
+      const subjectId = getSubjectIdFromNode(node.id);
+      
+      if (subjectId) {
+        // لو مش في الذاكرة، نسأل قاعدة البيانات
+        if (!userSubs[subjectId]) {
+           const docRef = doc(db, "subscriptions", `${currentUserData.uid}_${subjectId}`);
+           const docSnap = await getDoc(docRef);
+           
+           if (docSnap.exists() && docSnap.data().status === 'active') {
+               // الأدمن وافق بالفعل! نحدث الذاكرة ونفتح
+               userSubs[subjectId] = docSnap.data();
+               showToast("تم تفعيل اشتراكك! جاري فتح الملف...", "success");
+               
+               // نغير شكل الكارت في الشاشة فوراً
+               const cardEl = document.querySelector(`[data-node="${node.id}"]`);
+               if(cardEl) {
+                   cardEl.classList.remove('locked-card');
+                   const lock = cardEl.querySelector('.lock-badge');
+                   if(lock) lock.remove();
+               }
+               
+               openPlayer(node);
+               return;
+           } else {
+               // لسه مفيش اشتراك، نفتح مودال الدفع
+               const subject = treeData.find(n => n.id === subjectId);
+               document.getElementById('subSubjectName').textContent = `المادة المطلوبة: ${subject?.title || 'غير معروفة'}`;
+               document.getElementById('subModal').dataset.subjectId = subjectId;
+               document.getElementById('subNotes').value = '';
+               document.getElementById('subModal').classList.add('active');
+               return;
+           }
+        }
+      } else {
+        showToast("خطأ: الملف ده مش تابع لمادة", "error");
+        return;
+      }
+    }
     
-    // بناخد ID العنصر كـ SubjectId مؤقتاً عشان لما نوافق من لوحة التحكم نعرف نفتحه
-    document.getElementById('subModal').dataset.subjectId = node.id;
-    document.getElementById('subNotes').value = '';
-    document.getElementById('subModal').classList.add('active');
+    // لو الملف عام، يفتح على طول
+    openPlayer(node);
   } else {
     renderLevel(node.id);
   }
 }
 
 window.submitSubRequest = async function() {
-  const itemId = document.getElementById('subModal').dataset.subjectId;
+  const subjectId = document.getElementById('subModal').dataset.subjectId;
   const notes = document.getElementById('subNotes').value.trim();
   if (!notes) { showToast('يرجى إدخال رقم المحفظة أو أي ملاحظات', 'error'); return; }
   
   const btn = document.querySelector('#subModal .btn-primary');
   btn.disabled = true; btn.textContent = 'جاري الإرسال...';
 
+  const subject = treeData.find(n => n.id === subjectId);
   try {
-    // هنبعت الطلب بالـ ID بتاع العنصر نفسه
-    await requestSubscription(currentUserData.uid, currentUserData.name, itemId, 'طلب فتح محتوى', notes);
+    await requestSubscription(currentUserData.uid, currentUserData.name, subjectId, subject?.title || 'مادة', notes);
     showToast('تم إرسال الطلب بنجاح. سيتم تفعيله بعد المراجعة.');
     document.getElementById('subModal').classList.remove('active');
   } catch(e) { showToast('حدث خطأ', 'error'); }
