@@ -7,57 +7,66 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  :root { --navy: #152741; --accent: #a8741a; --bg: #f4f6f8; --white: #ffffff; --text: #1a1a1a; --muted: #5b6472; --line: #e9ecef; }
+  :root { --navy: #152741; --accent: #a8741a; --bg: #f4f6f8; --white: #ffffff; --text: #1a1a1a; --muted: #5b6472; --line: #e9ecef; --green: #1f6b45; --red: #b91c1c; }
   html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; background: var(--bg); font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; padding-bottom: 30px; font-size: 16px; }
-  .admin-header { background: var(--navy); color: white; padding: 15px 18px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
-  .admin-brand { font-family: Georgia, serif; font-size: 22px; font-weight: bold; }
+  
+  .admin-header { background: var(--navy); color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+  .admin-brand { font-family: Georgia, serif; font-size: 20px; font-weight: bold; }
   .admin-brand span { color: var(--accent); }
-  .btn-add-main { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: bold; font-size: 15px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-  .btn-logout { background: rgba(255,255,255,0.1); color: white; border: none; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
-  .admin-nav { display: flex; gap: 10px; margin-bottom: 20px; padding: 0 15px; }
-  .nav-tab { flex: 1; background: var(--white); border: 2px solid var(--line); padding: 12px; border-radius: 12px; font-size: 15px; font-weight: bold; color: var(--muted); cursor: pointer; text-align: center; transition: 0.2s; }
+  .btn-add-main { background: var(--accent); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .btn-logout { background: rgba(255,255,255,0.1); color: white; border: none; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
+  
+  .admin-nav { display: flex; gap: 8px; margin-bottom: 15px; padding: 0 15px; }
+  .nav-tab { flex: 1; background: var(--white); border: 2px solid var(--line); padding: 10px; border-radius: 10px; font-size: 14px; font-weight: bold; color: var(--muted); cursor: pointer; text-align: center; transition: 0.2s; }
   .nav-tab.active { background: var(--navy); color: white; border-color: var(--navy); }
+  
   .admin-container { padding: 0 15px; width: 100%; box-sizing: border-box; }
   
-  .tree-group { margin-bottom: 15px; } .node-card { background: var(--white); border: 2px solid var(--line); border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); overflow: hidden; }
-  .node-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-  .node-title-area { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
-  .node-icon { width: 45px; height: 45px; border-radius: 12px; background: #eef2fa; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  /* شجرة المحتوى - تم تصغيرها لتناسب الموبايل */
+  .tree-group { margin-bottom: 10px; } 
+  .node-card { background: var(--white); border: 2px solid var(--line); border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); overflow: hidden; }
+  .node-header { padding: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; cursor: pointer; }
+  .node-title-area { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 140px; }
+  .node-icon { width: 32px; height: 32px; border-radius: 8px; background: #eef2fa; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
   .node-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-  .node-title { font-weight: 800; color: var(--navy); font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .node-type { font-size: 12px; color: var(--accent); font-weight: 700; }
-  .node-actions { display: flex; gap: 6px; flex-shrink: 0; }
-  .action-btn { width: 38px; height: 38px; border-radius: 8px; border: 2px solid var(--line); background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 16px; cursor: pointer; }
-  .action-btn.manage { color: #1f6b45; border-color: #c9d6ee; background: #eef2fa; }
-  .action-btn.danger { color: #b91c1c; background: #fbeaea; border-color: #fbeaea; }
-  .children-area { display: none; padding: 12px; background: #fafbfc; border-top: 2px solid var(--line); }
+  .node-title { font-weight: 700; color: var(--navy); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .node-type { font-size: 11px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+  
+  .node-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .action-btn { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--line); background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; cursor: pointer; }
+  .action-btn.manage { color: var(--green); border-color: #c9d6ee; background: #eef2fa; }
+  .action-btn.danger { color: var(--red); background: #fbeaea; border-color: #fbeaea; }
+  
+  .children-area { display: none; padding: 10px; background: #fafbfc; border-top: 2px solid var(--line); }
   .children-area.active { display: block; }
   
-  .student-card { background: var(--white); border: 2px solid var(--line); border-radius: 16px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-  .student-info { display: flex; flex-direction: column; gap: 4px; }
-  .student-name { font-weight: bold; color: var(--navy); font-size: 17px; }
-  .student-email { font-size: 13px; color: var(--muted); }
+  /* الطلاب والطلبات */
+  .student-card, .request-card { background: var(--white); border: 2px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .student-info { display: flex; flex-direction: column; gap: 2px; }
+  .student-name { font-weight: bold; color: var(--navy); font-size: 15px; }
+  .student-email { font-size: 12px; color: var(--muted); }
   
-  .request-card { background: var(--white); border: 2px solid var(--line); border-radius: 16px; padding: 15px; margin-bottom: 12px; }
-  .request-title { font-weight: 800; color: var(--navy); font-size: 16px; margin-bottom: 5px; }
-  .request-sub { font-size: 14px; color: var(--accent); margin-bottom: 5px; }
-  .request-notes { font-size: 13px; color: var(--muted); margin-bottom: 15px; }
-  
+  .request-title { font-weight: 800; color: var(--navy); font-size: 15px; margin-bottom: 4px; }
+  .request-sub { font-size: 13px; color: var(--accent); margin-bottom: 4px; }
+  .request-notes { font-size: 12px; color: var(--muted); margin-bottom: 10px; background: #fafbfc; padding: 6px; border-radius: 6px; }
+
+  /* المودال */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: flex-end; z-index: 1000; }
   .modal-overlay.active { display: flex; }
-  .modal-box { background: var(--white); border-radius: 24px 24px 0 0; width: 100%; padding: 25px 20px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; animation: slideUp 0.3s ease; }
+  .modal-box { background: var(--white); border-radius: 20px 20px 0 0; width: 100%; padding: 20px 15px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; animation: slideUp 0.3s ease; }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .modal-box h3 { margin: 0 0 12px; color: var(--navy); font-size: 20px; text-align: center; }
-  .form-group { margin-bottom: 18px; width: 100%; }
-  .form-group label { display: block; font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
-  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 14px; border: 2px solid var(--line); border-radius: 10px; font-family: inherit; font-size: 16px; box-sizing: border-box; background: #fafbfc; }
-  .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
-  .btn-save { flex: 1; background: var(--navy); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
-  .btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 16px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
-  .modules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-  .module-item { background: #f8f9fa; border: 2px solid var(--line); border-radius: 14px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; }
-  .module-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; }
-  .module-title { font-size: 16px; font-weight: 800; color: var(--navy); }
+  .modal-box h3 { margin: 0 0 12px; color: var(--navy); font-size: 18px; text-align: center; }
+  .form-group { margin-bottom: 15px; width: 100%; }
+  .form-group label { display: block; font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 2px solid var(--line); border-radius: 8px; font-family: inherit; font-size: 15px; box-sizing: border-box; background: #fafbfc; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+  .btn-save { flex: 1; background: var(--navy); color: white; border: none; padding: 12px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+  .btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 12px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+  
+  .modules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+  .module-item { background: #f8f9fa; border: 2px solid var(--line); border-radius: 10px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+  .module-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; }
+  .module-title { font-size: 14px; font-weight: 800; color: var(--navy); }
   .icon-explain { background: #27ae60; } .icon-video { background: #e74c3c; } .icon-questions { background: #3498db; } .icon-summary { background: #9b59b6; } .icon-terms { background: #e67e22; }
 </style>
 </head>
@@ -65,7 +74,7 @@
 
 <div class="admin-header">
   <div class="admin-brand">CLEAR<span>NOTE</span></div>
-  <div style="display:flex; gap:12px;">
+  <div style="display:flex; gap:8px;">
     <button class="btn-add-main" id="addBtn" onclick="openAddModal(null, 'root')"><i class="fas fa-plus"></i> سنة</button>
     <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i></button>
   </div>
@@ -83,10 +92,10 @@
   <div id="requestsContainer" style="display:none;"></div>
 </div>
 
-<div class="modal-overlay" id="deviceModal"><div class="modal-box"><h3>الأجهزة</h3><div id="deviceList" style="margin-top:20px;"></div><button class="btn-cancel" style="width:100%; margin-top:20px;" onclick="closeModal('deviceModal')">إغلاق</button></div></div>
+<div class="modal-overlay" id="deviceModal"><div class="modal-box"><h3>الأجهزة</h3><div id="deviceList" style="margin-top:15px;"></div><button class="btn-cancel" style="width:100%; margin-top:15px;" onclick="closeModal('deviceModal')">إغلاق</button></div></div>
 <div class="modal-overlay" id="nodeModal"><div class="modal-box"><h3 id="modalTitle">إضافة</h3><p id="modalDesc"></p><input type="hidden" id="nodeParentId"><input type="hidden" id="nodeType"><div class="form-group" id="titleGroup"><label>العنوان</label><input type="text" id="nodeTitle"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal('nodeModal')">إلغاء</button><button class="btn-save" onclick="saveNode()">حفظ</button></div></div></div>
 <div class="modal-overlay" id="manageModal"><div class="modal-box"><h3 id="manageTitle">إدارة محتوى</h3><p>اختر الجزء:</p><div class="modules-grid"><div class="module-item" onclick="openCodeEditor('explain', 'الشرح')"><div class="module-icon icon-explain"><i class="fas fa-file-alt"></i></div><div class="module-title">الشرح</div></div><div class="module-item" onclick="openCodeEditor('video', 'فيديو')"><div class="module-icon icon-video"><i class="fas fa-video"></i></div><div class="module-title">فيديو</div></div><div class="module-item" onclick="openCodeEditor('questions', 'أسئلة')"><div class="module-icon icon-questions"><i class="fas fa-question-circle"></i></div><div class="module-title">أسئلة</div></div><div class="module-item" onclick="openCodeEditor('summary', 'ملخص')"><div class="module-icon icon-summary"><i class="fas fa-clipboard-list"></i></div><div class="module-title">ملخص</div></div><div class="module-item" onclick="openCodeEditor('terms', 'مصطلحات')"><div class="module-icon icon-terms"><i class="fas fa-book"></i></div><div class="module-title">مصطلحات</div></div></div><button class="btn-cancel" style="width:100%;" onclick="closeModal('manageModal')">إغلاق</button></div></div>
-<div class="modal-overlay" id="codeModal"><div class="modal-box"><h3 id="codeTitle">إضافة كود</h3><input type="hidden" id="currentNodeId"><input type="hidden" id="currentModuleKey"><div class="form-group"><label>عنوان المحتوى</label><input type="text" id="moduleTitleInput"></div><div class="form-group"><label>صلاحية الوصول</label><select id="moduleAccessInput"><option value="public">عام</option><option value="paid">مدفوع</option></select></div><div class="form-group"><label>كود HTML</label><textarea id="moduleCode" rows="6" style="font-family: monospace;"></textarea></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal('codeModal')">إلغاء</button><button class="btn-save" onclick="saveModuleCode()">حفظ</button></div></div></div>
+<div class="modal-overlay" id="codeModal"><div class="modal-box"><h3 id="codeTitle">إضافة كود</h3><input type="hidden" id="currentNodeId"><input type="hidden" id="currentModuleKey"><div class="form-group"><label>عنوان المحتوى</label><input type="text" id="moduleTitleInput"></div><div class="form-group"><label>صلاحية الوصول</label><select id="moduleAccessInput"><option value="public">عام</option><option value="paid">مدفوع</option></select></div><div class="form-group"><label>كود HTML</label><textarea id="moduleCode" rows="5" style="font-family: monospace;"></textarea></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal('codeModal')">إلغاء</button><button class="btn-save" onclick="saveModuleCode()">حفظ</button></div></div></div>
 
 <script type="module">
 import { db, onAuth, isAdmin, goTo, showToast, signOutUser, activateSubscription } from "./shared.js";
@@ -95,6 +104,7 @@ import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, serverTimestamp
 let treeData = [];
 let allStudents = [];
 let allRequests = [];
+let openNodes = new Set(); // عشان نحفظ التفرعات المفتوحة
 
 onAuth((user, userData) => { if (!user || !isAdmin(userData)) { goTo("index.html"); return; } loadAllData(); });
 window.doLogout = async () => { await signOutUser(); goTo("index.html"); };
@@ -108,7 +118,20 @@ window.switchTab = function(tab) {
   document.getElementById('addBtn').style.display = tab === 'tree' ? 'flex' : 'none';
 };
 
+// دالة لحفظ التفرعات المفتوحة قبل إعادة تحميل الشجرة
+function saveOpenState() {
+  if(!document.getElementById('treeContainer')) return;
+  document.querySelectorAll('.children-area').forEach(el => {
+    if(el.classList.contains('active')) {
+      openNodes.add(el.id.replace('children-', ''));
+    } else {
+      openNodes.delete(el.id.replace('children-', ''));
+    }
+  });
+}
+
 async function loadAllData() {
+  saveOpenState(); // نحفظ الحالة الأول
   const snapT = await getDocs(collection(db, "content_tree")); treeData = snapT.docs.map(d => ({ id: d.id, ...d.data() }));
   const snapS = await getDocs(collection(db, "users")); allStudents = snapS.docs.map(d => ({ id: d.id, ...d.data() }));
   const snapR = await getDocs(collection(db, "subscription_requests")); allRequests = snapR.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -118,16 +141,16 @@ async function loadAllData() {
 function renderRequests() {
   const container = document.getElementById('requestsContainer');
   const pending = allRequests.filter(r => r.status === 'pending');
-  if(pending.length === 0) { container.innerHTML = `<p style="text-align:center; padding:20px;">لا يوجد طلبات جديدة.</p>`; return; }
+  if(pending.length === 0) { container.innerHTML = `<p style="text-align:center; padding:20px; color:var(--muted)">لا يوجد طلبات جديدة.</p>`; return; }
   
   container.innerHTML = pending.map(req => `
     <div class="request-card">
       <div class="request-title">${req.userName}</div>
       <div class="request-sub">المادة: ${req.subjectName}</div>
       <div class="request-notes">ملاحظات: ${req.notes}</div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn-save" style="padding:10px; background:var(--green);" onclick="approveSub('${req.id}', '${req.uid}', '${req.subjectId}')">موافقة</button>
-        <button class="btn-cancel" style="padding:10px;" onclick="rejectSub('${req.id}')">رفض</button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-save" style="padding:8px; font-size:14px; background:var(--green);" onclick="approveSub('${req.id}', '${req.uid}', '${req.subjectId}')">موافقة</button>
+        <button class="btn-cancel" style="padding:8px; font-size:14px;" onclick="rejectSub('${req.id}')">رفض</button>
       </div>
     </div>
   `).join('');
@@ -172,11 +195,11 @@ window.openDevices = async function(uid, name) {
   if(devices.length === 0) { document.getElementById('deviceList').innerHTML = '<p style="text-align:center;">لا يوجد أجهزة.</p>'; return; }
   
   document.getElementById('deviceList').innerHTML = devices.map(dev => `
-    <div style="background:#fafbfc; border:1px solid var(--line); padding:12px; border-radius:10px; margin-bottom:10px;">
-      <div style="font-size:12px; color:var(--muted); direction:ltr; text-align:left;">${dev.userAgent}</div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-        <span style="font-weight:bold; font-size:13px; color:${dev.status === 'approved' ? 'green' : 'red'}">${dev.status === 'approved' ? 'متوافق' : 'قيد الانتظار'}</span>
-        <div style="display:flex; gap:5px;">
+    <div style="background:#fafbfc; border:1px solid var(--line); padding:10px; border-radius:8px; margin-bottom:8px;">
+      <div style="font-size:11px; color:var(--muted); direction:ltr; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${dev.userAgent}</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+        <span style="font-weight:bold; font-size:12px; color:${dev.status === 'approved' ? 'green' : 'red'}">${dev.status === 'approved' ? 'متوافق' : 'قيد الانتظار'}</span>
+        <div style="display:flex; gap:4px;">
           ${dev.status === 'pending' ? `<button class="action-btn" style="background:var(--green); color:white; border:none;" onclick="updateDevice('${uid}', '${dev.id}', 'approved')"><i class="fas fa-check"></i></button>` : ''}
           <button class="action-btn danger" onclick="deleteDevice('${uid}', '${dev.id}')"><i class="fas fa-trash"></i></button>
         </div>
@@ -209,16 +232,75 @@ function buildHTML(nodes) {
   return nodes.map(node => {
     const children = treeData.filter(n => n.parentId === node.id);
     const isModule = node.type.startsWith('module_');
-    let actionsHtml = isModule 
-      ? `<button class="action-btn" onclick="editModule('${node.id}')"><i class="fas fa-edit"></i></button><button class="action-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>` 
-      : `<button class="action-btn manage" onclick="openManage('${node.id}', '${node.title}')"><i class="fas fa-cog"></i></button><button class="action-btn" onclick="openAddModal('${node.id}', '${node.type}')"><i class="fas fa-plus"></i></button><button class="action-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>`;
-    return `<div class="tree-group"><div class="node-card"><div class="node-header"><div class="node-title-area" onclick="toggleChildren('${node.id}')"><div class="node-icon"><i class="fas ${isModule ? 'fa-file' : 'fa-folder'}"></i></div><div class="node-text"><div class="node-title">${node.title}</div><div class="node-type">${node.type}</div></div></div><div class="node-actions">${actionsHtml}</div></div>${!isModule ? `<div class="children-area" id="children-${node.id}">${children.length > 0 ? buildHTML(children) : 'لا يوجد فروع'}</div>` : ''}</div></div>`;
+    const isOpen = openNodes.has(node.id); // نشوف هل التفرع ده مفتوح ولا لأ
+    
+    let actionsHtml = "";
+    if (isModule) {
+      actionsHtml = `<button class="action-btn" onclick="editModule('${node.id}')"><i class="fas fa-edit"></i></button><button class="action-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>`;
+    } else {
+      // ضفنا زر التعديل هنا
+      actionsHtml = `
+        <button class="action-btn" onclick="editNode('${node.id}')"><i class="fas fa-edit"></i></button>
+        <button class="action-btn manage" onclick="openManage('${node.id}', '${node.title}')"><i class="fas fa-cog"></i></button>
+        <button class="action-btn" onclick="openAddModal('${node.id}', '${node.type}')"><i class="fas fa-plus"></i></button>
+        <button class="action-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>
+      `;
+    }
+    
+    return `<div class="tree-group"><div class="node-card"><div class="node-header"><div class="node-title-area" onclick="toggleChildren('${node.id}')"><div class="node-icon"><i class="fas ${isModule ? 'fa-file' : 'fa-folder'}"></i></div><div class="node-text"><div class="node-title">${node.title}</div><div class="node-type">${node.type}</div></div></div><div class="node-actions">${actionsHtml}</div></div>${!isModule ? `<div class="children-area ${isOpen ? 'active' : ''}" id="children-${node.id}">${children.length > 0 ? buildHTML(children) : '<div style="text-align:center; color:#aaa; font-size:12px; padding:5px;">لا يوجد فروع</div>'}</div>` : ''}</div></div>`;
   }).join('');
 }
 
-window.toggleChildren = function(id) { const el = document.getElementById(`children-${id}`); if (el) el.classList.toggle('active'); };
-window.openAddModal = function(parentId, parentType) { let newType = parentType === 'root' ? 'year' : parentType === 'year' ? 'program' : parentType === 'program' ? 'subject' : 'custom'; document.getElementById("nodeParentId").value = parentId || "root"; document.getElementById("nodeType").value = newType; document.getElementById("nodeTitle").value = ""; document.getElementById("nodeModal").classList.add("active"); };
-window.saveNode = async function() { const parentId = document.getElementById("nodeParentId").value; const type = document.getElementById("nodeType").value; const title = document.getElementById("nodeTitle").value.trim(); if (!title) return; await addDoc(collection(db, "content_tree"), { parentId, type, title, createdAt: serverTimestamp() }); closeModal('nodeModal'); loadAllData(); };
+window.toggleChildren = function(id) { 
+  const el = document.getElementById(`children-${id}`); 
+  if (el) {
+    el.classList.toggle('active');
+    if (el.classList.contains('active')) openNodes.add(id);
+    else openNodes.delete(id);
+  }
+};
+
+window.openAddModal = function(parentId, parentType) { 
+  let newType = parentType === 'root' ? 'year' : parentType === 'year' ? 'program' : parentType === 'program' ? 'subject' : 'custom'; 
+  document.getElementById("modalTitle").textContent = "إضافة جديد";
+  document.getElementById("nodeParentId").value = parentId || "root"; 
+  document.getElementById("nodeType").value = newType; 
+  document.getElementById("nodeTitle").value = ""; 
+  document.getElementById("nodeModal").dataset.editId = ""; // مسح الـ ID بتاع التعديل
+  document.getElementById("nodeModal").classList.add("active"); 
+};
+
+// دالة تعديل العناصر (السنة، البرنامج، إلخ)
+window.editNode = function(id) {
+  const node = treeData.find(n => n.id === id);
+  if(!node) return;
+  document.getElementById("modalTitle").textContent = "تعديل";
+  document.getElementById("nodeParentId").value = node.parentId;
+  document.getElementById("nodeType").value = node.type;
+  document.getElementById("nodeTitle").value = node.title;
+  document.getElementById("nodeModal").dataset.editId = id; // نحط الـ ID هنا عشان نعرف نعدل
+  document.getElementById("nodeModal").classList.add("active");
+};
+
+window.saveNode = async function() { 
+  const parentId = document.getElementById("nodeParentId").value; 
+  const type = document.getElementById("nodeType").value; 
+  const title = document.getElementById("nodeTitle").value.trim(); 
+  const editId = document.getElementById("nodeModal").dataset.editId;
+  
+  if (!title) return; 
+  
+  try {
+    if (editId) {
+      await updateDoc(doc(db, "content_tree", editId), { title });
+    } else {
+      await addDoc(collection(db, "content_tree"), { parentId, type, title, createdAt: serverTimestamp() }); 
+    }
+    closeModal('nodeModal'); 
+    loadAllData(); 
+  } catch(e) { showToast("حدث خطأ", "error"); }
+};
+
 window.openManage = function(nodeId, nodeTitle) { document.getElementById("manageTitle").textContent = `إدارة: ${nodeTitle}`; document.getElementById("manageModal").dataset.currentNodeId = nodeId; document.getElementById("manageModal").classList.add("active"); };
 window.openCodeEditor = function(moduleKey, moduleTitle) { const nodeId = document.getElementById("manageModal").dataset.currentNodeId; document.getElementById("codeTitle").textContent = `إعداد ${moduleTitle}`; document.getElementById("currentNodeId").value = nodeId; document.getElementById("currentModuleKey").value = moduleKey; const existing = treeData.find(n => n.parentId === nodeId && n.type === 'module_' + moduleKey); document.getElementById("moduleTitleInput").value = existing ? existing.title : moduleTitle; document.getElementById("moduleAccessInput").value = existing ? (existing.access || 'public') : 'public'; document.getElementById("moduleCode").value = existing ? (existing.htmlContent || '') : ''; closeModal('manageModal'); document.getElementById("codeModal").classList.add("active"); };
 window.saveModuleCode = async function() { const nodeId = document.getElementById("currentNodeId").value; const moduleKey = document.getElementById("currentModuleKey").value; const title = document.getElementById("moduleTitleInput").value.trim(); const access = document.getElementById("moduleAccessInput").value; const code = document.getElementById("moduleCode").value; const existing = treeData.find(n => n.parentId === nodeId && n.type === 'module_' + moduleKey); if (existing) { await updateDoc(doc(db, "content_tree", existing.id), { title, access, htmlContent: code }); } else { await addDoc(collection(db, "content_tree"), { parentId: nodeId, type: 'module_' + moduleKey, title, access, htmlContent: code, createdAt: serverTimestamp() }); } closeModal('codeModal'); loadAllData(); };
