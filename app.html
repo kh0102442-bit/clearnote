@@ -131,7 +131,7 @@
     <h2 class="player-title" id="playerTitle">المحتوى</h2>
     <button class="player-close" onclick="closePlayer()"><i class="fas fa-times"></i> خروج</button>
   </div>
-  <iframe id="playerFrame" class="player-frame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-modals"></iframe>
+  <iframe id="playerFrame" class="player-frame" sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-modals allow-presentation"></iframe>
 </div>
 
 <div class="sub-overlay" id="subModal">
@@ -154,12 +154,11 @@ import { collection, getDocs, query, where, doc, getDoc } from "https://www.gsta
 
 let currentUserData = null;
 let treeData = [];
-let userSubs = {}; 
+let userSubs = {};
 
 onAuth(async (user, userData) => {
   if (!user) { goTo("index.html"); return; }
   currentUserData = userData;
-  
   try {
     const dev = await checkDeviceStatus(user.uid);
     if (dev.status === 'pending') {
@@ -180,11 +179,7 @@ onAuth(async (user, userData) => {
   document.getElementById("profileName").textContent = displayName;
   document.getElementById("profileEmail").textContent = user.email;
   
-  try { 
-    await loadTreeData(); 
-    await loadMySubscriptions(); 
-  } catch(e) { console.error("Data load error", e); }
-  
+  try { await loadTreeData(); await loadMySubscriptions(); } catch(e) { console.error("Data load error", e); }
   renderHome();
 });
 
@@ -216,7 +211,6 @@ function renderSuggested() {
   const modules = treeData.filter(n => n.type.startsWith('module_'));
   if (modules.length === 0) { grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>لا يوجد محتوى بعد</p></div>`; return; }
   const shuffled = [...modules].sort(() => 0.5 - Math.random()).slice(0, 4);
-  
   grid.innerHTML = shuffled.map(node => renderCard(node)).join('');
   grid.querySelectorAll('[data-node]').forEach(el => {
     el.onclick = () => handleNodeClick(treeData.find(n => n.id === el.dataset.node));
@@ -242,15 +236,12 @@ function getSubjectIdFromNode(nodeId) {
   return null;
 }
 
-// التعديل هنا: بنتأكد من التاريخ قبل ما نحط الاشتراك في الذاكرة
 async function loadMySubscriptions() {
   userSubs = {};
   const q = query(collection(db, "subscriptions"), where("uid", "==", currentUserData.uid));
   const snap = await getDocs(q);
-  
   snap.forEach(d => {
     const data = d.data();
-    // لازم يكون active و expiresAt لسه في المستقبل
     if (data.status === 'active' && data.expiresAt && data.expiresAt.toDate() > new Date()) {
       userSubs[data.subjectId] = data; 
     }
@@ -263,7 +254,6 @@ function renderLevel(parentId) {
   updateBreadcrumbs(parentId);
   const nodes = treeData.filter(n => n.parentId === parentId);
   if (nodes.length === 0) { container.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i><h3>فارغ</h3></div>`; return; }
-  
   container.innerHTML = nodes.map(node => renderCard(node)).join('');
   container.querySelectorAll('[data-node]').forEach(el => {
     el.onclick = () => handleNodeClick(nodes.find(n => n.id === el.dataset.node));
@@ -288,9 +278,7 @@ function renderCard(node) {
     if (node.access === 'paid' || node.access === undefined) {
       const subjectId = getSubjectIdFromNode(node.id);
       if (subjectId) {
-        if (!userSubs[subjectId]) {
-          isLocked = true; 
-        }
+        if (!userSubs[subjectId]) isLocked = true; 
       } else {
         isLocked = true; 
       }
@@ -299,7 +287,6 @@ function renderCard(node) {
 
   const lockIcon = isLocked ? '<span class="lock-badge locked"><i class="fas fa-lock"></i></span>' : '';
   const cardClass = isLocked ? `card-item ${node.type || 'custom'} locked-card` : `card-item ${node.type || 'custom'}`;
-
   const titleHtml = `${icon}${node.title}`;
   const descHtml = node.description ? `<div class="card-desc">${node.description}</div>` : '';
 
@@ -317,24 +304,19 @@ async function handleNodeClick(node) {
   if (node.type === 'content' || node.type.startsWith('module_')) {
     if (node.access === 'paid' || node.access === undefined) {
       const subjectId = getSubjectIdFromNode(node.id);
-      
       if (subjectId) {
         if (!userSubs[subjectId]) {
            const docRef = doc(db, "subscriptions", `${currentUserData.uid}_${subjectId}`);
            const docSnap = await getDoc(docRef);
-           
-           // التعديل هنا: بنتأكد من التاريخ وقت الضغط
            if (docSnap.exists() && docSnap.data().status === 'active' && docSnap.data().expiresAt.toDate() > new Date()) {
                userSubs[subjectId] = docSnap.data();
                showToast("تم تفعيل اشتراكك! جاري فتح الملف...", "success");
-               
                const cardEl = document.querySelector(`[data-node="${node.id}"]`);
                if(cardEl) {
                    cardEl.classList.remove('locked-card');
                    const lock = cardEl.querySelector('.lock-badge');
                    if(lock) lock.remove();
                }
-               
                openPlayer(node);
                return;
            } else {
@@ -351,7 +333,6 @@ async function handleNodeClick(node) {
         return;
       }
     }
-    
     openPlayer(node);
   } else {
     renderLevel(node.id);
@@ -365,7 +346,6 @@ window.submitSubRequest = async function() {
   
   const btn = document.querySelector('#subModal .btn-primary');
   btn.disabled = true; btn.textContent = 'جاري الإرسال...';
-
   const subject = treeData.find(n => n.id === subjectId);
   try {
     await requestSubscription(currentUserData.uid, currentUserData.name, subjectId, subject?.title || 'مادة', notes);
@@ -387,12 +367,95 @@ function updateBreadcrumbs(parentId) {
   });
 }
 
+// ===== Video Player Helpers =====
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function extractYouTubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function generateVideoPlayerHTML(videos) {
+  videos = [...videos].sort((a,b) => (a.order||0) - (b.order||0));
+  let html = '<div style="padding:14px;font-family:\'Cairo\',sans-serif;">';
+  
+  videos.forEach((v, i) => {
+    html += `<div style="background:#fff;border:2px solid #e9ecef;border-radius:14px;padding:14px;margin-bottom:16px;">
+      <div style="font-weight:800;color:#152741;font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        <span style="background:#152741;color:#fff;width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;">${i+1}</span>
+        ${escapeHtml(v.title || 'فيديو')}
+      </div>`;
+    
+    if (v.sourceType === 'upload') {
+      html += `<div style="background:#f4f6f8;border-radius:10px;padding:36px 20px;text-align:center;color:#8899aa;">
+        <i class="fas fa-video-slash" style="font-size:38px;margin-bottom:10px;display:block;color:#cbd5e0;"></i>
+        <div style="font-size:14px;font-weight:700;color:#4a5568;">الفيديو غير متوفر حالياً</div>
+        <div style="font-size:12px;margin-top:6px;">سيتم رفعه قريباً</div>
+        ${v.fileName ? `<div style="font-size:11px;margin-top:10px;color:#a0aec0;direction:ltr;">📁 ${escapeHtml(v.fileName)}</div>` : ''}
+      </div>`;
+    } else if (v.url) {
+      const ytId = extractYouTubeId(v.url);
+      if (ytId) {
+        html += `<div style="position:relative;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;background:#000;">
+          <iframe src="https://www.youtube.com/embed/${ytId}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+        </div>`;
+      } else if (/\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(v.url)) {
+        html += `<video controls playsinline style="width:100%;border-radius:10px;max-height:320px;background:#000;display:block;">
+          <source src="${escapeHtml(v.url)}">
+          المتصفح لا يدعم تشغيل هذا الفيديو.
+        </video>`;
+      } else {
+        html += `<div style="background:#f4f6f8;border-radius:10px;padding:24px;text-align:center;">
+          <i class="fas fa-link" style="font-size:32px;color:#2980b9;display:block;margin-bottom:12px;"></i>
+          <div style="font-size:13px;color:#4a5568;margin-bottom:12px;">لا يمكن تشغيل هذا الرابط مباشرة</div>
+          <a href="${escapeHtml(v.url)}" target="_blank" rel="noopener" style="background:#152741;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:bold;">
+            <i class="fas fa-external-link-alt"></i> فتح في المتصفح
+          </a>
+        </div>`;
+      }
+    } else {
+      html += `<div style="padding:20px;text-align:center;color:#8899aa;font-size:13px;">لا يوجد مصدر للفيديو</div>`;
+    }
+    
+    if (v.notes) {
+      html += `<div style="margin-top:12px;padding:10px 12px;background:#fdfaf3;border-right:3px solid #a8741a;border-radius:6px;font-size:13px;color:#4a5568;line-height:1.65;">
+        <strong style="color:#152741;display:block;margin-bottom:4px;">📝 ملاحظات:</strong>
+        ${escapeHtml(v.notes).replace(/\n/g, '<br>')}
+      </div>`;
+    }
+    html += `</div>`;
+  });
+  
+  html += '</div>';
+  return html;
+}
+
 function openPlayer(node) {
   document.getElementById('playerTitle').textContent = node.title;
   document.getElementById('lessonPlayer').classList.add('active');
   const iframe = document.getElementById('playerFrame');
-  const htmlContent = node.htmlContent || '<div style="text-align:center;padding:50px;"><h2>لا يوجد محتوى</h2></div>';
-  iframe.srcdoc = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>body{font-family:'Cairo',sans-serif;padding:16px;line-height:1.8}</style></head><body>${htmlContent}</body></html>`;
+  
+  let htmlContent;
+  if (node.type === 'module_video') {
+    const videos = node.videos || [];
+    if (videos.length > 0) {
+      htmlContent = generateVideoPlayerHTML(videos);
+    } else {
+      htmlContent = `<div style="text-align:center;padding:60px 20px;font-family:'Cairo',sans-serif;color:#8899aa;">
+        <i class="fas fa-video-slash" style="font-size:56px;margin-bottom:15px;display:block;color:#cbd5e0;"></i>
+        <h2 style="color:#4a5568;font-size:18px;margin:0 0 8px;">لا توجد فيديوهات بعد</h2>
+        <p style="font-size:13px;margin:0;">سيتم إضافة فيديوهات قريباً</p>
+      </div>`;
+    }
+  } else {
+    htmlContent = node.htmlContent || '<div style="text-align:center;padding:50px;"><h2>لا يوجد محتوى</h2></div>';
+  }
+  
+  iframe.srcdoc = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>body{font-family:'Cairo',sans-serif;padding:0;line-height:1.8;margin:0;background:#f8f9fa;} img{max-width:100%;height:auto;border-radius:8px;}</style><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></head><body>${htmlContent}</body></html>`;
 }
 
 window.closePlayer = function() { document.getElementById('lessonPlayer').classList.remove('active'); document.getElementById('playerFrame').srcdoc = ''; };
