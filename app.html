@@ -228,32 +228,21 @@ async function loadTreeData() {
   treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// ====== الحل العبقري هنا: الاعتماد على العمق وليس النوع ======
 function getSubjectIdFromNode(nodeId) {
   let current = treeData.find(n => n.id === nodeId);
   let path = [];
-  
-  // نمشي مع الشجرة لفوق لحد ما نوصل للجذر
   while(current) {
     path.unshift(current);
-    if (current.parentId === "root") break; // وقفنا عند السنة الدراسية
+    if (current.parentId === "root") break; 
     current = treeData.find(n => n.id === current.parentId);
   }
-  
-  // path[0] = السنة الدراسية
-  // path[1] = البرنامج
-  // path[2] = المادة (أو أول حاجة تحت البرنامج)
-  
-  if (path.length >= 3) {
-    return path[2].id; // المادة هي المستوى الثالث
-  } else if (path.length === 2) {
-    return path[1].id; // لو مفيش مادة، نستخدم البرنامج
-  } else if (path.length === 1) {
-    return path[0].id; // لو مفيش برنامج، نستخدم السنة
-  }
+  if (path.length >= 3) return path[2].id; 
+  else if (path.length === 2) return path[1].id; 
+  else if (path.length === 1) return path[0].id; 
   return null;
 }
 
+// التعديل هنا: بنتأكد من التاريخ قبل ما نحط الاشتراك في الذاكرة
 async function loadMySubscriptions() {
   userSubs = {};
   const q = query(collection(db, "subscriptions"), where("uid", "==", currentUserData.uid));
@@ -261,7 +250,8 @@ async function loadMySubscriptions() {
   
   snap.forEach(d => {
     const data = d.data();
-    if (data.status === 'active') {
+    // لازم يكون active و expiresAt لسه في المستقبل
+    if (data.status === 'active' && data.expiresAt && data.expiresAt.toDate() > new Date()) {
       userSubs[data.subjectId] = data; 
     }
   });
@@ -333,7 +323,8 @@ async function handleNodeClick(node) {
            const docRef = doc(db, "subscriptions", `${currentUserData.uid}_${subjectId}`);
            const docSnap = await getDoc(docRef);
            
-           if (docSnap.exists() && docSnap.data().status === 'active') {
+           // التعديل هنا: بنتأكد من التاريخ وقت الضغط
+           if (docSnap.exists() && docSnap.data().status === 'active' && docSnap.data().expiresAt.toDate() > new Date()) {
                userSubs[subjectId] = docSnap.data();
                showToast("تم تفعيل اشتراكك! جاري فتح الملف...", "success");
                
