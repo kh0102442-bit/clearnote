@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ClearNote — لوحة التحكم</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- ✅ إضافة مكتبة SortableJS للسحب والإفلات -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<style>
+  :root {
+    --navy: #152741; --navy-dark: #0f1e33; --accent: #a8741a;
+    --bg: #f4f6f8; --card: #ffffff; --text: #1a1a1a;
+    --muted: #5b6472; --line: #e9ecef; --line-soft: #f0f2f5;
+    --green: #1f6b45; --red: #b91c1c; --blue: #2980b9; --purple: #8e44ad;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg); font-family: 'Cairo', sans-serif; font-size: 15px; line-height: 1.6; max-width: 100vw; overflow-x: hidden; }
+  body { padding-bottom: 84px; }
+
+  .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 9000; }
+  .loading-overlay.hide { display: none; }
+  .loading-spinner { width: 44px; height: 44px; border: 4px solid var(--line); border-top-color: var(--navy); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .admin-topbar { background: var(--navy); color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.12); }
+  .admin-brand { font-family: Georgia, serif; font-size: 19px; font-weight: 700; letter-spacing: 1px; }
+  .admin-brand span { color: var(--accent); }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+  .topbar-btn { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: 0.15s; }
+  .topbar-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.95); }
+  .topbar-btn .dot { position: absolute; top: 6px; left: 6px; min-width: 16px; height: 16px; line-height: 16px; background: var(--red); color: #fff; border-radius: 9999px; font-size: 10px; font-weight: 800; padding: 0 4px; text-align: center; border: 2px solid var(--navy); display: none; }
+  .topbar-btn .dot.show { display: block; }
+
+  .seg-wrap { background: var(--card); padding: 12px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 62px; z-index: 90; }
+  .seg { display: flex; background: var(--line-soft); border-radius: 12px; padding: 4px; gap: 2px; }
+  .seg-btn { flex: 1; padding: 10px 6px; background: transparent; border: none; font-family: inherit; font-size: 12.5px; font-weight: 800; color: var(--muted); cursor: pointer; border-radius: 9px; transition: 0.18s; display: flex; align-items: center; justify-content: center; gap: 5px; position: relative; min-width: 0; }
+  .seg-btn i { font-size: 14px; }
+  .seg-btn.active { background: var(--navy); color: #fff; box-shadow: 0 2px 8px rgba(21,39,65,.25); }
+  .seg-btn .dot { position: absolute; top: 2px; left: 2px; min-width: 16px; height: 16px; line-height: 16px; background: var(--red); color: #fff; border-radius: 9999px; font-size: 9px; font-weight: 800; padding: 0 4px; text-align: center; border: 1px solid var(--card); }
+  @media (max-width: 420px) {
+    .seg-btn span.lbl { display: none; }
+    .seg-btn i { font-size: 17px; }
+    .seg-btn { padding: 11px 4px; }
+  }
+
+  .main-wrap { max-width: 920px; margin: 0 auto; padding: 16px; }
+
+  .skel { background: linear-gradient(90deg, #f0f2f5, #e9ecef, #f0f2f5); background-size: 200% 100%; animation: skel 1.5s infinite; border-radius: 10px; }
+  @keyframes skel { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  .skel-card { height: 76px; margin-bottom: 12px; }
+
+  .error-banner { background: #fbeaea; border: 1px solid #f0c6c6; color: var(--red); padding: 12px 16px; border-radius: 10px; margin-bottom: 14px; font-size: 13px; line-height: 1.6; display: none; }
+  .error-banner.show { display: block; }
+  .error-banner strong { display: block; margin-bottom: 4px; }
+
+  .btn-primary-action { background: var(--accent); color: #fff; border: none; padding: 11px 16px; border-radius: 10px; font-family: inherit; font-weight: 800; font-size: 13.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+
+  .tree-group { margin-bottom: 8px; }
+  .node-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .node-header { padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .node-title-area { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer; }
+  
+  /* ✅ تنسيق أيقونة السحب */
+  .drag-handle { cursor: grab; color: #a0aec0; padding: 0 4px; font-size: 16px; display: flex; align-items: center; }
+  .drag-handle:active { cursor: grabbing; }
+
+  .node-icon { width: 34px; height: 34px; border-radius: 9px; background: #eef2fa; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .node-text { flex: 1; min-width: 0; }
+  .node-title { font-weight: 800; color: var(--navy); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .node-type { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 1px; }
+  
+  .node-actions { display: flex; gap: 4px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; max-width: 150px; }
+  .action-btn { width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--line); background: #f8f9fa; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: 0.15s; }
+  .action-btn:hover { background: var(--line-soft); }
+  .action-btn.manage { color: var(--green); border-color: #c9d6ee; background: #eef2fa; }
+  .action-btn.danger { color: var(--red); background: #fbeaea; border-color: #fbeaea; }
+  
+  .children-area { display: none; padding: 8px 12px 12px; background: #fafbfc; border-top: 1px solid var(--line); min-height: 20px; }
+  .children-area.active { display: block; }
+
+  /* ✅ تنسيق العنصر أثناء السحب */
+  .sortable-ghost { opacity: 0.4; background: #eef2fa; border: 2px dashed var(--navy); border-radius: 12px; }
+  .sortable-drag { opacity: 1; transform: rotate(1deg); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+
+  .user-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .user-info { flex: 1; min-width: 0; }
+  .user-name { font-weight: 800; color: var(--navy); font-size: 14.5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .user-email { font-size: 12px; color: var(--muted); margin-top: 2px; direction: ltr; text-align: right; }
+  .user-role-chip { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 10.5px; font-weight: 800; font-family: 'Inter', 'Cairo', sans-serif; letter-spacing: 0.4px; }
+  .role-student { background: #eef2fa; color: #2a4b8d; }
+  .role-ta { background: #e3f2fd; color: #0d47a1; }
+  .role-doctor { background: #f3e5f5; color: #4a148c; }
+  .role-admin { background: #fbeaea; color: #7b1818; }
+  .role-founder { background: linear-gradient(135deg,#d4af37,#f4e5b1); color: #4a2f0a; }
+  .verified-inline { color: #1da1f2; font-size: 14px; }
+
+  .unified-req-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border-right: 4px solid var(--line); transition: border-color 0.2s; }
+  .unified-req-card.status-pending { border-right-color: var(--accent); }
+  .unified-req-card.status-approved { border-right-color: var(--green); }
+  .unified-req-card.status-rejected { border-right-color: var(--red); }
+  .unified-req-card.highlight { box-shadow: 0 0 0 4px rgba(168,116,26,0.5); background: #fefaf0; }
+  .unified-req-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .unified-req-user { flex: 1; min-width: 0; }
+  .unified-req-name { font-weight: 800; color: var(--navy); font-size: 14.5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .unified-req-time { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .req-detail { font-size: 12.5px; color: var(--muted); line-height: 1.7; padding: 8px 10px; background: #fafbfc; border-radius: 7px; margin-bottom: 8px; }
+  .req-detail strong { color: var(--navy); }
+  .req-detail .ua-text { direction: ltr; text-align: left; font-size: 11px; color: #8899aa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 4px; font-family: monospace; }
+  .req-notes { font-size: 12px; padding: 8px 10px; background: #fefaf0; border-right: 3px solid var(--accent); border-radius: 6px; margin-bottom: 10px; color: var(--muted); line-height: 1.6; }
+  .req-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .req-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-family: inherit; font-weight: 800; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .req-btn.approve { background: var(--green); color: #fff; }
+  .req-btn.reject { background: #fbeaea; color: var(--red); border: 1px solid #f0c6c6; }
+
+  .verif-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+  .vchip { padding: 3px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 800; white-space: nowrap; }
+  .vchip-sub { background: #fff8e1; color: #7b5c00; }
+  .vchip-free { background: #e8f5e9; color: #1f6b45; }
+  .vchip-paid { background: #e7f5ff; color: #0d47a1; }
+  .vchip-device { background: #f3e5f5; color: #4a148c; }
+  .vchip-pending { background: #fef3c7; color: #92400e; }
+  .vchip-approved { background: #e8f5e9; color: #1f6b45; }
+  .vchip-rejected { background: #fbeaea; color: #b91c1c; }
+
+  .filter-row { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 4px; }
+  .filter-chip { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--line); background: var(--card); color: var(--muted); font-family: inherit; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; transition: 0.15s; display: inline-flex; align-items: center; gap: 4px; }
+  .filter-chip.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  .empty-box { text-align: center; padding: 50px 20px; color: var(--muted); }
+  .empty-box i { font-size: 44px; color: var(--line); display: block; margin-bottom: 12px; }
+  .empty-box h3 { margin: 0 0 4px; font-size: 14.5px; color: var(--navy); font-weight: 800; }
+  .empty-box p { margin: 0; font-size: 12.5px; }
+
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 68px; background: var(--card); border-top: 1px solid var(--line); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0); box-shadow: 0 -2px 12px rgba(21,39,65,0.08); }
+  .bottom-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: none; border: none; color: var(--muted); font-family: inherit; font-size: 10.5px; font-weight: 700; cursor: pointer; padding: 6px 2px; position: relative; }
+  .bottom-nav button i { font-size: 19px; }
+  .bottom-nav button.active { color: var(--navy); }
+  .bottom-nav button.active::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 28px; height: 3px; background: var(--accent); border-radius: 0 0 3px 3px; }
+  .bottom-nav .nav-dot { position: absolute; top: 4px; left: 50%; margin-left: 8px; min-width: 16px; height: 16px; line-height: 16px; background: var(--red); color: #fff; border-radius: 9999px; font-size: 9px; font-weight: 800; padding: 0 4px; text-align: center; border: 1.5px solid var(--card); display: none; }
+  .bottom-nav .nav-dot.show { display: block; }
+  @media (min-width: 768px) { .bottom-nav { display: none; } body { padding-bottom: 20px; } }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: flex-end; z-index: 1000; }
+  .modal-overlay.active { display: flex; }
+  .modal-box { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; max-width: 520px; margin: 0 auto; padding: 22px 18px; max-height: 92vh; overflow-y: auto; animation: slideUp 0.25s ease; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-box h3 { margin: 0 0 14px; color: var(--navy); font-size: 17px; text-align: center; font-weight: 800; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 2px solid var(--line); border-radius: 10px; font-family: inherit; font-size: 14px; background: #fafbfc; box-sizing: border-box; }
+  .form-group textarea { resize: vertical; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-save { flex: 1; background: var(--navy); color: #fff; border: none; padding: 13px; border-radius: 10px; font-family: inherit; font-size: 14.5px; font-weight: 800; cursor: pointer; }
+  .btn-save:disabled { opacity: 0.6; cursor: wait; }
+  .btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); border: none; padding: 13px; border-radius: 10px; font-family: inherit; font-size: 14.5px; font-weight: 800; cursor: pointer; }
+
+  .modules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+  .module-item { background: #f8f9fa; border: 1.5px solid var(--line); border-radius: 10px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: 0.15s; }
+  .module-item:hover { border-color: var(--navy); background: #eef2fa; }
+  .module-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; }
+  .module-title { font-size: 13px; font-weight: 800; color: var(--navy); }
+  .icon-explain { background: #27ae60; } .icon-video { background: #e74c3c; } .icon-questions { background: #3498db; } .icon-summary { background: #9b59b6; } .icon-terms { background: #e67e22; }
+
+  .video-item { background: #fafbfc; border: 1.5px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+  .video-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .video-file-preview { margin-top: 8px; padding: 8px 10px; background: #fff; border-radius: 6px; font-size: 12.5px; color: #333; border: 1px solid var(--line); }
+  .video-upload-status { font-size: 12px; font-weight: 700; margin-top: 6px; min-height: 18px; }
+  .yt-preview { margin-top: 8px; }
+  .yt-preview img { width: 140px; height: 79px; object-fit: cover; border-radius: 8px; border: 2px solid var(--green); display: block; }
+  .yt-preview .yt-label { font-size: 11px; font-weight: 800; margin-top: 4px; display: block; }
+
+  .html-upload-zone { border: 2px dashed #c9d6ee; background: #f8fbff; border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; }
+  .html-upload-zone:hover, .html-upload-zone.drag-over { border-color: var(--navy); background: #eef2fa; }
+  .html-upload-zone i { font-size: 26px; color: var(--navy); margin-bottom: 8px; display: block; }
+  .html-upload-zone .up-text { font-size: 13px; color: var(--navy); font-weight: 800; }
+  .html-upload-zone .up-sub { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .html-upload-zone.success { border-color: var(--green); background: #e8f5e9; }
+  .html-upload-zone.success i { color: var(--green); }
+  .html-file-info { font-size: 12px; color: var(--green); margin-top: 6px; display: none; font-weight: 700; }
+  .html-file-info.show { display: block; }
+  .divider-text { text-align: center; color: var(--muted); font-size: 12px; margin: 14px 0; position: relative; font-weight: 800; }
+  .divider-text:before, .divider-text:after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: var(--line); }
+  .divider-text:before { left: 0; } .divider-text:after { right: 0; }
+
+  .notif-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 420px; background: var(--card); z-index: 99999; transform: translateX(100%); transition: transform 0.3s ease; display: flex; flex-direction: column; box-shadow: -4px 0 20px rgba(0,0,0,0.15); }
+  .notif-panel.active { transform: translateX(0); }
+  .notif-panel-header { background: var(--navy); color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .notif-panel-header h3 { margin: 0; font-size: 15px; }
+  .notif-panel-header button { background: transparent; border: none; color: #fff; font-size: 20px; cursor: pointer; padding: 4px 8px; }
+  .notif-panel-body { flex: 1; overflow-y: auto; padding: 12px; background: var(--bg); }
+  .notif-panel-footer { padding: 12px; border-top: 1px solid var(--line); text-align: center; }
+  .notif-panel-footer button { background: transparent; border: none; color: var(--accent); font-family: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+  .notif-item { background: var(--card); border-radius: 10px; padding: 12px; margin-bottom: 8px; border-right: 3px solid var(--line); cursor: pointer; transition: 0.15s; }
+  .notif-item.unread { border-right-color: var(--accent); background: #fefaf0; }
+  .notif-item:hover { background: var(--line-soft); }
+  .notif-item .n-title { font-weight: 800; font-size: 13.5px; color: var(--navy); margin-bottom: 4px; }
+  .notif-item .n-msg { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin-bottom: 6px; }
+  .notif-item .n-time { font-size: 10.5px; color: #8899aa; }
+  .notif-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99998; display: none; }
+  .notif-overlay.active { display: block; }
+
+  .history-item { background: #fafbfc; border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+  .history-item .hi-field { font-weight: 800; color: var(--navy); font-size: 13px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .history-item .hi-field i { color: var(--accent); font-size: 11px; }
+  .history-item .hi-change { font-size: 12px; line-height: 1.75; word-break: break-word; }
+  .history-item .hi-old { color: var(--red); text-decoration: line-through; opacity: 0.75; }
+  .history-item .hi-new { color: var(--green); font-weight: 700; }
+  .history-item .hi-arrow { margin: 0 6px; color: #8899aa; font-size: 10px; }
+  .history-item .hi-time { font-size: 10.5px; color: #8899aa; margin-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .history-item .hi-by { font-size: 10.5px; color: #8899aa; padding: 1px 8px; background: #f0f2f5; border-radius: 10px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div style="color:var(--muted);font-size:14px;">جاري التحميل...</div>
+</div>
+
+<div class="admin-topbar">
+  <div class="admin-brand">CLEAR<span>NOTE</span></div>
+  <div class="topbar-actions">
+    <button class="topbar-btn" onclick="openNotifPanel()"><i class="fas fa-bell"></i><span class="dot" id="notifDot"></span></button>
+    <button class="topbar-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i></button>
+  </div>
+</div>
+
+<div class="seg-wrap">
+  <div class="seg">
+    <button class="seg-btn active" data-tab="tree" onclick="switchTab('tree')"><i class="fas fa-sitemap"></i><span class="lbl">المحتوى</span></button>
+    <button class="seg-btn" data-tab="students" onclick="switchTab('students')"><i class="fas fa-users"></i><span class="lbl">المستخدمون</span></button>
+    <button class="seg-btn" data-tab="requests" onclick="switchTab('requests')"><i class="fas fa-inbox"></i><span class="lbl">الطلبات</span><span class="dot" id="reqDot" style="display:none;">0</span></button>
+  </div>
+</div>
+
+<div class="main-wrap">
+  <div class="error-banner" id="errorBanner"></div>
+  <div id="treeContainer"></div>
+  <div id="studentsContainer" style="display:none;"></div>
+  <div id="requestsContainer" style="display:none;"></div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="active" data-tab="tree" onclick="switchTab('tree')"><i class="fas fa-sitemap"></i><span>المحتوى</span></button>
+  <button data-tab="students" onclick="switchTab('students')"><i class="fas fa-users"></i><span>المستخدمون</span></button>
+  <button data-tab="requests" onclick="switchTab('requests')"><i class="fas fa-inbox"></i><span>الطلبات</span><span class="nav-dot" id="reqDotNav">0</span></button>
+</nav>
+
+<div class="modal-overlay" id="deviceModal"><div class="modal-box"><h3>الأجهزة</h3><div id="deviceList" style="margin-top:15px;"></div><button class="btn-cancel" style="width:100%; margin-top:15px;" onclick="closeModal('deviceModal')">إغلاق</button></div></div>
+
+<div class="modal-overlay" id="historyModal">
+  <div class="modal-box">
+    <h3 id="historyModalTitle">سجل التعديلات</h3>
+    <div id="historyContent" style="margin-top:8px;"></div>
+    <button class="btn-cancel" style="width:100%; margin-top:14px;" onclick="closeModal('historyModal')">إغلاق</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="nodeModal"><div class="modal-box"><h3 id="modalTitle">إضافة</h3><input type="hidden" id="nodeParentId"><input type="hidden" id="nodeType"><div class="form-group"><label>العنوان</label><input type="text" id="nodeTitle"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal('nodeModal')">إلغاء</button><button class="btn-save" onclick="saveNode()">حفظ</button></div></div></div>
+
+<div class="modal-overlay" id="manageModal"><div class="modal-box"><h3 id="manageTitle">إدارة</h3><div class="modules-grid"><div class="module-item" onclick="openCodeEditor('explain', 'الشرح')"><div class="module-icon icon-explain"><i class="fas fa-file-alt"></i></div><div class="module-title">الشرح</div></div><div class="module-item" onclick="openVideoManager()"><div class="module-icon icon-video"><i class="fas fa-video"></i></div><div class="module-title">فيديو</div></div><div class="module-item" onclick="openCodeEditor('questions', 'أسئلة')"><div class="module-icon icon-questions"><i class="fas fa-question-circle"></i></div><div class="module-title">أسئلة</div></div><div class="module-item" onclick="openCodeEditor('summary', 'ملخص')"><div class="module-icon icon-summary"><i class="fas fa-clipboard-list"></i></div><div class="module-title">ملخص</div></div><div class="module-item" onclick="openCodeEditor('terms', 'مصطلحات')"><div class="module-icon icon-terms"><i class="fas fa-book"></i></div><div class="module-title">مصطلحات</div></div></div><button class="btn-cancel" style="width:100%;" onclick="closeModal('manageModal')">إغلاق</button></div></div>
+
+<div class="modal-overlay" id="codeModal"><div class="modal-box"><h3 id="codeTitle">إضافة كود</h3><input type="hidden" id="currentNodeId"><input type="hidden" id="currentModuleKey"><div class="form-group"><label>عنوان</label><input type="text" id="moduleTitleInput"></div><div class="form-group"><label>الصلاحية</label><select id="moduleAccessInput"><option value="public">عام</option><option value="paid">مدفوع</option></select></div><div class="form-group"><label>ارفع ملف HTML</label><div class="html-upload-zone" id="htmlUploadZone" onclick="document.getElementById('htmlFileInput').click()"><i class="fas fa-cloud-upload-alt"></i><div class="up-text">اضغط لاختيار</div><div class="up-sub">.html</div></div><input type="file" id="htmlFileInput" accept=".html,.htm,text/html" style="display:none" onchange="handleHtmlFileUpload(event)"><div class="html-file-info" id="htmlFileInfo"></div></div><div class="divider-text">أو</div><div class="form-group"><label>الصق الكود</label><textarea id="moduleCode" rows="8" style="font-family:monospace;font-size:13px;"></textarea></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal('codeModal')">إلغاء</button><button class="btn-save" onclick="saveModuleCode()">حفظ</button></div></div></div>
+
+<div class="modal-overlay" id="videoModal"><div class="modal-box" style="max-height:95vh;"><h3>الفيديوهات</h3><div class="form-group"><label>عنوان القسم</label><input type="text" id="videoSectionTitle"></div><div class="form-group"><label>الصلاحية</label><select id="videoAccessInput"><option value="public">عام</option><option value="paid">مدفوع</option></select></div><div id="videoItemsContainer"></div><button class="btn-save" style="width:100%; background:var(--green); margin-bottom:12px;" onclick="addVideoItem()"><i class="fas fa-plus"></i> إضافة فيديو آخر</button><div class="modal-actions"><button class="btn-cancel" onclick="closeModal('videoModal')">إلغاء</button><button class="btn-save" onclick="saveVideos()">حفظ</button></div></div></div>
+
+<div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header"><h3><i class="fas fa-bell"></i> الإشعارات</h3><button onclick="closeNotifPanel()"><i class="fas fa-times"></i></button></div>
+  <div class="notif-panel-body" id="notifBody"><p style="text-align:center; color:var(--muted); padding:40px;">لا توجد إشعارات</p></div>
+  <div class="notif-panel-footer"><button onclick="markAllRead()">تعليم الكل كمقروء</button></div>
+</div>
+
+<script type="module">
+import {
+  db, onAuth, isAdmin, goTo, showToast, signOutUser, activateSubscription,
+  listenAdminNotifications, markAdminNotificationRead, markAllAdminNotificationsRead,
+  createNotification, escapeHtml, getProfileHistory, uploadVideo
+} from "./shared.js";
+import {
+  collection, getDocs, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let treeData = [];
+let allUsers = [];
+let allSubRequests = [];
+let allVerifications = [];
+let allDevices = [];
+let openNodes = new Set();
+let videoItemCounter = 0;
+let adminNotifs = [];
+let adminNotifUnsub = null;
+let currentTab = 'tree';
+
+let reqTypeFilter = 'all';
+let reqStatusFilter = 'pending';
+
+/* ===== Init ===== */
+onAuth(async (user, userData) => {
+  if (!user || !isAdmin(userData)) { goTo("index.html"); return; }
+  try {
+    adminNotifUnsub = listenAdminNotifications((notifs) => {
+      adminNotifs = notifs;
+      renderNotifBadges();
+      renderNotifPanel();
+    });
+  } catch (e) { console.warn('notif listener failed:', e); }
+  await loadAllData();
+});
+
+window.doLogout = async () => {
+  if (adminNotifUnsub) adminNotifUnsub();
+  await signOutUser();
+  goTo("index.html");
+};
+
+window.switchTab = function(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  ['tree', 'students', 'requests'].forEach(name => {
+    const el = document.getElementById(name + 'Container');
+    if (el) el.style.display = name === tab ? 'block' : 'none';
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+/* ===== Load ===== */
+async function loadAllData() {
+  showSkeletons();
+  saveOpenState();
+  const errors = [];
+
+  try {
+    const snap = await getDocs(collection(db, "content_tree"));
+    treeData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    
+    // ✅ معالجة العناصر القديمة التي لا تحتوي على order
+    treeData.forEach((n, i) => {
+      if (n.order === undefined || n.order === null) n.order = Date.now() + i; 
+    });
+    // الترتيب المبدئي
+    treeData.sort((a, b) => (a.order || 0) - (b.order || 0));
+  } catch (e) { console.warn('tree failed:', e); errors.push('المحتوى'); treeData = []; }
+
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) { console.warn('users failed:', e); errors.push('المستخدمون'); allUsers = []; }
+
+  try {
+    const snap = await getDocs(collection(db, "subscription_requests"));
+    allSubRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) { console.warn('subreqs failed:', e); errors.push('طلبات الاشتراك'); allSubRequests = []; }
+
+  try {
+    const snap = await getDocs(collection(db, "verification_requests"));
+    allVerifications = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) { console.warn('verif failed:', e); errors.push('التوثيق'); allVerifications = []; }
+
+  try { allDevices = await loadAllDevicesInParallel(); }
+  catch (e) { console.warn('devices failed:', e); errors.push('الأجهزة'); allDevices = []; }
+
+  const banner = document.getElementById('errorBanner');
+  if (errors.length > 0) {
+    banner.innerHTML = `<strong>تعذر تحميل بعض البيانات:</strong> ${errors.join('، ')}. الصفحة تعمل بشكل جزئي.`;
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
+
+  hideLoading();
+  renderTree();
+  renderUsers();
+  renderRequests();
+  updateAllBadges();
+}
+
+async function loadAllDevicesInParallel() {
+  const promises = allUsers.map(async (user) => {
+    try {
+      const snap = await getDocs(collection(db, 'devices', user.id, 'list'));
+      return snap.docs.map(d => ({
+        id: d.id, ...d.data(),
+        _uid: user.id,
+        _userName: user.name || 'بدون اسم',
+        _userRole: user.badgeType === 'founder' ? 'founder' : (user.role || 'student'),
+        _userVerified: !!user.isVerified && (() => {
+          try {
+            const until = user.verifiedUntil?.toDate ? user.verifiedUntil.toDate() : (user.verifiedUntil ? new Date(user.verifiedUntil) : null);
+            return !until || until > new Date();
+          } catch (e) { return false; }
+        })()
+      }));
+    } catch (e) { return []; }
+  });
+  const results = await Promise.all(promises);
+  return results.flat();
+}
+
+function hideLoading() { document.getElementById('loadingOverlay').classList.add('hide'); }
+
+function showSkeletons() {
+  const skel = `<div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div>`;
+  ['treeContainer', 'studentsContainer', 'requestsContainer'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = skel;
+  });
+}
+
+/* ===== Badges ===== */
+function updateAllBadges() {
+  const pendingSubs = allSubRequests.filter(r => r.status === 'pending').length;
+  const pendingVerif = allVerifications.filter(v => v.status === 'pending').length;
+  const pendingDevices = allDevices.filter(d => d.status === 'pending').length;
+  const totalPending = pendingSubs + pendingVerif + pendingDevices;
+
+  const reqDot = document.getElementById('reqDot');
+  if (reqDot) { reqDot.style.display = totalPending > 0 ? 'inline-block' : 'none'; reqDot.textContent = totalPending > 9 ? '9+' : totalPending; }
+
+  const reqDotNav = document.getElementById('reqDotNav');
+  if (reqDotNav) { reqDotNav.classList.toggle('show', totalPending > 0); reqDotNav.textContent = totalPending > 9 ? '9+' : totalPending; }
+}
+
+/* ===== Tree & Drag and Drop ===== */
+function saveOpenState() {
+  document.querySelectorAll('.children-area').forEach(el => {
+    if (el.classList.contains('active')) openNodes.add(el.id.replace('children-', ''));
+    else openNodes.delete(el.id.replace('children-', ''));
+  });
+}
+
+function renderTree() {
+  const container = document.getElementById('treeContainer');
+  const rootNodes = treeData.filter(n => n.parentId === "root").sort((a,b) => (a.order||0)-(b.order||0));
+  
+  if (rootNodes.length === 0) {
+    container.innerHTML = `<button class="btn-primary-action" onclick="openAddModal(null, 'root')"><i class="fas fa-plus"></i> إضافة سنة دراسية</button><div class="empty-box"><i class="fas fa-sitemap"></i><h3>لا يوجد محتوى</h3><p>ابدأ بإضافة سنة دراسية</p></div>`;
+    return;
+  }
+  
+  // ✅ وضع الجذور داخل حاوية قابلة للسحب
+  container.innerHTML = `
+    <button class="btn-primary-action" onclick="openAddModal(null, 'root')"><i class="fas fa-plus"></i> إضافة سنة دراسية</button>
+    <div id="rootSortableContainer" data-parent-id="root" class="sortable-container">
+      ${buildTreeHTML(rootNodes)}
+    </div>
+  `;
+  
+  // ✅ تفعيل السحب والإفلات بعد بناء الشجرة
+  setTimeout(initSortables, 100);
+}
+
+function buildTreeHTML(nodes) {
+  return nodes.map(node => {
+    const children = treeData.filter(n => n.parentId === node.id).sort((a,b) => (a.order||0)-(b.order||0));
+    const isModule = node.type && node.type.startsWith('module_');
+    const isOpen = openNodes.has(node.id);
+    const iconClass = isModule ? (node.type === 'module_video' ? 'fa-video' : 'fa-file') : 'fa-folder';
+    const title = escapeHtml(node.title || '').replace(/'/g, '&#39;');
+    
+    // ✅ استخدام مقبض السحب بدلاً من الأسهم
+    const dragHandle = `<div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>`;
+    
+    const actions = isModule
+      ? `<button class="action-btn" onclick="editModule('${node.id}')"><i class="fas fa-edit"></i></button><button class="action-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>`
+      : `<button class="action-btn" onclick="editNode('${node.id}')"><i class="fas fa-edit"></i></button><button class="action-btn manage" onclick="openManage('${node.id}', '${title}')"><i class="fas fa-cog"></i></button><button class="action-btn" onclick="openAddModal('${node.id}', '${node.type}')"><i class="fas fa-plus"></i></button><button class="action-btn danger" onclick="deleteNode('${node.id}')"><i class="fas fa-trash"></i></button>`;
+      
+    return `
+      <div class="tree-group" data-id="${node.id}">
+        <div class="node-card">
+          <div class="node-header">
+            <div class="node-title-area" onclick="toggleChildren('${node.id}')">
+              ${dragHandle}
+              <div class="node-icon"><i class="fas ${iconClass}"></i></div>
+              <div class="node-text">
+                <div class="node-title">${escapeHtml(node.title || '')}</div>
+                <div class="node-type">${node.type || ''}</div>
+              </div>
+            </div>
+            <div class="node-actions">${actions}</div>
+          </div>
+          ${!isModule ? `
+            <div class="children-area ${isOpen ? 'active' : ''}" id="children-${node.id}">
+              <div class="sortable-container" data-parent-id="${node.id}" style="min-height:10px;">
+                ${children.length > 0 ? buildTreeHTML(children) : '<div style="text-align:center; color:#aaa; font-size:12px; padding:8px;">لا يوجد فروع</div>'}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ✅ تهيئة مكتبة السحب والإفلات
+function initSortables() {
+  document.querySelectorAll('.sortable-container').forEach(el => {
+    new Sortable(el, {
+      group: 'nested',
+      handle: '.drag-handle',
+      animation: 150,
+      fallbackOnBody: true,
+      swapThreshold: 0.65,
+      ghostClass: 'sortable-ghost',
+      dragClass: 'sortable-drag',
+      onEnd: function (evt) {
+        const container = evt.to;
+        // إذا تم سحب العنصر إلى حاوية فارغة تحتوي على رسالة "لا يوجد فروع"، نقوم بحذفها
+        const emptyMsg = container.querySelector('div[style*="text-align:center"]');
+        if (emptyMsg && container.querySelectorAll('.tree-group').length > 0) {
+          emptyMsg.remove();
+        }
+        saveNewOrder(container);
+      }
+    });
+  });
+}
+
+// ✅ حفظ الترتيب الجديد في قاعدة البيانات دفعة واحدة
+async function saveNewOrder(container) {
+  const parentId = container.getAttribute('data-parent-id');
+  const items = container.querySelectorAll(':scope > .tree-group');
+  if (!items.length) return;
+
+  const batch = writeBatch(db);
+  let hasChanges = false;
+
+  items.forEach((item, index) => {
+    const id = item.getAttribute('data-id');
+    const newOrder = index + 1; // 1, 2, 3...
+    
+    // تحديث البيانات المحلية
+    const node = treeData.find(n => n.id === id);
+    if (node) {
+      if (node.order !== newOrder || node.parentId !== parentId) {
+        hasChanges = true;
+        node.order = newOrder;
+        node.parentId = parentId;
+        // إضافة تحديث للـ batch
+        batch.update(doc(db, 'content_tree', id), { order: newOrder, parentId: parentId });
+      }
+    }
+  });
+
+  if (hasChanges) {
+    try {
+      await batch.commit();
+      showToast('تم تحديث الترتيب ✓');
+    } catch (error) {
+      console.error('Error saving order:', error);
+      showToast('فشل حفظ الترتيب', 'error');
+      loadAllData(); // إعادة تحميل في حال حدوث خطأ
+    }
+  }
+}
+
+window.toggleChildren = function(id) {
+  const el = document.getElementById(`children-${id}`);
+  if (el) {
+    el.classList.toggle('active');
+    if (el.classList.contains('active')) openNodes.add(id);
+    else openNodes.delete(id);
+  }
+};
+
+window.openAddModal = function(parentId, parentType) {
+  let newType = parentType === 'root' ? 'year' : parentType === 'year' ? 'program' : parentType === 'program' ? 'subject' : 'custom';
+  document.getElementById("modalTitle").textContent = "إضافة";
+  document.getElementById("nodeParentId").value = parentId || "root";
+  document.getElementById("nodeType").value = newType;
+  document.getElementById("nodeTitle").value = "";
+  document.getElementById("nodeModal").dataset.editId = "";
+  document.getElementById("nodeModal").classList.add("active");
+};
+
+window.editNode = function(id) {
+  const node = treeData.find(n => n.id === id);
+  if (!node) return;
+  document.getElementById("modalTitle").textContent = "تعديل";
+  document.getElementById("nodeParentId").value = node.parentId;
+  document.getElementById("nodeType").value = node.type;
+  document.getElementById("nodeTitle").value = node.title;
+  document.getElementById("nodeModal").dataset.editId = id;
+  document.getElementById("nodeModal").classList.add("active");
+};
+
+window.saveNode = async function() {
+  const parentId = document.getElementById("nodeParentId").value;
+  const type = document.getElementById("nodeType").value;
+  const title = document.getElementById("nodeTitle").value.trim();
+  const editId = document.getElementById("nodeModal").dataset.editId;
+  if (!title) return;
+  
+  const siblings = treeData.filter(n => n.parentId === parentId);
+  const newOrder = siblings.length > 0 ? Math.max(...siblings.map(n => n.order || 0)) + 1 : 1;
+  
+  try {
+    if (editId) await updateDoc(doc(db, "content_tree", editId), { title });
+    else await addDoc(collection(db, "content_tree"), { parentId, type, title, order: newOrder, createdAt: serverTimestamp() });
+    closeModal('nodeModal');
+    loadAllData();
+  } catch (e) { showToast("حدث خطأ", "error"); }
+};
+
+window.openManage = function(nodeId, nodeTitle) {
+  document.getElementById("manageTitle").textContent = `إدارة: ${nodeTitle}`;
+  document.getElementById("manageModal").dataset.currentNodeId = nodeId;
+  document.getElementById("manageModal").classList.add("active");
+};
+
+window.deleteNode = async function(id) {
+  if (treeData.some(n => n.parentId === id)) { showToast('احذف المحتوى الداخلي أولاً', 'error'); return; }
+  if (!confirm("حذف؟")) return;
+  await deleteDoc(doc(db, "content_tree", id));
+  loadAllData();
+};
+
+/* ===== Editors ===== */
+window.openCodeEditor = function(moduleKey, moduleTitle) {
+  const nodeId = document.getElementById("manageModal").dataset.currentNodeId;
+  document.getElementById("codeTitle").textContent = `إعداد ${moduleTitle}`;
+  document.getElementById("currentNodeId").value = nodeId;
+  document.getElementById("currentModuleKey").value = moduleKey;
+  const existing = treeData.find(n => n.parentId === nodeId && n.type === 'module_' + moduleKey);
+  document.getElementById("moduleTitleInput").value = existing ? existing.title : moduleTitle;
+  document.getElementById("moduleAccessInput").value = existing ? (existing.access || 'public') : 'public';
+  document.getElementById("moduleCode").value = existing ? (existing.htmlContent || '') : '';
+  resetHtmlUploadZone();
+  closeModal('manageModal');
+  document.getElementById("codeModal").classList.add("active");
+};
+
+function resetHtmlUploadZone() {
+  const zone = document.getElementById('htmlUploadZone');
+  zone.classList.remove('success');
+  zone.querySelector('.up-text').textContent = 'اضغط لاختيار ملف HTML';
+  zone.querySelector('.up-sub').textContent = '.html أو .htm';
+  zone.querySelector('i').className = 'fas fa-cloud-upload-alt';
+  document.getElementById('htmlFileInput').value = '';
+  document.getElementById('htmlFileInfo').classList.remove('show');
+}
+
+window.handleHtmlFileUpload = function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!/\.(html?|htm)$/i.test(file.name)) { showToast('ملف غير صالح', 'error'); event.target.value = ''; return; }
+  if (file.size > 1024 * 1024) { showToast('الحد 1 ميجا', 'error'); event.target.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('moduleCode').value = e.target.result;
+    const zone = document.getElementById('htmlUploadZone');
+    zone.classList.add('success');
+    zone.querySelector('.up-text').textContent = '✓ تم التحميل';
+    zone.querySelector('.up-sub').textContent = 'راجع الكود';
+    zone.querySelector('i').className = 'fas fa-check-circle';
+    const info = document.getElementById('htmlFileInfo');
+    info.textContent = `📄 ${file.name} — ${(file.size / 1024).toFixed(1)} KB`;
+    info.classList.add('show');
+    showToast('تم التحميل');
+  };
+  reader.readAsText(file);
+};
+
+window.saveModuleCode = async function() {
+  const nodeId = document.getElementById("currentNodeId").value;
+  const moduleKey = document.getElementById("currentModuleKey").value;
+  const title = document.getElementById("moduleTitleInput").value.trim();
+  const access = document.getElementById("moduleAccessInput").value;
+  const code = document.getElementById("moduleCode").value;
+  if (!code || !code.trim()) { showToast('أدخل الكود أو ارفع ملف', 'error'); return; }
+  const existing = treeData.find(n => n.parentId === nodeId && n.type === 'module_' + moduleKey);
+  
+  const siblings = treeData.filter(n => n.parentId === nodeId);
+  const newOrder = siblings.length > 0 ? Math.max(...siblings.map(n => n.order || 0)) + 1 : 1;
+  
+  try {
+    if (existing) await updateDoc(doc(db, "content_tree", existing.id), { title, access, htmlContent: code });
+    else await addDoc(collection(db, "content_tree"), { parentId: nodeId, type: 'module_' + moduleKey, title, access, htmlContent: code, order: newOrder, createdAt: serverTimestamp() });
+    openNodes.add(nodeId);
+    closeModal('codeModal');
+    loadAllData();
+    showToast('تم الحفظ ✓');
+  } catch (e) { showToast('خطأ', 'error'); }
+};
+
+window.editModule = async function(nodeId) {
+  const node = treeData.find(n => n.id === nodeId);
+  if (!node) return;
+  if (node.type === 'module_video') {
+    document.getElementById('videoModal').dataset.nodeId = node.parentId;
+    document.getElementById('videoModal').dataset.editId = node.id;
+    document.getElementById('videoSectionTitle').value = node.title;
+    document.getElementById('videoAccessInput').value = node.access || 'paid';
+    const container = document.getElementById('videoItemsContainer');
+    container.innerHTML = '';
+    videoItemCounter = 0;
+    const videos = node.videos || [];
+    if (videos.length > 0) videos.forEach(v => addVideoItemWithData(v));
+    else addVideoItem();
+    document.getElementById('videoModal').classList.add('active');
+  } else {
+    document.getElementById("currentNodeId").value = node.parentId;
+    document.getElementById("currentModuleKey").value = node.type.replace('module_', '');
+    document.getElementById("moduleTitleInput").value = node.title;
+    document.getElementById("moduleAccessInput").value = node.access || 'public';
+    document.getElementById("moduleCode").value = node.htmlContent || '';
+    resetHtmlUploadZone();
+    document.getElementById("codeModal").classList.add("active");
+  }
+};
+
+/* ===== Video manager ===== */
+window.openVideoManager = function() {
+  const nodeId = document.getElementById('manageModal').dataset.currentNodeId;
+  const existing = treeData.find(n => n.parentId === nodeId && n.type === 'module_video');
+  document.getElementById('videoModal').dataset.nodeId = nodeId;
+  document.getElementById('videoModal').dataset.editId = existing ? existing.id : '';
+  document.getElementById('videoSectionTitle').value = existing ? existing.title : 'فيديوهات';
+  document.getElementById('videoAccessInput').value = existing ? (existing.access || 'paid') : 'paid';
+  const container = document.getElementById('videoItemsContainer');
+  container.innerHTML = '';
+  videoItemCounter = 0;
+  const videos = (existing && existing.videos) ? existing.videos : [];
+  if (videos.length > 0) videos.forEach(v => addVideoItemWithData(v));
+  else addVideoItem();
+  closeModal('manageModal');
+  document.getElementById('videoModal').classList.add('active');
+};
+
+window.addVideoItem = function() { 
+  addVideoItemWithData(null); 
+};
+
+function extractYtId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function addVideoItemWithData(v) {
+  const index = videoItemCounter++;
+  const container = document.getElementById('videoItemsContainer');
+  const sourceType = v && v.sourceType ? v.sourceType : 'link';
+  const linkUrl = v && v.sourceType === 'link' && v.url ? v.url : '';
+  const uploadUrl = v && v.sourceType === 'upload' && v.url ? v.url : '';
+  const fileName = v && v.sourceType === 'upload' ? (v.fileName || '') : '';
+  const ytId = extractYtId(linkUrl);
+  const ytPreviewHtml = ytId
+    ? `<img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" alt=""><span class="yt-label" style="color:var(--green);">✓ فيديو يوتيوب</span>`
+    : (linkUrl ? `<span class="yt-label" style="color:var(--muted);">🔗 رابط خارجي</span>` : '');
+
+  const html = `
+  <div class="video-item" data-index="${index}">
+    <div class="video-item-header">
+      <strong style="color:var(--navy);font-size:13px;">فيديو</strong>
+      <button class="action-btn danger" onclick="removeVideoItem(this)"><i class="fas fa-trash"></i></button>
+    </div>
+    <div class="form-group">
+      <label>عنوان الفيديو</label>
+      <input type="text" class="video-title-input" value="${v ? escapeHtml(v.title || '') : ''}">
+    </div>
+    <div class="form-group">
+      <label>نوع المصدر</label>
+      <select class="video-source-type" onchange="toggleVideoSource(this)">
+        <option value="link" ${sourceType === 'link' ? 'selected' : ''}>رابط (يوتيوب أو MP4)</option>
+        <option value="upload" ${sourceType === 'upload' ? 'selected' : ''}>رفع ملف (أقل من 100 ميجا)</option>
+      </select>
+    </div>
+    <div class="form-group video-link-group" style="display:${sourceType === 'upload' ? 'none' : 'block'};">
+      <label>الرابط</label>
+      <input type="text" class="video-url-input" value="${escapeHtml(linkUrl)}" dir="ltr" placeholder="https://www.youtube.com/watch?v=..." oninput="onVideoLinkInput(this)">
+      <div class="form-hint" style="font-size:11.5px;color:var(--muted);margin-top:4px;">يمكنك لصق رابط يوتيوب عادي (watch?v=) أو رابط MP4 مباشر</div>
+      <div class="yt-preview">${ytPreviewHtml}</div>
+    </div>
+    <div class="form-group video-upload-group" style="display:${sourceType === 'upload' ? 'block' : 'none'};">
+      <label>ملف الفيديو (حد أقصى 100 ميجا)</label>
+      <input type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-matroska,video/*" class="video-file-input" onchange="handleVideoFileSelect(this)">
+      <input type="hidden" class="video-uploaded-url" value="${escapeHtml(uploadUrl)}">
+      <div class="video-file-preview" style="display:${fileName || uploadUrl ? 'block' : 'none'};" data-filename="${escapeHtml(fileName)}">${fileName || (uploadUrl ? 'فيديو مرفوع ✓' : '')}</div>
+      <div class="video-upload-status">${uploadUrl ? '<span style="color:var(--green);">✓ محفوظ مسبقاً</span>' : ''}</div>
+    </div>
+    <div class="form-group">
+      <label>ملاحظات (اختياري)</label>
+      <textarea class="video-notes-input" rows="2">${v && v.notes ? escapeHtml(v.notes) : ''}</textarea>
+    </div>
+  </div>`;
+  container.insertAdjacentHTML('beforeend', html);
+  updateVideoLabels();
+}
+
+function updateVideoLabels() {
+  document.querySelectorAll('#videoItemsContainer .video-item').forEach((item, i) => {
+    const h = item.querySelector('.video-item-header strong');
+    if (h) h.textContent = `فيديو ${i + 1}`;
+  });
+}
+
+window.removeVideoItem = function(btn) { btn.closest('.video-item').remove(); updateVideoLabels(); };
+
+window.toggleVideoSource = function(select) {
+  const item = select.closest('.video-item');
+  item.querySelector('.video-link-group').style.display = select.value === 'link' ? 'block' : 'none';
+  item.querySelector('.video-upload-group').style.display = select.value === 'upload' ? 'block' : 'none';
+};
+
+window.onVideoLinkInput = function(input) {
+  const item = input.closest('.video-item');
+  const preview = item.querySelector('.yt-preview');
+  if (!preview) return;
+  const url = input.value.trim();
+  const ytId = extractYtId(url);
+  if (ytId) {
+    preview.innerHTML = `<img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" alt=""><span class="yt-label" style="color:var(--green);">✓ فيديو يوتيوب — جاهز</span>`;
+  } else if (url && /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(url)) {
+    preview.innerHTML = `<span class="yt-label" style="color:var(--blue);">🎬 فيديو مباشر (MP4/WebM)</span>`;
+  } else if (url) {
+    preview.innerHTML = `<span class="yt-label" style="color:var(--muted);">🔗 رابط خارجي (سيُفتح في تبويب جديد)</span>`;
+  } else {
+    preview.innerHTML = '';
+  }
+};
+
+window.handleVideoFileSelect = async function(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('video/')) {
+    showToast('الرجاء اختيار ملف فيديو', 'error');
+    input.value = '';
+    return;
+  }
+  const MAX = 100 * 1024 * 1024;
+  if (file.size > MAX) {
+    showToast(`الحد الأقصى 100 ميجا. حجم ملفك: ${(file.size / 1024 / 1024).toFixed(1)} ميجا`, 'error');
+    input.value = '';
+    return;
+  }
+
+  const item = input.closest('.video-item');
+  const preview = item.querySelector('.video-file-preview');
+  const status = item.querySelector('.video-upload-status');
+  const hiddenUrl = item.querySelector('.video-uploaded-url');
+
+  preview.style.display = 'block';
+  preview.dataset.filename = file.name;
+  preview.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} ميجا)`;
+  status.style.color = 'var(--accent)';
+  status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع... 0%';
+
+  try {
+    const url = await uploadVideo(file, (pct) => {
+      status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> جاري الرفع... ${pct}%`;
+    });
+    hiddenUrl.value = url;
+    status.style.color = 'var(--green)';
+    status.innerHTML = '✓ تم الرفع بنجاح — جاهز للحفظ';
+    showToast('تم رفع الفيديو ✓');
+  } catch (e) {
+    console.error('Video upload error:', e);
+    hiddenUrl.value = '';
+    status.style.color = 'var(--red)';
+    status.innerHTML = '❌ ' + (e.message || 'فشل الرفع');
+    showToast(e.message || 'فشل الرفع', 'error');
+  }
+};
+
+window.saveVideos = async function() {
+  const nodeId = document.getElementById('videoModal').dataset.nodeId;
+  const editId = document.getElementById('videoModal').dataset.editId;
+  const title = document.getElementById('videoSectionTitle').value.trim();
+  const access = document.getElementById('videoAccessInput').value;
+  if (!title) { showToast('أدخل عنوان القسم', 'error'); return; }
+
+  const videos = [];
+  let hasError = false;
+
+  document.querySelectorAll('#videoItemsContainer .video-item').forEach((item, i) => {
+    const vTitle = item.querySelector('.video-title-input').value.trim();
+    const sourceType = item.querySelector('.video-source-type').value;
+    const linkUrl = item.querySelector('.video-url-input').value.trim();
+    const uploadUrl = item.querySelector('.video-uploaded-url').value.trim();
+    const preview = item.querySelector('.video-file-preview');
+    const fileName = preview && preview.style.display !== 'none' ? (preview.dataset.filename || '') : '';
+    const notes = item.querySelector('.video-notes-input').value.trim();
+
+    if (!vTitle) return;
+
+    let url = null;
+    let savedFileName = null;
+
+    if (sourceType === 'link') {
+      if (!linkUrl) { showToast(`الفيديو ${i + 1}: أدخل الرابط`, 'error'); hasError = true; return; }
+      url = linkUrl;
+    } else {
+      if (!uploadUrl) { showToast(`الفيديو ${i + 1}: ارفع الملف أولاً`, 'error'); hasError = true; return; }
+      url = uploadUrl;
+      savedFileName = fileName || 'فيديو';
+    }
+
+    videos.push({
+      title: vTitle,
+      sourceType,
+      url,
+      fileName: savedFileName,
+      notes,
+      order: i + 1
+    });
+  });
+
+  if (hasError) return;
+  if (videos.length === 0) { showToast('أضف فيديو واحد على الأقل بعنوان', 'error'); return; }
+
+  const siblings = treeData.filter(n => n.parentId === nodeId);
+  const newOrder = siblings.length > 0 ? Math.max(...siblings.map(n => n.order || 0)) + 1 : 1;
+
+  try {
+    if (editId) await updateDoc(doc(db, 'content_tree', editId), { title, access, videos, updatedAt: serverTimestamp() });
+    else await addDoc(collection(db, 'content_tree'), { parentId: nodeId, type: 'module_video', title, access, videos, order: newOrder, createdAt: serverTimestamp() });
+    openNodes.add(nodeId);
+    showToast('تم الحفظ ✓');
+    closeModal('videoModal');
+    loadAllData();
+  } catch (e) {
+    console.error('saveVideos failed:', e);
+    showToast('خطأ في الحفظ', 'error');
+  }
+};
+
+/* ===== Users ===== */
+function renderUsers() {
+  const container = document.getElementById('studentsContainer');
+  if (allUsers.length === 0) { container.innerHTML = `<div class="empty-box"><i class="fas fa-users"></i><h3>لا يوجد مستخدمون</h3></div>`; return; }
+  const order = { founder: 0, admin: 1, doctor: 2, ta: 3, student: 4 };
+  const sorted = [...allUsers].sort((a, b) => {
+    const oa = a.badgeType === 'founder' ? 0 : order[a.role] ?? 5;
+    const ob = b.badgeType === 'founder' ? 0 : order[b.role] ?? 5;
+    return oa - ob;
+  });
+  container.innerHTML = sorted.map(u => {
+    const roleKey = u.badgeType === 'founder' ? 'founder' : u.role === 'admin' ? 'admin' : u.role === 'ta' ? 'ta' : u.role === 'doctor' ? 'doctor' : 'student';
+    const roleLabel = roleKey === 'founder' ? 'FOUNDER' : roleKey === 'admin' ? 'ADMIN' : roleKey === 'ta' ? 'TA' : roleKey === 'doctor' ? 'DOCTOR' : 'STUDENT';
+    const roleClass = roleKey === 'founder' ? 'role-founder' : roleKey === 'admin' ? 'role-admin' : roleKey === 'ta' ? 'role-ta' : roleKey === 'doctor' ? 'role-doctor' : 'role-student';
+    let isVerified = false;
+    if (u.isVerified) {
+      try {
+        const until = u.verifiedUntil?.toDate ? u.verifiedUntil.toDate() : (u.verifiedUntil ? new Date(u.verifiedUntil) : null);
+        isVerified = !until || until > new Date();
+      } catch (e) {}
+    }
+    const safeName = escapeHtml(u.name || 'بدون اسم').replace(/'/g, '&#39;');
+    return `<div class="user-card"><div class="user-info"><div class="user-name">${escapeHtml(u.name || 'بدون اسم')}<span class="user-role-chip ${roleClass}">${roleLabel}</span>${isVerified ? '<i class="fas fa-check-circle verified-inline"></i>' : ''}</div><div class="user-email">${escapeHtml(u.email || '')}</div></div><div style="display:flex; gap:6px; flex-shrink:0;"><button class="action-btn manage" title="سجل التعديلات" onclick="openHistoryModal('${u.id}', '${safeName}')"><i class="fas fa-history"></i></button><button class="action-btn manage" title="الأجهزة" onclick="openDevices('${u.id}', '${safeName}')"><i class="fas fa-mobile-alt"></i></button></div></div>`;
+  }).join('');
+}
+
+/* ===== History modal ===== */
+window.openHistoryModal = async function(uid, name) {
+  const modal = document.getElementById('historyModal');
+  const title = document.getElementById('historyModalTitle');
+  const content = document.getElementById('historyContent');
+  title.textContent = `سجل التعديلات${name ? ' — ' + name : ''}`;
+  content.innerHTML = `<p style="text-align:center; padding:30px; color:var(--muted);"><i class="fas fa-spinner fa-spin" style="font-size:20px;"></i><br>جاري التحميل...</p>`;
+  modal.classList.add('active');
+
+  try {
+    const history = await getProfileHistory(uid, 100);
+    if (!history || history.length === 0) {
+      content.innerHTML = `<div class="empty-box" style="border:none; background:transparent; padding:30px 20px;"><i class="fas fa-history" style="font-size:40px;"></i><h3>لا يوجد سجل تعديلات</h3><p>لم يقم هذا المستخدم بأي تعديل على بياناته بعد</p></div>`;
+      return;
+    }
+    content.innerHTML = history.map(h => {
+      const editedAt = h.editedAt?.toDate ? h.editedAt.toDate() : (h.editedAt ? new Date(h.editedAt) : null);
+      const timeStr = editedAt ? editedAt.toLocaleString('ar-EG', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+      const byLabel = h.editedBy === 'self' ? 'بواسطة المستخدم' : h.editedBy === 'admin' ? 'بواسطة الإدارة' : (h.editedBy || '—');
+      let oldVal = h.oldValue === null || h.oldValue === undefined || h.oldValue === '' ? '(فارغ)' : String(h.oldValue);
+      let newVal = h.newValue === null || h.newValue === undefined || h.newValue === '' ? '(فارغ)' : String(h.newValue);
+      if (h.field === 'avatarUrl') { oldVal = h.oldValue ? '(صورة)' : '(بدون صورة)'; newVal = h.newValue ? '(صورة جديدة)' : '(بدون صورة)'; }
+      else if (h.field === 'privacy') { oldVal = h.oldValue ? JSON.stringify(h.oldValue) : '(فارغ)'; newVal = h.newValue ? JSON.stringify(h.newValue) : '(فارغ)'; }
+      const displayOld = oldVal.length > 120 ? oldVal.slice(0, 120) + '…' : oldVal;
+      const displayNew = newVal.length > 120 ? newVal.slice(0, 120) + '…' : newVal;
+      return `<div class="history-item"><div class="hi-field"><i class="fas fa-pen"></i> ${escapeHtml(h.fieldLabel || h.field || '—')}</div><div class="hi-change"><span class="hi-old">${escapeHtml(displayOld)}</span><i class="fas fa-arrow-left hi-arrow"></i><span class="hi-new">${escapeHtml(displayNew)}</span></div><div class="hi-time"><span><i class="fas fa-clock"></i> ${timeStr}</span><span class="hi-by">${escapeHtml(byLabel)}</span></div></div>`;
+    }).join('');
+  } catch (e) {
+    console.error('openHistoryModal failed:', e);
+    content.innerHTML = `<p style="text-align:center; padding:30px; color:var(--red);"><i class="fas fa-exclamation-triangle" style="font-size:24px; display:block; margin-bottom:8px;"></i>تعذر تحميل السجل. حاول مرة أخرى.</p>`;
+  }
+};
+
+/* ===== Devices ===== */
+window.openDevices = async function(uid, name) {
+  document.getElementById('deviceList').innerHTML = '<p style="text-align:center;">جاري التحميل...</p>';
+  document.getElementById('deviceModal').classList.add('active');
+  try {
+    const snap = await getDocs(collection(db, 'devices', uid, 'list'));
+    const devices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (devices.length === 0) { document.getElementById('deviceList').innerHTML = '<p style="text-align:center;">لا يوجد أجهزة.</p>'; return; }
+    document.getElementById('deviceList').innerHTML = devices.map(dev => `
+      <div style="background:#fafbfc; border:1px solid var(--line); padding:10px; border-radius:8px; margin-bottom:8px;">
+        <div style="font-size:11px; color:var(--muted); direction:ltr; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(dev.userAgent || '')}</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <span style="font-weight:800; font-size:11.5px; color:${dev.status === 'approved' ? 'var(--green)' : dev.status === 'blocked' ? 'var(--red)' : 'var(--accent)'};">${dev.status === 'approved' ? 'متوافق' : dev.status === 'blocked' ? 'محظور' : 'قيد الانتظار'}</span>
+          <div style="display:flex; gap:4px;">
+            ${dev.status === 'pending' ? `<button class="action-btn" style="background:var(--green); color:#fff; border:none;" onclick="updateDevice('${uid}', '${dev.id}', 'approved')"><i class="fas fa-check"></i></button>` : ''}
+            ${dev.status === 'approved' ? `<button class="action-btn" style="background:#fbeaea; color:var(--red); border-color:#fbeaea;" onclick="updateDevice('${uid}', '${dev.id}', 'blocked')"><i class="fas fa-ban"></i></button>` : ''}
+            <button class="action-btn danger" onclick="deleteDevice('${uid}', '${dev.id}')"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) { document.getElementById('deviceList').innerHTML = '<p style="text-align:center;color:var(--red)">حدث خطأ</p>'; }
+};
+
+window.updateDevice = async function(uid, devId, status) {
+  try {
+    await updateDoc(doc(db, 'devices', uid, 'list', devId), { status });
+    if (status === 'approved') await createNotification(uid, 'device_approved', '✅ تمت الموافقة على جهازك', 'يمكنك الدخول الآن', 'app.html').catch(() => {});
+    else if (status === 'blocked') await createNotification(uid, 'device_blocked', '🚫 تم حظر جهازك', 'تم حظر هذا الجهاز', 'app.html').catch(() => {});
+    showToast('تم');
+    openDevices(uid, '');
+  } catch (e) { showToast('خطأ', 'error'); }
+};
+
+window.deleteDevice = async function(uid, devId) {
+  if (!confirm('حذف؟')) return;
+  await deleteDoc(doc(db, 'devices', uid, 'list', devId));
+  showToast('تم');
+  openDevices(uid, '');
+};
+
+/* ===== Unified Requests ===== */
+function toDate(v) {
+  try { if (!v) return null; return v.toDate ? v.toDate() : new Date(v); }
+  catch { return null; }
+}
+
+function buildUnifiedRequests() {
+  const userMap = {};
+  allUsers.forEach(u => userMap[u.id] = u);
+
+  const subReqs = allSubRequests.map(r => {
+    const user = userMap[r.uid];
+    const roleKey = user?.badgeType === 'founder' ? 'founder' : (user?.role || 'student');
+    let isVerified = false;
+    if (user?.isVerified) {
+      try {
+        const until = user.verifiedUntil?.toDate ? user.verifiedUntil.toDate() : (user.verifiedUntil ? new Date(user.verifiedUntil) : null);
+        isVerified = !until || until > new Date();
+      } catch (e) {}
+    }
+    return { _kind: 'subscription', id: r.id, uid: r.uid, userName: r.userName || user?.name || 'بدون اسم', userRole: roleKey, userIsVerified: isVerified, status: r.status, createdAt: r.createdAt, subjectId: r.subjectId, subjectName: r.subjectName, notes: r.notes || '' };
+  });
+
+  const verifReqs = allVerifications.map(v => {
+    const user = userMap[v.uid];
+    const roleKey = user?.badgeType === 'founder' ? 'founder' : (v.role || user?.role || 'student');
+    let isVerified = false;
+    if (user?.isVerified) {
+      try {
+        const until = user.verifiedUntil?.toDate ? user.verifiedUntil.toDate() : (user.verifiedUntil ? new Date(user.verifiedUntil) : null);
+        isVerified = !until || until > new Date();
+      } catch (e) {}
+    }
+    return { _kind: 'verification', id: v.id, uid: v.uid, userName: v.userName || user?.name || 'بدون اسم', userRole: roleKey, userIsVerified: isVerified, status: v.status, createdAt: v.createdAt, verifType: v.type, plan: v.plan, price: v.price, durationDays: v.durationDays, notes: v.notes || '' };
+  });
+
+  const deviceReqs = allDevices.map(d => {
+    let status;
+    if (d.status === 'pending') status = 'pending';
+    else if (d.status === 'approved') status = 'approved';
+    else status = 'rejected';
+    return { _kind: 'device', id: d.id, uid: d._uid, userName: d._userName || 'بدون اسم', userRole: d._userRole || 'student', userIsVerified: d._userVerified || false, status: status, createdAt: d.createdAt, userAgent: d.userAgent || '', deviceId: d.deviceId || d.id };
+  });
+
+  return [...subReqs, ...verifReqs, ...deviceReqs];
+}
+
+function sortRequests(list) {
+  const roleOrder = { founder: 5, admin: 4, doctor: 3, ta: 2, student: 1 };
+  return list.sort((a, b) => {
+    const aS = a.status === 'pending' ? 3 : a.status === 'approved' ? 2 : 1;
+    const bS = b.status === 'pending' ? 3 : b.status === 'approved' ? 2 : 1;
+    if (aS !== bS) return bS - aS;
+    if (a.userIsVerified !== b.userIsVerified) return a.userIsVerified ? -1 : 1;
+    const aR = roleOrder[a.userRole] || 0;
+    const bR = roleOrder[b.userRole] || 0;
+    if (aR !== bR) return bR - aR;
+    const aT = toDate(a.createdAt)?.getTime() || 0;
+    const bT = toDate(b.createdAt)?.getTime() || 0;
+    return bT - aT;
+  });
+}
+
+function renderRequests() {
+  const container = document.getElementById('requestsContainer');
+  const all = buildUnifiedRequests();
+  const sorted = sortRequests(all);
+
+  let filtered = sorted;
+  if (reqTypeFilter !== 'all') filtered = filtered.filter(r => r._kind === reqTypeFilter);
+  if (reqStatusFilter !== 'all') filtered = filtered.filter(r => r.status === reqStatusFilter);
+
+  const typeFilters = [
+    { key: 'all', label: 'الكل', count: all.length },
+    { key: 'subscription', label: 'اشتراك', count: all.filter(r => r._kind === 'subscription').length },
+    { key: 'verification', label: 'توثيق', count: all.filter(r => r._kind === 'verification').length },
+    { key: 'device', label: 'جهاز', count: all.filter(r => r._kind === 'device').length }
+  ];
+  const statusFilters = [
+    { key: 'all', label: 'الكل', count: all.length },
+    { key: 'pending', label: 'معلقة', count: all.filter(r => r.status === 'pending').length },
+    { key: 'approved', label: 'مقبولة', count: all.filter(r => r.status === 'approved').length },
+    { key: 'rejected', label: 'مرفوضة', count: all.filter(r => r.status === 'rejected').length }
+  ];
+
+  const typeChips = typeFilters.map(f => `<button class="filter-chip ${reqTypeFilter === f.key ? 'active' : ''}" onclick="setReqTypeFilter('${f.key}')">${f.label} (${f.count})</button>`).join('');
+  const statusChips = statusFilters.map(f => `<button class="filter-chip ${reqStatusFilter === f.key ? 'active' : ''}" onclick="setReqStatusFilter('${f.key}')">${f.label} (${f.count})</button>`).join('');
+
+  let listHtml;
+  if (filtered.length === 0) {
+    listHtml = `<div class="empty-box"><i class="fas fa-inbox"></i><h3>لا يوجد طلبات</h3><p>ستظهر هنا طلبات الاشتراك والتوثيق والأجهزة</p></div>`;
+  } else {
+    listHtml = filtered.map(r => renderRequestCard(r)).join('');
+  }
+
+  container.innerHTML = `<div class="filter-row">${typeChips}</div><div class="filter-row">${statusChips}</div>${listHtml}`;
+}
+
+function renderRequestCard(r) {
+  const roleLabels = { founder: 'FOUNDER', admin: 'ADMIN', doctor: 'DOCTOR', ta: 'TA', student: 'STUDENT' };
+  const roleClasses = { founder: 'role-founder', admin: 'role-admin', doctor: 'role-doctor', ta: 'role-ta', student: 'role-student' };
+  const statusLabels = { pending: 'قيد الانتظار', approved: 'مقبول', rejected: 'مرفوض' };
+  const statusClasses = { pending: 'vchip-pending', approved: 'vchip-approved', rejected: 'vchip-rejected' };
+
+  let typeBadge;
+  if (r._kind === 'subscription') typeBadge = `<span class="vchip vchip-sub">اشتراك</span>`;
+  else if (r._kind === 'verification') typeBadge = r.verifType === 'free' ? `<span class="vchip vchip-free">توثيق - مجاني</span>` : `<span class="vchip vchip-paid">توثيق - مدفوع</span>`;
+  else typeBadge = `<span class="vchip vchip-device">جهاز جديد</span>`;
+
+  const date = toDate(r.createdAt);
+  const timeStr = date ? date.toLocaleString('ar-EG', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+
+  let detailsHtml = '';
+  if (r._kind === 'subscription') detailsHtml = `<div class="req-detail"><strong>المادة:</strong> ${escapeHtml(r.subjectName || '—')}</div>`;
+  else if (r._kind === 'verification') {
+    if (r.verifType === 'paid') detailsHtml = `<div class="req-detail"><strong>الخطة:</strong> ${escapeHtml(r.plan || '')} — <strong>المبلغ:</strong> ${r.price || 0}ج — <strong>المدة:</strong> ${r.durationDays || 0} يوم</div>`;
+    else detailsHtml = `<div class="req-detail"><strong>النوع:</strong> توثيق مجاني دائم</div>`;
+  } else if (r._kind === 'device') detailsHtml = `<div class="req-detail"><strong>جهاز جديد يحاول الدخول</strong><div class="ua-text" title="${escapeHtml(r.userAgent)}">${escapeHtml(r.userAgent)}</div></div>`;
+  if (r.notes) detailsHtml += `<div class="req-notes"><strong>ملاحظات:</strong> ${escapeHtml(r.notes)}</div>`;
+
+  let actionsHtml = '';
+  if (r.status === 'pending') {
+    if (r._kind === 'subscription') actionsHtml = `<div class="req-actions"><button class="req-btn approve" onclick="approveSub('${r.id}', '${r.uid}', '${r.subjectId}')"><i class="fas fa-check"></i> موافقة</button><button class="req-btn reject" onclick="rejectSub('${r.id}')"><i class="fas fa-times"></i> رفض</button></div>`;
+    else if (r._kind === 'verification') actionsHtml = `<div class="req-actions"><button class="req-btn approve" onclick="approveVerification('${r.id}', '${r.uid}', ${r.durationDays || 0})"><i class="fas fa-check"></i> موافقة</button><button class="req-btn reject" onclick="rejectVerificationPrompt('${r.id}', '${r.uid}')"><i class="fas fa-times"></i> رفض</button></div>`;
+    else if (r._kind === 'device') actionsHtml = `<div class="req-actions"><button class="req-btn approve" onclick="approveDevice('${r.uid}', '${r.id}')"><i class="fas fa-check"></i> موافقة</button><button class="req-btn reject" onclick="rejectDevicePrompt('${r.uid}', '${r.id}')"><i class="fas fa-times"></i> حظر</button></div>`;
+  }
+
+  return `<div class="unified-req-card status-${r.status}" data-req-id="${r.id}" data-req-uid="${r.uid}"><div class="unified-req-header"><div class="unified-req-user"><div class="unified-req-name">${escapeHtml(r.userName)}<span class="user-role-chip ${roleClasses[r.userRole] || 'role-student'}">${roleLabels[r.userRole] || 'STUDENT'}</span>${r.userIsVerified ? '<i class="fas fa-check-circle verified-inline"></i>' : ''}</div><div class="unified-req-time">${timeStr}</div></div><div class="verif-badges">${typeBadge}<span class="vchip ${statusClasses[r.status]}">${statusLabels[r.status]}</span></div></div>${detailsHtml}${actionsHtml}</div>`;
+}
+
+window.setReqTypeFilter = function(f) { reqTypeFilter = f; renderRequests(); };
+window.setReqStatusFilter = function(f) { reqStatusFilter = f; renderRequests(); };
+
+/* ===== Approve / Reject ===== */
+window.approveSub = async function(reqId, uid, subId) {
+  try {
+    await activateSubscription(uid, subId);
+    await updateDoc(doc(db, 'subscription_requests', reqId), { status: 'approved', reviewedAt: serverTimestamp() });
+    const req = allSubRequests.find(r => r.id === reqId);
+    await createNotification(uid, 'subscription_approved', '✅ تم تفعيل اشتراكك', `تمت الموافقة على "${req?.subjectName || 'المادة'}" لمدة 30 يوم`, 'app.html').catch(() => {});
+    showToast('تم');
+    loadAllData();
+  } catch (e) { showToast('خطأ', 'error'); }
+};
+
+window.rejectSub = async function(reqId) {
+  try {
+    const req = allSubRequests.find(r => r.id === reqId);
+    await updateDoc(doc(db, 'subscription_requests', reqId), { status: 'rejected', reviewedAt: serverTimestamp() });
+    if (req) await createNotification(req.uid, 'subscription_rejected', '❌ تم رفض الاشتراك', 'لم يُقبل طلبك', 'app.html').catch(() => {});
+    showToast('تم');
+    loadAllData();
+  } catch (e) { showToast('خطأ', 'error'); }
+};
+
+window.approveVerification = async function(reqId, uid, durationDays) {
+  if (!confirm('تأكيد الموافقة؟')) return;
+  try {
+    const updates = { isVerified: true, verifiedAt: serverTimestamp() };
+    if (durationDays > 0) { const expiresAt = new Date(); expiresAt.setDate(expiresAt.getDate() + durationDays); updates.verifiedUntil = expiresAt; }
+    else updates.verifiedUntil = null;
+    await updateDoc(doc(db, 'users', uid), updates);
+    await updateDoc(doc(db, 'verification_requests', reqId), { status: 'approved', reviewedAt: serverTimestamp() });
+    const msg = durationDays > 0 ? `تم توثيق حسابك لمدة ${durationDays} يوم` : 'تم توثيق حسابك مجاناً — بدون تاريخ انتهاء';
+    await createNotification(uid, 'verification_approved', '✅ تم توثيق حسابك', msg, 'profile.html').catch(() => {});
+    showToast('تم التوثيق ✓');
+    loadAllData();
+  } catch (e) { showToast(e.message || 'حدث خطأ', 'error'); }
+};
+
+window.rejectVerificationPrompt = async function(reqId, uid) {
+  const reason = prompt('سبب الرفض:', 'لم يتم التحقق من الهوية');
+  if (reason === null) return;
+  try {
+    await updateDoc(doc(db, 'verification_requests', reqId), { status: 'rejected', rejectReason: reason, reviewedAt: serverTimestamp() });
+    await createNotification(uid, 'verification_rejected', '❌ تم رفض طلب التوثيق', reason || 'تواصل مع الإدارة', 'profile.html').catch(() => {});
+    showToast('تم الرفض');
+    loadAllData();
+  } catch (e) { showToast('حدث خطأ', 'error'); }
+};
+
+window.approveDevice = async function(uid, devId) {
+  try {
+    await updateDoc(doc(db, 'devices', uid, 'list', devId), { status: 'approved' });
+    await createNotification(uid, 'device_approved', '✅ تمت الموافقة على جهازك', 'يمكنك الدخول الآن من هذا الجهاز', 'app.html').catch(() => {});
+    showToast('تمت الموافقة على الجهاز ✓');
+    loadAllData();
+  } catch (e) { showToast('خطأ', 'error'); }
+};
+
+window.rejectDevicePrompt = async function(uid, devId) {
+  if (!confirm('حظر هذا الجهاز؟')) return;
+  try {
+    await updateDoc(doc(db, 'devices', uid, 'list', devId), { status: 'blocked' });
+    await createNotification(uid, 'device_blocked', '🚫 تم حظر جهازك', 'تم حظر هذا الجهاز بواسطة الإدارة', 'app.html').catch(() => {});
+    showToast('تم الحظر');
+    loadAllData();
+  } catch (e) { showToast('خطأ', 'error'); }
+};
+
+/* ===== Notifications ===== */
+function renderNotifBadges() {
+  const unread = adminNotifs.filter(n => !n.read).length;
+  const dot = document.getElementById('notifDot');
+  if (dot) { dot.classList.toggle('show', unread > 0); dot.textContent = unread > 9 ? '9+' : unread; }
+}
+
+function renderNotifPanel() {
+  const body = document.getElementById('notifBody');
+  if (!body) return;
+  if (adminNotifs.length === 0) { body.innerHTML = `<p style="text-align:center; color:var(--muted); padding:40px;">لا توجد إشعارات</p>`; return; }
+  body.innerHTML = adminNotifs.map(n => {
+    let time = '';
+    try { time = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleString('ar-EG') : ''; } catch (e) {}
+    return `<div class="notif-item ${n.read ? '' : 'unread'}" onclick="handleNotif('${n.id}')"><div class="n-title">${escapeHtml(n.title || '')}</div><div class="n-msg">${escapeHtml(n.message || '')}</div><div class="n-time">${time}</div></div>`;
+  }).join('');
+}
+
+window.openNotifPanel = () => { document.getElementById('notifPanel').classList.add('active'); document.getElementById('notifOverlay').classList.add('active'); };
+window.closeNotifPanel = () => { document.getElementById('notifPanel').classList.remove('active'); document.getElementById('notifOverlay').classList.remove('active'); };
+
+window.handleNotif = async function(id) {
+  const notif = adminNotifs.find(n => n.id === id);
+  try { await markAdminNotificationRead(id); } catch (e) {}
+  closeNotifPanel();
+  if (!notif) return;
+  const type = notif.type;
+  if (type === 'new_subscription_request') { switchTab('requests'); reqTypeFilter = 'subscription'; reqStatusFilter = 'pending'; renderRequests(); if (notif.meta?.reqId) setTimeout(() => highlightRequest(notif.meta.reqId), 150); }
+  else if (type === 'new_verification_request') { switchTab('requests'); reqTypeFilter = 'verification'; reqStatusFilter = 'pending'; renderRequests(); if (notif.meta?.reqId) setTimeout(() => highlightRequest(notif.meta.reqId), 150); }
+  else if (type === 'new_device') { switchTab('requests'); reqTypeFilter = 'device'; reqStatusFilter = 'pending'; renderRequests(); if (notif.meta?.deviceId) setTimeout(() => highlightRequest(notif.meta.deviceId), 150); else if (notif.meta?.uid) setTimeout(() => highlightByUid(notif.meta.uid), 150); }
+  else if (type === 'new_student') { switchTab('students'); }
+  else { switchTab('requests'); }
+};
+
+function highlightRequest(reqId) {
+  const el = document.querySelector(`[data-req-id="${reqId}"]`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.add('highlight');
+  setTimeout(() => el.classList.remove('highlight'), 3000);
+}
+
+function highlightByUid(uid) {
+  const els = document.querySelectorAll(`[data-req-uid="${uid}"]`);
+  if (els.length === 0) return;
+  els[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  els.forEach(el => { el.classList.add('highlight'); setTimeout(() => el.classList.remove('highlight'), 3000); });
+}
+
+window.markAllRead = async () => {
+  try { await markAllAdminNotificationsRead(adminNotifs); showToast('تم'); }
+  catch (e) { showToast('خطأ', 'error'); }
+};
+
+window.closeModal = function(id) { document.getElementById(id).classList.remove("active"); };
+</script>
+</body>
+</html>
