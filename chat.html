@@ -1,1322 +1,1373 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#15243d">
-  <title>ClearNote — الدردشات</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --navy: #15243d;
-      --navy-2: #1e3556;
-      --beige: #efe9df;
-      --white: #ffffff;
-      --line: #e4e0d8;
-      --text: #1b2433;
-      --muted: #7a8494;
-      --mine: #d9efd0;
-      --accent: #c9893a;
-      --danger: #b42318;
-      --soft: #f6f4ef;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ClearNote — الدردشات</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --navy: #152741; --navy-dark: #0f1e33; --accent: #a8741a;
+  --bg: #f4f6f8; --card: #fff; --text: #1a1a1a; --muted: #5b6472;
+  --line: #e9ecef; --line-soft: #f0f2f5; --green: #1f6b45; --red: #b91c1c;
+  --blue: #2980b9; --chat-bg: #efeae2; --sidebar-w: 80px; --list-w: 340px;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; background: var(--bg); font-family: 'Cairo', sans-serif; font-size: 15px; line-height: 1.5; height: 100vh; overflow: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, textarea { font-family: inherit; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    [hidden] { display: none !important; }
-    body {
-      font-family: 'Cairo', sans-serif; color: var(--text);
-      background: var(--beige); overflow: hidden;
-    }
-    button, input, textarea { font: inherit; color: inherit; }
-    button { cursor: pointer; border: none; background: none; }
-    input, textarea { font-size: 16px; } /* يمنع التكبير التلقائي في iOS */
+/* ===== Layout ===== */
+.app { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 
-    .app {
-      display: grid; height: 100vh; height: 100dvh; background: var(--white);
-    }
+/* Desktop Nav Rail */
+.nav-rail { width: var(--sidebar-w); background: #0f1e33; display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 8px; flex-shrink: 0; border-left: 1px solid rgba(255,255,255,.05); }
+.nav-rail .brand { font-family: Georgia, serif; font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 16px; letter-spacing: .5px; }
+.nav-rail .brand span { color: var(--accent); }
+.nav-rail-btn { width: 52px; height: 52px; border-radius: 14px; color: #a0aec0; font-size: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: .15s; position: relative; }
+.nav-rail-btn:hover { background: rgba(255,255,255,.08); color: #fff; }
+.nav-rail-btn.active { background: rgba(255,255,255,.12); color: var(--accent); }
+.nav-rail-btn span { font-size: 9px; font-weight: 700; margin-top: 1px; }
+.nav-rail-btn .badge { position: absolute; top: 6px; left: 6px; background: var(--red); color: #fff; font-size: 9px; font-weight: 800; padding: 0 5px; border-radius: 99px; min-width: 16px; height: 16px; line-height: 16px; text-align: center; border: 2px solid #0f1e33; }
 
-    /* ===== القائمة ===== */
-    .side {
-      display: flex; flex-direction: column; min-height: 0;
-      background: var(--white); border-left: 1px solid var(--line);
-    }
-    .side-head {
-      height: 60px; flex-shrink: 0; padding: 0 16px;
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--navy); color: #fff;
-    }
-    .side-title { font-weight: 700; font-size: 17px; display: flex; gap: 8px; align-items: center; }
-    .brand { font-weight: 700; font-size: 16px; letter-spacing: .5px; }
-    .brand span { color: var(--accent); }
+/* Filter Sidebar */
+.filter-sidebar { width: var(--list-w); background: var(--card); border-left: 1px solid var(--line); display: flex; flex-direction: column; flex-shrink: 0; }
+.filter-sidebar .fs-header { padding: 14px 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+.filter-sidebar .fs-title { font-weight: 800; color: var(--navy); font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.filter-sidebar .fs-new-btn { width: 34px; height: 34px; border-radius: 10px; background: var(--navy); color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: .15s; }
+.filter-sidebar .fs-new-btn:hover { background: var(--navy-dark); }
+.fs-search { padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.fs-search-wrap { position: relative; }
+.fs-search input { width: 100%; padding: 9px 36px 9px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--line-soft); font-size: 13px; transition: .15s; }
+.fs-search input:focus { outline: none; border-color: var(--navy); background: #fff; }
+.fs-search i { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); color: var(--muted); font-size: 13px; pointer-events: none; }
+.fs-list { flex: 1; overflow-y: auto; padding: 6px 8px; }
+.fs-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; font-size: 13.5px; font-weight: 700; color: var(--muted); transition: .15s; margin-bottom: 2px; }
+.fs-item:hover { background: var(--line-soft); color: var(--navy); }
+.fs-item.active { background: var(--navy); color: #fff; }
+.fs-item i { width: 22px; font-size: 14px; text-align: center; }
+.fs-item .fs-label { flex: 1; }
+.fs-item .fs-badge { background: var(--red); color: #fff; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 99px; min-width: 18px; text-align: center; }
+.fs-item.active .fs-badge { background: #fff; color: var(--navy); }
 
-    .search { padding: 10px 12px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
-    .search-box {
-      display: flex; align-items: center; gap: 8px; padding: 0 12px;
-      background: var(--soft); border: 1px solid transparent; border-radius: 12px;
-    }
-    .search-box:focus-within { background: #fff; border-color: var(--navy-2); }
-    .search-box i { color: var(--muted); }
-    .search-box input {
-      flex: 1; min-width: 0; padding: 10px 0; border: none; outline: none; background: none;
-    }
+/* Conversation Sidebar */
+.conv-sidebar { width: var(--list-w); background: var(--card); border-left: 1px solid var(--line); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; position: relative; }
+.conv-topbar { background: var(--navy); color: #fff; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; height: 56px; }
+.conv-topbar .brand { font-family: Georgia, serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+.conv-topbar .brand span { color: var(--accent); }
+.conv-topbar .spacer { flex: 1; }
+.conv-topbar-btn { width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,.1); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; position: relative; transition: .15s; }
+.conv-topbar-btn:active { background: rgba(255,255,255,.22); }
+.conv-topbar-btn .dot { position: absolute; top: 4px; left: 4px; min-width: 15px; height: 15px; line-height: 15px; background: var(--red); border-radius: 99px; font-size: 9px; font-weight: 800; padding: 0 4px; border: 2px solid var(--navy); display: none; }
+.conv-topbar-btn .dot.show { display: block; }
+.conv-topbar-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,var(--navy),var(--accent)); color: #fff; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
+.conv-topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    .list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+/* Mobile Filters */
+.mobile-filters { display: none; gap: 6px; padding: 8px 12px; overflow-x: auto; background: var(--card); border-bottom: 1px solid var(--line); scrollbar-width: none; flex-shrink: 0; }
+.mobile-filters::-webkit-scrollbar { display: none; }
+.mf-tab { padding: 6px 12px; border-radius: 16px; background: var(--line-soft); color: var(--muted); font-size: 12px; font-weight: 700; white-space: nowrap; transition: .15s; border: none; }
+.mf-tab.active { background: var(--navy); color: #fff; }
+.mf-tab .badge { background: var(--red); color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 99px; margin-right: 4px; }
+.mf-tab.active .badge { background: #fff; color: var(--navy); }
 
-    .row {
-      display: flex; align-items: center; gap: 12px; min-height: 70px;
-      padding: 10px 14px; border-bottom: 1px solid #f1eee8; cursor: pointer;
-    }
-    .row:hover { background: #faf8f4; }
-    .row.active { background: #ece6da; }
-    .row-body { flex: 1; min-width: 0; }
-    .row-name {
-      font-weight: 700; font-size: 15px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .row-sub {
-      margin-top: 2px; font-size: 13px; color: var(--muted);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .row-time { font-size: 12px; color: var(--muted); flex-shrink: 0; align-self: flex-start; }
+.conv-list { flex: 1; overflow-y: auto; background: var(--card); padding-bottom: 80px; }
+.conv-item { padding: 12px 14px; display: flex; gap: 12px; align-items: center; cursor: pointer; border-bottom: 1px solid var(--line-soft); transition: background .15s; position: relative; }
+.conv-item:hover { background: var(--line-soft); }
+.conv-item.active { background: #eef2fa; }
+.conv-item.unread .conv-name { font-weight: 900; }
+.conv-item.unread .conv-preview { color: var(--text); font-weight: 700; }
+.conv-item.unread::before { content: ''; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.conv-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg,#152741,#a8741a); color: #fff; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; position: relative; cursor: pointer; }
+.conv-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.conv-avatar .type-icon { position: absolute; bottom: -2px; left: -2px; width: 20px; height: 20px; border-radius: 50%; background: var(--card); color: var(--navy); font-size: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--card); }
+.conv-avatar .type-icon.channel { background: #e7f5ff; color: #0d47a1; }
+.conv-avatar .type-icon.group { background: #e8f5e9; color: #1f6b45; }
+.conv-avatar .type-icon.study_room { background: #f3e5f5; color: #4a148c; }
+.conv-body { flex: 1; min-width: 0; }
+.conv-top { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin-bottom: 2px; }
+.conv-name { font-weight: 800; color: var(--navy); font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conv-time { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+.conv-bottom { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.conv-preview { font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.conv-badge { background: var(--green); color: #fff; font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 99px; flex-shrink: 0; min-width: 20px; text-align: center; }
+.conv-pinned { color: var(--accent); font-size: 11px; }
 
-    .hint { padding: 28px 20px; text-align: center; color: var(--muted); font-size: 14px; }
+/* Main area */
+.main-area { flex: 1; display: flex; flex-direction: column; background: var(--chat-bg); position: relative; overflow: hidden; min-width: 0; }
+.empty-main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; color: var(--muted); }
+.empty-main i { font-size: 72px; color: #cbd5e0; margin-bottom: 16px; }
+.empty-main h2 { font-size: 22px; color: var(--navy); margin: 0 0 8px; font-weight: 800; }
+.empty-main p { margin: 0 0 20px; font-size: 14px; max-width: 340px; }
 
-    /* ===== الصورة الشخصية ===== */
-    .av {
-      width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
-      display: grid; place-items: center; overflow: hidden; position: relative;
-      background: linear-gradient(135deg, var(--navy-2), var(--navy));
-      color: #fff; font-weight: 700; font-size: 18px;
-    }
-    .av img { width: 100%; height: 100%; object-fit: cover; }
-    .av.clickable { cursor: pointer; }
-    .av.clickable:hover { box-shadow: 0 0 0 3px rgba(201, 137, 58, .35); }
-    .av-head {
-      width: 38px; height: 38px; font-size: 15px;
-      border: 2px solid rgba(255, 255, 255, .25);
-    }
+.chat-room { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--chat-bg); }
+.chat-header { background: var(--navy); color: #fff; padding: 10px 14px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,.15); z-index: 10; min-height: 62px; }
+.chat-back { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,.1); color: #fff; display: none; align-items: center; justify-content: center; font-size: 15px; }
+.chat-header-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg,#152741,#a8741a); overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; flex-shrink: 0; cursor: pointer; }
+.chat-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.chat-header-body { flex: 1; min-width: 0; cursor: pointer; }
+.chat-header-title { font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-header-sub { font-size: 11.5px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-header-actions { display: flex; gap: 6px; }
+.chat-action-btn { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,.1); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: .15s; }
+.chat-action-btn:active { background: rgba(255,255,255,.25); }
 
-    /* ===== منطقة المحادثة ===== */
-    .main {
-      flex-direction: column; min-width: 0; min-height: 0;
-      background: var(--beige);
-    }
-    .empty {
-      margin: auto; text-align: center; color: var(--muted); font-size: 15px;
-    }
-    .empty i { font-size: 44px; margin-bottom: 12px; color: #b8b1a4; }
+.pinned-bar { background: #fff8e1; border-bottom: 1px solid #ffe4a7; padding: 8px 14px; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #7b5c00; cursor: pointer; flex-shrink: 0; }
+.pinned-bar i { color: var(--accent); }
+.pinned-bar .pinned-text { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .chat { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.messages-scroll { flex: 1; overflow-y: auto; padding: 16px 12px; scroll-behavior: smooth; }
+.messages-inner { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 2px; }
 
-    .chat-head {
-      height: 60px; flex-shrink: 0; padding: 0 12px;
-      display: flex; align-items: center; gap: 12px;
-      background: var(--navy); color: #fff;
-    }
-    .head-name {
-      flex: 1; min-width: 0; text-align: right;
-      font-weight: 700; font-size: 16px; color: #fff; cursor: pointer;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .icon-btn {
-      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
-      display: inline-grid; place-items: center; color: inherit;
-    }
-    .icon-btn:hover { background: rgba(255, 255, 255, .12); }
-    .back { display: none; }
+.msg-row { display: flex; gap: 8px; margin-bottom: 2px; align-items: flex-end; }
+.msg-row.mine { flex-direction: row-reverse; }
+.msg-row.cont { margin-bottom: 2px; }
+.msg-row.space { margin-bottom: 10px; }
+.msg-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#152741,#a8741a); color: #fff; font-weight: 800; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; cursor: pointer; }
+.msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.msg-avatar.hidden { visibility: hidden; }
+.msg-content { flex: 1; min-width: 0; max-width: 75%; }
+.msg-row.mine .msg-content { display: flex; flex-direction: column; align-items: flex-end; }
+.msg-sender { font-size: 11.5px; font-weight: 800; color: var(--accent); margin-bottom: 2px; padding: 0 4px; }
+.msg-row.mine .msg-sender { color: var(--navy); }
+.msg-bubble { background: #fff; border-radius: 12px; padding: 8px 12px; font-size: 14px; line-height: 1.55; color: var(--text); position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,.05); max-width: 100%; }
+.msg-row.mine .msg-bubble { background: #d9fdd3; color: #0f1419; }
+.msg-bubble.deleted { font-style: italic; color: var(--muted); background: #f0f2f5; }
+.msg-meta { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--muted); margin-top: 3px; padding: 0 4px; }
+.msg-row.mine .msg-meta { justify-content: flex-end; }
+.msg-meta .edited { font-style: italic; }
+.msg-meta .check { color: var(--blue); }
+.msg-reply-preview { background: rgba(0,0,0,.05); border-right: 3px solid var(--accent); border-radius: 6px; padding: 4px 8px; margin-bottom: 4px; font-size: 12px; color: var(--muted); cursor: pointer; }
+.msg-reply-preview .sender { font-weight: 800; color: var(--accent); font-size: 11px; }
+.msg-media img, .msg-media video { max-width: 100%; border-radius: 8px; display: block; cursor: pointer; }
+.msg-file { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,.04); border-radius: 8px; padding: 10px; text-decoration: none; color: inherit; }
+.msg-file i { font-size: 24px; color: var(--accent); }
+.msg-file-info { flex: 1; min-width: 0; }
+.msg-file-name { font-weight: 800; font-size: 13px; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-file-size { font-size: 11px; color: var(--muted); }
+.msg-voice { display: flex; align-items: center; gap: 10px; min-width: 200px; }
+.msg-voice button { width: 34px; height: 34px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.msg-voice .duration { font-size: 11.5px; color: var(--muted); font-family: monospace; }
+.msg-voice audio { flex: 1; height: 32px; }
+.msg-reactions { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 4px; }
+.reaction-chip { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 2px 8px; font-size: 12px; display: inline-flex; align-items: center; gap: 3px; cursor: pointer; transition: .15s; }
+.reaction-chip.mine { background: #e7f5ff; border-color: #b6e0fe; color: #0d47a1; }
+.msg-poll { background: #fff; border-radius: 10px; padding: 12px; min-width: 260px; }
+.poll-question { font-weight: 800; color: var(--navy); font-size: 14px; margin-bottom: 10px; }
+.poll-option { background: var(--line-soft); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; cursor: pointer; font-size: 13px; position: relative; overflow: hidden; transition: .15s; }
+.poll-option:hover { background: #e7f5ff; }
+.poll-option .bar { position: absolute; inset: 0; background: rgba(29,161,242,.2); border-radius: 8px; transition: width .3s; }
+.poll-option .content { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.poll-option.voted .content::after { content: '✓'; color: var(--blue); font-weight: 800; }
+.poll-meta { font-size: 11px; color: var(--muted); margin-top: 8px; text-align: center; }
+.msg-task { background: #fff; border-radius: 10px; padding: 12px; min-width: 260px; }
+.task-title { font-weight: 800; color: var(--navy); font-size: 14px; margin-bottom: 4px; }
+.task-desc { font-size: 12.5px; color: var(--muted); margin-bottom: 8px; }
+.task-due { font-size: 11.5px; color: var(--red); margin-bottom: 8px; }
+.task-progress { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; color: var(--muted); }
+.task-progress-bar { flex: 1; height: 6px; background: var(--line-soft); border-radius: 3px; overflow: hidden; }
+.task-progress-bar div { height: 100%; background: var(--green); border-radius: 3px; transition: width .3s; }
+.task-complete-btn { width: 100%; padding: 8px; border-radius: 8px; background: var(--green); color: #fff; font-weight: 800; font-size: 12.5px; }
+.task-complete-btn.done { background: var(--line-soft); color: var(--green); cursor: default; }
+.msg-actions { position: absolute; top: -12px; background: #fff; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); display: none; padding: 2px; z-index: 20; gap: 0; }
+.msg-row.mine .msg-actions { left: -4px; }
+.msg-row:not(.mine) .msg-actions { right: -4px; }
+.msg-row:hover .msg-actions, .msg-actions.show { display: flex; }
+.msg-action-btn { width: 28px; height: 28px; border-radius: 6px; color: var(--muted); font-size: 12px; display: flex; align-items: center; justify-content: center; }
+.msg-action-btn:hover { background: var(--line-soft); color: var(--navy); }
+.msg-action-btn.danger:hover { background: #fbeaea; color: var(--red); }
 
-    .messages {
-      flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
-      padding: 14px clamp(10px, 4vw, 8%);
-      display: flex; flex-direction: column; gap: 4px;
-      background-color: var(--beige);
-      background-image: radial-gradient(rgba(0, 0, 0, .035) 1px, transparent 1px);
-      background-size: 18px 18px;
-    }
+.composer { background: var(--card); border-top: 1px solid var(--line); padding: 10px 12px; flex-shrink: 0; position: relative; }
+.composer-inner { max-width: 800px; margin: 0 auto; display: flex; gap: 8px; align-items: flex-end; }
+.composer textarea { flex: 1; min-height: 42px; max-height: 120px; padding: 11px 14px; border-radius: 22px; border: 1.5px solid var(--line); background: var(--line-soft); font-size: 14px; resize: none; outline: none; transition: .15s; line-height: 1.4; }
+.composer textarea:focus { border-color: var(--navy); background: #fff; }
+.composer-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--line-soft); color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; transition: .15s; }
+.composer-btn:hover { background: var(--line); }
+.composer-btn.send { background: var(--navy); color: #fff; }
+.composer-btn.send:hover { background: var(--navy-dark); }
+.composer-btn.recording { background: var(--red); color: #fff; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 
-    .load-more {
-      align-self: center; margin: 2px 0 8px; padding: 7px 16px;
-      background: #fff; border-radius: 999px; font-size: 13px; color: var(--navy-2);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .08);
-    }
+.reply-bar { background: #e7f5ff; border-right: 3px solid var(--blue); padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #0d47a1; max-width: 800px; margin-left: auto; margin-right: auto; }
+.reply-bar .close { color: var(--red); font-size: 14px; padding: 2px 6px; }
+.recording-bar { display: none; align-items: center; gap: 10px; padding: 8px 0; max-width: 800px; margin: 0 auto; }
+.recording-bar.show { display: flex; }
+.recording-bar .red-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); animation: pulse 1s infinite; }
+.recording-bar .timer { font-family: monospace; font-weight: 800; color: var(--red); font-size: 14px; }
+.recording-bar .info { flex: 1; color: var(--muted); font-size: 13px; }
 
-    .msg-row { display: flex; content-visibility: auto; contain-intrinsic-size: auto 56px; }
-    .msg-row.mine { justify-content: flex-end; }
-    .msg-row.theirs { justify-content: flex-start; }
-    .msg-row.flash .bubble { outline: 2px solid var(--accent); }
+.attach-menu { position: absolute; bottom: 100%; right: 12px; background: #fff; border-radius: 14px; box-shadow: 0 6px 24px rgba(0,0,0,.18); padding: 10px; display: none; grid-template-columns: repeat(2,1fr); gap: 6px; min-width: 180px; z-index: 50; }
+.attach-menu.show { display: grid; }
+.attach-item { padding: 12px; border-radius: 10px; background: var(--line-soft); display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 800; color: var(--navy); transition: .15s; }
+.attach-item:hover { background: #e7f5ff; }
+.attach-item i { font-size: 22px; }
+.attach-item.photo i { color: #e74c3c; }
+.attach-item.file i { color: #2980b9; }
+.attach-item.poll i { color: #8e44ad; }
+.attach-item.task i { color: #1f6b45; }
+.emoji-picker { position: absolute; bottom: 100%; right: 12px; background: #fff; border-radius: 14px; box-shadow: 0 6px 24px rgba(0,0,0,.18); padding: 10px; display: none; grid-template-columns: repeat(8,1fr); gap: 4px; width: 296px; z-index: 50; }
+.emoji-picker.show { display: grid; }
+.emoji-btn { width: 32px; height: 32px; border-radius: 6px; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: .15s; }
+.emoji-btn:hover { background: var(--line-soft); }
 
-    .bubble {
-      position: relative; max-width: 560px; width: fit-content;
-      min-width: 90px; padding: 7px 10px 4px;
-      background: #fff; border-radius: 12px;
-      box-shadow: 0 1px 1px rgba(0, 0, 0, .08);
-      cursor: pointer; overflow-wrap: anywhere;
-    }
-    .mine .bubble { background: var(--mine); }
-    .bubble-text { white-space: pre-wrap; line-height: 1.65; font-size: 15px; }
-    .bubble-text.deleted { color: var(--muted); font-style: italic; font-size: 14px; }
+/* Mobile Bottom Nav */
+.mobile-bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: var(--card); border-top: 1px solid var(--line); display: none; z-index: 200; padding-bottom: env(safe-area-inset-bottom, 0); box-shadow: 0 -2px 12px rgba(21,39,65,.08); }
+.mobile-bottom-nav a, .mobile-bottom-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--text-light); text-decoration: none; font-size: 10.5px; font-weight: 700; position: relative; background: none; border: none; font-family: inherit; cursor: pointer; padding: 6px 2px; }
+.mobile-bottom-nav i { font-size: 19px; }
+.mobile-bottom-nav .active { color: var(--navy); }
+.mobile-bottom-nav .active::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 28px; height: 3px; background: var(--accent); border-radius: 0 0 3px 3px; }
 
-    .quote {
-      margin-bottom: 6px; padding: 5px 8px; border-radius: 8px;
-      background: rgba(0, 0, 0, .05); border-right: 3px solid var(--accent); cursor: pointer;
-    }
-    .quote b { display: block; font-size: 12px; color: var(--navy-2); }
-    .quote span {
-      display: block; font-size: 13px; color: #4b5563;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
+/* Responsive */
+@media (max-width:1200px) { :root { --list-w: 300px; } }
+@media (max-width:1050px) {
+  .filter-sidebar { display: none; }
+  .nav-rail { display: none; }
+  .conv-sidebar { width: 100%; max-width: 400px; }
+  .mobile-filters { display: flex; }
+}
+@media (max-width:800px) {
+  .app { flex-direction: column; }
+  .conv-sidebar { width: 100%; max-width: none; height: 100vh; }
+  .main-area { position: fixed; inset: 0; z-index: 50; transform: translateX(100%); transition: transform .25s ease; }
+  body.mobile-room-open .main-area { transform: translateX(0); }
+  body.mobile-room-open .conv-sidebar { display: none; }
+  .mobile-bottom-nav { display: flex; }
+  .conv-list, .messages-scroll { padding-bottom: 70px; }
+  .composer { padding-bottom: calc(10px + 64px); }
+  .chat-back { display: flex; }
+}
 
-    .meta {
-      display: flex; justify-content: flex-end; align-items: center; gap: 6px;
-      margin-top: 2px; font-size: 11px; color: var(--muted);
-    }
+/* FAB */
+.fab-new-chat {
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-size: 22px;
+  box-shadow: 0 4px 16px rgba(21,39,65,.4);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+@media (min-width: 1050px) { .fab-new-chat { display: none; } }
 
-    .reacts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
-    .react {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 1px 8px; border-radius: 12px; font-size: 13px;
-      background: #fff; border: 1px solid var(--line);
-    }
-    .react.on { border-color: var(--accent); background: #fff6e8; }
-    .react .cnt { font-size: 12px; color: var(--muted); }
+/* Modals */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 1000; display: none; align-items: flex-end; }
+.modal-overlay.active { display: flex; }
+.modal-box { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; max-width: 520px; margin: 0 auto; padding: 22px 18px; max-height: 92vh; overflow-y: auto; animation: slideUp .25s ease; }
+@media (min-width: 600px) { .modal-overlay { align-items: center; } .modal-box { border-radius: 20px; } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-box h3 { margin: 0 0 14px; color: var(--navy); font-size: 17px; text-align: center; font-weight: 800; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 2px solid var(--line); border-radius: 10px; font-family: inherit; font-size: 14px; background: #fafbfc; box-sizing: border-box; }
+.form-group textarea { resize: vertical; min-height: 80px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+.btn-save { flex: 1; background: var(--navy); color: #fff; padding: 13px; border-radius: 10px; font-weight: 800; font-size: 14.5px; }
+.btn-save:disabled { opacity: .6; cursor: wait; }
+.btn-cancel { flex: 1; background: #e9ecef; color: var(--muted); padding: 13px; border-radius: 10px; font-weight: 800; font-size: 14.5px; }
 
-    /* ===== شريط الرد والتعديل ===== */
-    .ctx {
-      display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-      background: #fff; border-top: 1px solid var(--line);
-      border-right: 3px solid var(--accent);
-    }
-    .ctx-icon { color: var(--accent); flex-shrink: 0; }
-    .ctx-body { flex: 1; min-width: 0; }
-    .ctx-title { font-size: 13px; font-weight: 700; color: var(--navy-2); }
-    .ctx-text {
-      font-size: 13px; color: var(--muted);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .ctx .icon-btn { color: var(--muted); width: 34px; height: 34px; }
+.notif-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 420px; background: var(--card); z-index: 99999; transform: translateX(100%); transition: transform .3s ease; display: flex; flex-direction: column; box-shadow: -4px 0 20px rgba(0,0,0,.15); }
+.notif-panel.active { transform: translateX(0); }
+.notif-header { background: var(--navy); color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+.notif-header h3 { margin: 0; font-size: 15px; }
+.notif-header button { background: transparent; color: #fff; font-size: 20px; padding: 4px 8px; }
+.notif-body { flex: 1; overflow-y: auto; padding: 12px; background: var(--bg); }
+.notif-item { background: var(--card); border-radius: 10px; padding: 12px; margin-bottom: 8px; border-right: 3px solid var(--line); cursor: pointer; transition: .15s; }
+.notif-item.unread { border-right-color: var(--accent); background: #fefaf0; }
+.notif-item .n-title { font-weight: 800; font-size: 13.5px; color: var(--navy); margin-bottom: 4px; }
+.notif-item .n-msg { font-size: 12.5px; color: var(--muted); line-height: 1.55; margin-bottom: 6px; }
+.notif-item .n-time { font-size: 10.5px; color: #8899aa; }
+.notif-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 99998; display: none; }
+.notif-overlay.active { display: block; }
 
-    /* ===== حقل الكتابة ===== */
-    .composer {
-      display: flex; align-items: flex-end; gap: 8px; padding: 10px 12px;
-      background: var(--soft); border-top: 1px solid var(--line); flex-shrink: 0;
-    }
-    .composer textarea {
-      flex: 1; min-width: 0; max-height: 140px; resize: none;
-      padding: 10px 14px; border: 1px solid var(--line); border-radius: 18px;
-      background: #fff; outline: none; line-height: 1.5;
-    }
-    .composer textarea:focus { border-color: var(--navy-2); }
-    .send {
-      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
-      display: grid; place-items: center; background: var(--navy); color: #fff;
-    }
-    .send.edit { background: var(--accent); }
+.empty-box { text-align: center; padding: 50px 20px; color: var(--muted); }
+.empty-box i { font-size: 44px; color: #cbd5e0; display: block; margin-bottom: 12px; }
+.empty-box h3 { margin: 0 0 4px; font-size: 15px; color: var(--navy); font-weight: 800; }
+.empty-box p { margin: 0; font-size: 13px; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--line); border-top-color: var(--navy); border-radius: 50%; animation: spin .8s linear infinite; margin: 20px auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.hide { display: none !important; }
 
-    /* ===== لوحة الخيارات ===== */
-    .overlay {
-      position: fixed; inset: 0; z-index: 40; background: rgba(15, 23, 42, .35);
-      opacity: 0; pointer-events: none; transition: opacity .2s;
-    }
-    .overlay.show { opacity: 1; pointer-events: auto; }
-    .sheet {
-      position: fixed; left: 0; right: 0; bottom: 0; z-index: 41;
-      max-width: 460px; margin: 0 auto; padding: 10px 14px calc(14px + env(safe-area-inset-bottom));
-      background: #fff; border-radius: 18px 18px 0 0; box-shadow: 0 -6px 24px rgba(0, 0, 0, .15);
-      transform: translateY(100%); transition: transform .2s ease;
-    }
-    .sheet.show { transform: none; }
-    .grip { width: 40px; height: 4px; border-radius: 4px; background: #d6d3cc; margin: 0 auto 10px; }
-    .emoji-row {
-      display: flex; justify-content: space-between; margin-bottom: 8px;
-      padding: 6px 8px; border-radius: 999px; background: var(--soft);
-    }
-    .emo { width: 44px; height: 44px; border-radius: 50%; font-size: 24px; }
-    .emo:active { transform: scale(.9); }
-    .act-list { display: flex; flex-direction: column; }
-    .act {
-      display: flex; align-items: center; gap: 12px; width: 100%;
-      padding: 13px 10px; border-radius: 10px; font-size: 15px; text-align: right;
-    }
-    .act:hover { background: var(--soft); }
-    .act i { width: 20px; text-align: center; color: var(--navy-2); }
-    .act.danger, .act.danger i { color: var(--danger); }
+.user-row { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; cursor: pointer; transition: .15s; }
+.user-row:hover { background: var(--line-soft); }
+.user-row .u-av { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg,#152741,#a8741a); color: #fff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+.user-row .u-av img { width: 100%; height: 100%; object-fit: cover; }
+.user-row .u-info { flex: 1; min-width: 0; }
+.user-row .u-name { font-weight: 800; color: var(--navy); font-size: 14px; }
+.user-row .u-sub { font-size: 12px; color: var(--muted); }
 
-    /* ===== الهاتف ===== */
-    @media (max-width: 899px) {
-      .app { grid-template-columns: 1fr; }
-      .main { display: none; }
-      .app.chat-open .side { display: none; }
-      .app.chat-open .main { display: flex; }
-      .back { display: inline-grid; }
-      .bubble { max-width: 84%; }
-    }
-
-    /* ===== الكمبيوتر ===== */
-    @media (min-width: 900px) {
-      .app { grid-template-columns: 360px 1fr; }
-      .main { display: flex; }
-      .app.chat-open .side { display: flex; }
-      .bubble { max-width: 560px; }
-    }
-  </style>
+.upload-progress { background: var(--navy); color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.upload-progress .bar { flex: 1; height: 4px; background: rgba(255,255,255,.3); border-radius: 2px; overflow: hidden; }
+.upload-progress .bar div { height: 100%; background: var(--accent); transition: width .2s; }
+</style>
 </head>
 <body>
-  <div class="app" id="app">
 
-    <aside class="side">
-      <header class="side-head">
-        <div class="side-title"><i class="fa-solid fa-comments"></i> الدردشات</div>
-        <div class="brand">CLEAR<span>NOTE</span></div>
-      </header>
+<div class="app">
+<aside class="nav-rail">
+  <div class="brand">C<span>N</span></div>
+  <button class="nav-rail-btn" onclick="window.location.href='app.html'"><i class="fas fa-home"></i><span>الرئيسية</span></button>
+  <button class="nav-rail-btn" onclick="window.location.href='app.html'"><i class="fas fa-book-open"></i><span>المحتوى</span></button>
+  <button class="nav-rail-btn active" onclick="window.location.href='chat.html'"><i class="fas fa-comments"></i><span>دردشات</span></button>
+  <button class="nav-rail-btn" onclick="window.location.href='app.html'"><i class="fas fa-clock"></i><span>مذاكرة</span></button>
+  <div style="flex:1;"></div>
+  <button class="nav-rail-btn" onclick="openNotifications()" title="الإشعارات"><i class="far fa-bell"></i><span>إشعارات</span><span class="badge" id="notifBadgeRail" style="display:none;">0</span></button>
+  <button class="nav-rail-btn" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>حسابي</span></button>
+</aside>
 
-      <div class="search">
-        <label class="search-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input id="search" type="search" placeholder="ابحث بالاسم أو اسم المستخدم أو الهاتف" autocomplete="off">
-        </label>
-      </div>
-
-      <div class="list" id="list"></div>
-    </aside>
-
-    <main class="main">
-      <div class="empty" id="empty">
-        <div><i class="fa-regular fa-comments"></i></div>
-        <div>ابحث عن شخص لبدء محادثة</div>
-      </div>
-
-      <section class="chat" id="chat" hidden>
-        <header class="chat-head">
-          <button class="icon-btn back" id="back" type="button" aria-label="رجوع">
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
-          <div id="headAv"></div>
-          <button class="head-name" id="headName" type="button"></button>
-        </header>
-
-        <div class="messages" id="messages">
-          <button class="load-more" id="loadMore" type="button" hidden>تحميل الرسائل الأقدم</button>
-        </div>
-
-        <div class="ctx" id="ctx" hidden>
-          <i class="ctx-icon" id="ctxIcon"></i>
-          <div class="ctx-body">
-            <div class="ctx-title" id="ctxTitle"></div>
-            <div class="ctx-text" id="ctxText"></div>
-          </div>
-          <button class="icon-btn" id="ctxClose" type="button" aria-label="إلغاء">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <form class="composer" id="composer">
-          <textarea id="input" rows="1" maxlength="2000" placeholder="اكتب رسالة..." autocomplete="off"></textarea>
-          <button class="send" id="send" type="submit" aria-label="إرسال">
-            <i class="fa-solid fa-paper-plane" id="sendIcon"></i>
-          </button>
-        </form>
-      </section>
-    </main>
+<aside class="filter-sidebar">
+  <div class="fs-header">
+    <div class="fs-title"><i class="fas fa-comments" style="color:var(--accent);"></i> الدردشات</div>
+    <button class="fs-new-btn" onclick="openNewChatModal()"><i class="fas fa-plus"></i></button>
   </div>
-
-  <div class="overlay" id="overlay"></div>
-  <div class="sheet" id="sheet">
-    <div class="grip"></div>
-    <div id="sheetBody"></div>
+  <div class="fs-search">
+    <div class="fs-search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" id="fsSearchInput" placeholder="ابحث..." oninput="onSearchInput(this.value)">
+    </div>
   </div>
+  <div class="fs-list" id="fsList">
+    <div class="fs-item active" data-filter="all" onclick="setFilter('all')"><i class="fas fa-comments"></i><span class="fs-label">الكل</span></div>
+    <div class="fs-item" data-filter="unread" onclick="setFilter('unread')"><i class="fas fa-envelope"></i><span class="fs-label">غير مقروء</span><span class="fs-badge" id="fsUnreadBadge" style="display:none;">0</span></div>
+    <div class="fs-item" data-filter="dm" onclick="setFilter('dm')"><i class="fas fa-user"></i><span class="fs-label">خاص</span></div>
+    <div class="fs-item" data-filter="group" onclick="setFilter('group')"><i class="fas fa-users"></i><span class="fs-label">جروبات</span></div>
+    <div class="fs-item" data-filter="channel" onclick="setFilter('channel')"><i class="fas fa-bullhorn"></i><span class="fs-label">قنوات</span></div>
+    <div class="fs-item" data-filter="study_room" onclick="setFilter('study_room')"><i class="fas fa-book-open"></i><span class="fs-label">مذاكرة</span></div>
+    <div class="fs-item" data-filter="requests" onclick="setFilter('requests')"><i class="fas fa-envelope-open"></i><span class="fs-label">طلبات المراسلة</span><span class="fs-badge" id="fsRequestsBadge" style="display:none;">0</span></div>
+  </div>
+</aside>
 
-  <script type="module">
-    import { auth, db, showToast } from './shared.js';
-    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-    import {
-      collection, doc, getDoc, getDocs, setDoc, updateDoc, writeBatch,
-      query, where, orderBy, limit, startAfter, onSnapshot, serverTimestamp, deleteField
-    } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+<div class="conv-sidebar">
+  <div class="conv-topbar">
+    <div class="brand">CLEAR<span>NOTE</span></div>
+    <div class="spacer"></div>
+    <button class="conv-topbar-btn" onclick="openNotifications()"><i class="far fa-bell"></i><span class="dot" id="notifDot"></span></button>
+    <div class="conv-topbar-avatar" id="topAvatar" onclick="window.location.href='profile.html'">U</div>
+  </div>
+  <div class="mobile-filters" id="mobileFilters">
+    <button class="mf-tab active" data-filter="all" onclick="setFilter('all')">الكل</button>
+    <button class="mf-tab" data-filter="unread" onclick="setFilter('unread')">غير مقروء</button>
+    <button class="mf-tab" data-filter="dm" onclick="setFilter('dm')">خاص</button>
+    <button class="mf-tab" data-filter="group" onclick="setFilter('group')">جروبات</button>
+    <button class="mf-tab" data-filter="channel" onclick="setFilter('channel')">قنوات</button>
+    <button class="mf-tab" data-filter="study_room" onclick="setFilter('study_room')">مذاكرة</button>
+    <button class="mf-tab" data-filter="requests" onclick="setFilter('requests')">طلبات</button>
+  </div>
+  <div class="conv-list" id="convList"><div class="spinner"></div></div>
+</div>
 
-    /* ============================================================
-       الإعدادات
-       ============================================================ */
-    const LOGIN_PAGE = 'index.html';
-    const PROFILE_PAGE = 'profile.html';   // يستقبل ?uid=
-    const PAGE_SIZE = 30;                  // حجم الصفحة للرسائل
-    const CHAT_LIST_LIMIT = 300;           // أقصى عدد محادثات في القائمة
-    const MAX_TEXT = 2000;
-    const EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+<button class="fab-new-chat" onclick="openNewChatModal()"><i class="fas fa-plus"></i></button>
 
-    /* ============================================================
-       العناصر والحالة
-       ============================================================ */
-    const $ = id => document.getElementById(id);
+<main class="main-area" id="mainArea">
+  <div class="empty-main" id="emptyState">
+    <i class="fas fa-comments"></i>
+    <h2>مرحباً بك في الدردشات</h2>
+    <p>اختر محادثة من القائمة لبدء المراسلة، أو أنشئ واحدة جديدة</p>
+  </div>
+  <div class="chat-room hide" id="chatRoom">
+    <div class="chat-header">
+      <button class="chat-back" onclick="closeRoom()"><i class="fas fa-arrow-right"></i></button>
+      <div class="chat-header-avatar" id="chatHeaderAvatar" onclick="goToUserProfile()"></div>
+      <div class="chat-header-body" onclick="openChatSettings()">
+        <div class="chat-header-title" id="chatHeaderTitle">المحادثة</div>
+        <div class="chat-header-sub" id="chatHeaderSub"></div>
+      </div>
+      <div class="chat-header-actions">
+        <button class="chat-action-btn" onclick="openChatMenu()"><i class="fas fa-ellipsis-v"></i></button>
+      </div>
+    </div>
+    <div class="pinned-bar hide" id="pinnedBar" onclick="scrollToPinnedMessage()">
+      <i class="fas fa-thumbtack"></i><span class="pinned-text" id="pinnedText"></span><i class="fas fa-chevron-down"></i>
+    </div>
+    <div class="messages-scroll" id="messagesScroll">
+      <div class="messages-inner" id="messagesInner"><div class="spinner"></div></div>
+    </div>
+    <div class="composer" id="composer">
+      <div class="reply-bar hide" id="replyBar"><span id="replyBarText"></span><button class="close" onclick="cancelReply()"><i class="fas fa-times"></i></button></div>
+      <div class="recording-bar" id="recordingBar">
+        <span class="red-dot"></span><span class="timer" id="recordingTimer">0:00</span><span class="info">جاري التسجيل...</span>
+        <button class="composer-btn" onclick="cancelVoiceRecording()" style="background:#fbeaea;color:var(--red);"><i class="fas fa-trash"></i></button>
+        <button class="composer-btn send" onclick="stopVoiceRecording(true)" style="background:var(--green);"><i class="fas fa-paper-plane"></i></button>
+      </div>
+      <div class="composer-inner">
+        <button class="composer-btn" onclick="toggleAttachMenu()"><i class="fas fa-paperclip"></i></button>
+        <textarea id="msgInput" placeholder="اكتب رسالة..." rows="1" oninput="onInputChange()" onkeydown="onInputKeyDown(event)"></textarea>
+        <button class="composer-btn" onclick="toggleEmojiPicker()"><i class="far fa-smile"></i></button>
+        <button class="composer-btn" id="sendBtn" onclick="sendTextMessage()" style="display:none;"><i class="fas fa-paper-plane"></i></button>
+        <button class="composer-btn" id="voiceBtn" onclick="startVoiceRecording()"><i class="fas fa-microphone"></i></button>
+      </div>
+      <div class="attach-menu" id="attachMenu">
+        <button class="attach-item photo" onclick="pickImage()"><i class="fas fa-image"></i>صورة</button>
+        <button class="attach-item file" onclick="pickFile()"><i class="fas fa-file"></i>ملف</button>
+        <button class="attach-item poll" onclick="openCreatePoll()"><i class="fas fa-poll"></i>استطلاع</button>
+        <button class="attach-item task" onclick="openCreateTask()"><i class="fas fa-tasks"></i>مهمة</button>
+      </div>
+      <div class="emoji-picker" id="emojiPicker"></div>
+    </div>
+  </div>
+</main>
 
-    const els = {
-      app: $('app'),
-      search: $('search'),
-      list: $('list'),
-      empty: $('empty'),
-      chat: $('chat'),
-      back: $('back'),
-      headAv: $('headAv'),
-      headName: $('headName'),
-      messages: $('messages'),
-      loadMore: $('loadMore'),
-      ctx: $('ctx'),
-      ctxIcon: $('ctxIcon'),
-      ctxTitle: $('ctxTitle'),
-      ctxText: $('ctxText'),
-      ctxClose: $('ctxClose'),
-      composer: $('composer'),
-      input: $('input'),
-      send: $('send'),
-      sendIcon: $('sendIcon'),
-      overlay: $('overlay'),
-      sheet: $('sheet'),
-      sheetBody: $('sheetBody')
+<nav class="mobile-bottom-nav">
+  <a href="app.html"><i class="fas fa-home"></i><span>الرئيسية</span></a>
+  <a href="app.html"><i class="fas fa-book-open"></i><span>المحتوى</span></a>
+  <button class="active" onclick="window.location.href='chat.html'"><i class="fas fa-comments"></i><span>دردشات</span></button>
+  <a href="app.html"><i class="fas fa-clock"></i><span>بومودورو</span></a>
+  <a href="profile.html"><i class="fas fa-user"></i><span>حسابي</span></a>
+</nav>
+</div>
+
+<div class="modal-overlay" id="newChatModal">
+  <div class="modal-box">
+    <h3>محادثة جديدة</h3>
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <button class="mf-tab active" data-new-type="dm" onclick="setNewChatType('dm')" style="flex:1;">مراسلة</button>
+      <button class="mf-tab" data-new-type="group" onclick="setNewChatType('group')" style="flex:1;">جروب</button>
+      <button class="mf-tab" data-new-type="channel" onclick="setNewChatType('channel')" style="flex:1;">قناة</button>
+      <button class="mf-tab" data-new-type="study_room" onclick="setNewChatType('study_room')" style="flex:1;">مذاكرة</button>
+    </div>
+    <div id="newChatBody"></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('newChatModal')">إلغاء</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="createPollModal">
+  <div class="modal-box">
+    <h3>استطلاع جديد</h3>
+    <div class="form-group"><label>السؤال</label><input type="text" id="pollQuestion"></div>
+    <div class="form-group"><label>الخيارات</label><div id="pollOptionsList"></div>
+      <button onclick="addPollOption()" style="width:100%;padding:8px;border:1.5px dashed var(--line);border-radius:8px;color:var(--muted);font-weight:700;font-size:12px;margin-top:4px;"><i class="fas fa-plus"></i> إضافة خيار</button>
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:14px;"><input type="checkbox" id="pollMulti"> اختيار متعدد</label>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('createPollModal')">إلغاء</button><button class="btn-save" onclick="submitPoll()">إنشاء</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="createTaskModal">
+  <div class="modal-box">
+    <h3>مهمة جديدة</h3>
+    <div class="form-group"><label>العنوان</label><input type="text" id="taskTitle"></div>
+    <div class="form-group"><label>الوصف</label><textarea id="taskDesc"></textarea></div>
+    <div class="form-group"><label>تاريخ الاستحقاق</label><input type="datetime-local" id="taskDue"></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('createTaskModal')">إلغاء</button><button class="btn-save" onclick="submitTask()">إنشاء</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="chatSettingsModal">
+  <div class="modal-box">
+    <h3>إعدادات المحادثة</h3>
+    <div id="chatSettingsBody"></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('chatSettingsModal')">إغلاق</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="chatMenuModal">
+  <div class="modal-box">
+    <h3>خيارات</h3>
+    <div id="chatMenuBody"></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('chatMenuModal')">إلغاء</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editMsgModal">
+  <div class="modal-box">
+    <h3>تعديل الرسالة</h3>
+    <div class="form-group"><textarea id="editMsgInput"></textarea></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('editMsgModal')">إلغاء</button><button class="btn-save" onclick="submitEditMessage()">حفظ</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pollVoteModal">
+  <div class="modal-box">
+    <h3 id="pollVoteTitle">صوّت</h3>
+    <div id="pollVoteBody"></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('pollVoteModal')">إلغاء</button><button class="btn-save" onclick="submitPollVote()">تصويت</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="imageViewerModal" onclick="if(event.target===this)closeModal('imageViewerModal')">
+  <div style="position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <img id="viewerImage" style="max-width:100%;max-height:100%;object-fit:contain;">
+  </div>
+</div>
+
+<div class="modal-overlay" id="joinPreviewModal">
+  <div class="modal-box"><div id="joinPreviewBody"></div></div>
+</div>
+
+<div class="notif-overlay" id="notifOverlay" onclick="closeNotifications()"></div>
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-header">
+    <h3><i class="fas fa-bell"></i> الإشعارات</h3>
+    <button onclick="closeNotifications()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="notif-body" id="notifBody"></div>
+</div>
+
+<input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageSelected(event)">
+<input type="file" id="fileInput" style="display:none;" onchange="handleFileSelected(event)">
+
+<script type="module">
+import {
+  db, auth, onAuth, goTo, showToast, signOutUser, getUserData,
+  listenUserConversations, listenConversation, listenConversationMembers,
+  listenMessages, listenMessageRequests, listenUserNotifications,
+  sendMessage, editMessage, deleteMessage, pinMessage, unpinMessage,
+  reactToMessage, markConversationRead, setMemberNotifMode, togglePinConversation,
+  createPoll, votePoll, createTask, completeTask,
+  createConversation, getOrCreateDM, acceptMessageRequest, rejectMessageRequest,
+  getMyMembership, getConversation, getConversationMembers,
+  joinConversation, leaveConversation, kickMember, updateMemberRole,
+  updateConversationSettings, createInviteLink, getInviteByCode, acceptInvite,
+  uploadChatImage, uploadChatFile, uploadVoice,
+  markNotificationRead, markAllNotificationsRead,
+  startStudySession, listenActiveSession, pauseStudySession, resumeStudySession, endStudySession,
+  escapeHtml, toDate, formatChatTime, getAvatarUrl,
+  CONVERSATION_TYPE_LABELS, MEMBER_ROLE_LABELS
+} from "./shared.js";
+import { doc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let currentUser = null;
+let currentUserData = null;
+let conversations = [];
+let currentFilter = 'all';
+let searchQuery = '';
+let activeConvId = null;
+let activeConv = null;
+let activeMembers = [];
+let messages = [];
+let currentMembership = null;
+let replyToMsg = null;
+let editingMsgId = null;
+let votingPollMsgId = null;
+let votingPollData = null;
+let selectedPollOptionIds = [];
+let unsubs = { conversations: null, messages: null, members: null, conv: null, session: null, requests: null };
+let notifUnsub = null;
+let userNotifs = [];
+let cachedUsers = {};
+let messageRequests = [];
+let mediaRecorder = null;
+let recordedChunks = [];
+let voiceTimerInterval = null;
+let voiceStartTime = 0;
+let pollOptionsCount = 0;
+let newChatType = 'dm';
+let membershipsCache = {};
+
+/* ===== Init ===== */
+onAuth(async (user, userData) => {
+  if (!user) { goTo('index.html'); return; }
+  currentUser = user;
+  currentUserData = userData;
+  if (!currentUserData) { showToast('خطأ في تحميل البيانات', 'error'); return; }
+
+  renderTopAvatar();
+  initEmojiPicker();
+  listenConversations();
+  listenRequests();
+  try {
+    notifUnsub = listenUserNotifications(user.uid, (notifs) => {
+      userNotifs = notifs;
+      updateNotifBadge();
+      renderNotifPanel();
+    });
+  } catch (e) { console.warn('notif listener failed:', e); }
+
+  route();
+  window.addEventListener('hashchange', route);
+});
+
+function renderTopAvatar() {
+  const el = document.getElementById('topAvatar');
+  if (currentUserData?.avatarUrl) el.innerHTML = `<img src="${getAvatarUrl(currentUserData.avatarUrl, 80)}">`;
+  else el.textContent = (currentUserData?.name || 'U').charAt(0).toUpperCase();
+}
+
+/* ===== Routing ===== */
+function route() {
+  const hash = location.hash || '#/';
+  if (hash === '#/' || hash === '') {
+    closeRoomInternal();
+    showEmptyState();
+  } else if (hash.startsWith('#/c/')) {
+    const convId = hash.replace('#/c/', '');
+    if (convId && convId !== activeConvId) openConversation(convId);
+  } else if (hash === '#/requests') {
+    closeRoomInternal();
+    currentFilter = 'requests';
+    updateFilterUI();
+    renderConversations();
+  } else if (hash.startsWith('#/join/')) {
+    const code = hash.replace('#/join/', '');
+    handleJoinPreview(code);
+  }
+}
+
+function showEmptyState() {
+  document.getElementById('emptyState').classList.remove('hide');
+  document.getElementById('chatRoom').classList.add('hide');
+  document.body.classList.remove('mobile-room-open');
+}
+
+/* ===== Join Preview ===== */
+async function handleJoinPreview(code) {
+  closeRoomInternal();
+  document.body.classList.remove('mobile-room-open');
+  document.getElementById('emptyState').classList.add('hide');
+  document.getElementById('chatRoom').classList.add('hide');
+  const body = document.getElementById('joinPreviewBody');
+  body.innerHTML = `<div class="spinner"></div>`;
+  document.getElementById('joinPreviewModal').classList.add('active');
+
+  try {
+    const invite = await getInviteByCode(code);
+    if (!invite) { showToast('رابط غير صالح', 'error'); closeModal('joinPreviewModal'); history.replaceState(null, '', '#/'); return; }
+    const conv = await getConversation(invite.convId);
+    if (!conv) { showToast('المحادثة غير موجودة', 'error'); closeModal('joinPreviewModal'); return; }
+    const avatarHtml = conv.avatarUrl ? `<img src="${getAvatarUrl(conv.avatarUrl, 200)}">` : (conv.name || 'C').charAt(0).toUpperCase();
+    const isAlready = conv.memberUids?.includes(currentUser.uid);
+
+    body.innerHTML = `
+      <div class="join-preview" style="padding:30px 20px;text-align:center;">
+        <div style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#152741,#a8741a);color:#fff;font-weight:800;font-size:36px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">${avatarHtml}</div>
+        <div style="font-size:22px;font-weight:800;color:var(--navy);margin-bottom:6px;">${escapeHtml(conv.name || 'محادثة')}</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:24px;">${CONVERSATION_TYPE_LABELS[conv.type] || ''} • ${conv.memberCount || 0} عضو</div>
+        <div style="display:flex;gap:10px;max-width:320px;margin:0 auto;">
+          <button class="btn-cancel" onclick="closeModal('joinPreviewModal');history.replaceState(null,'','#/')">إلغاء</button>
+          ${isAlready
+            ? `<button class="btn-save" onclick="openJoinedConv('${conv.id}')">فتح</button>`
+            : `<button class="btn-save" style="background:var(--green);" onclick="joinAndOpen('${code}', '${conv.id}')">انضمام</button>`}
+        </div>
+      </div>
+    `;
+  } catch (e) { showToast('حدث خطأ', 'error'); closeModal('joinPreviewModal'); }
+}
+
+window.openJoinedConv = (convId) => { closeModal('joinPreviewModal'); location.hash = `#/c/${convId}`; };
+window.joinAndOpen = async (code, convId) => {
+  try { await acceptInvite(code, currentUser.uid); showToast('تم الانضمام ✓'); closeModal('joinPreviewModal'); location.hash = `#/c/${convId}`; }
+  catch (e) { showToast(e.message || 'خطأ', 'error'); }
+};
+
+/* ===== Conversations ===== */
+function listenConversations() {
+  if (unsubs.conversations) unsubs.conversations();
+  try {
+    unsubs.conversations = listenUserConversations(currentUser.uid, (convs) => {
+      conversations = convs;
+      prefetchData(convs);
+      renderConversations();
+    });
+  } catch (e) { console.warn('convs listener failed:', e); }
+}
+
+async function prefetchData(convs) {
+  const needUsers = [], needMemberships = [];
+  convs.forEach(c => {
+    if (c.type === 'dm') {
+      const others = (c.memberUids || []).filter(u => u !== currentUser.uid);
+      others.forEach(u => { if (!cachedUsers[u]) needUsers.push(u); });
+    }
+    if (!membershipsCache[c.id]) needMemberships.push(c.id);
+  });
+
+  await Promise.all([
+    ...needUsers.map(async uid => { try { cachedUsers[uid] = await getUserData(uid); } catch (e) {} }),
+    ...needMemberships.map(async convId => { try { membershipsCache[convId] = await getMyMembership(convId, currentUser.uid); } catch (e) {} })
+  ]);
+  renderConversations();
+}
+
+window.setFilter = (f) => {
+  currentFilter = f;
+  updateFilterUI();
+  renderConversations();
+  if (history.location.hash === '#/requests' && f !== 'requests') history.replaceState(null, '', '#/');
+};
+
+function updateFilterUI() {
+  document.querySelectorAll('.fs-item').forEach(t => t.classList.toggle('active', t.dataset.filter === currentFilter));
+  document.querySelectorAll('.mf-tab[data-filter]').forEach(t => t.classList.toggle('active', t.dataset.filter === currentFilter));
+  const unreadCount = conversations.filter(c => isUnread(c)).length;
+  const ub1 = document.getElementById('fsUnreadBadge');
+  if (ub1) { ub1.style.display = unreadCount > 0 ? 'inline-block' : 'none'; ub1.textContent = unreadCount > 9 ? '9+' : unreadCount; }
+  const rb = document.getElementById('fsRequestsBadge');
+  if (rb) { rb.style.display = messageRequests.length > 0 ? 'inline-block' : 'none'; rb.textContent = messageRequests.length > 9 ? '9+' : messageRequests.length; }
+}
+
+function isUnread(conv) {
+  const mem = membershipsCache[conv.id];
+  if (!mem || !mem.lastReadAt) return (conv.lastMessageAt ? true : false);
+  const lastMsg = toDate(conv.lastMessageAt);
+  const lastRead = toDate(mem.lastReadAt);
+  return lastMsg && (!lastRead || lastMsg > lastRead);
+}
+
+window.onSearchInput = (val) => { searchQuery = val.trim().toLowerCase(); renderConversations(); };
+
+function renderConversations() {
+  const list = document.getElementById('convList');
+  updateFilterUI();
+  if (currentFilter === 'requests') { renderMessageRequests(list); return; }
+
+  let filtered = [...conversations];
+  if (currentFilter === 'unread') filtered = filtered.filter(c => isUnread(c));
+  else if (currentFilter !== 'all') filtered = filtered.filter(c => c.type === currentFilter);
+  if (searchQuery) filtered = filtered.filter(c => getConvDisplayName(c).toLowerCase().includes(searchQuery));
+
+  filtered.sort((a, b) => {
+    const ap = membershipsCache[a.id]?.isPinned ? 1 : 0;
+    const bp = membershipsCache[b.id]?.isPinned ? 1 : 0;
+    if (ap !== bp) return bp - ap;
+    return (toDate(b.lastMessageAt)?.getTime() || 0) - (toDate(a.lastMessageAt)?.getTime() || 0);
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-box"><i class="fas fa-comments"></i><h3>لا توجد محادثات</h3><p>${searchQuery ? 'لا نتائج للبحث' : 'ابدأ محادثة من زر +'}</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(c => renderConvItem(c)).join('');
+}
+
+function renderConvItem(conv) {
+  const name = getConvDisplayName(conv);
+  const avatar = getConvAvatar(conv);
+  const preview = conv.lastMessagePreview || 'لا توجد رسائل';
+  const timeStr = formatChatTime(conv.lastMessageAt);
+  const unread = isUnread(conv);
+  const isPinned = membershipsCache[conv.id]?.isPinned;
+  const typeIcon = conv.type === 'channel' ? 'fa-bullhorn' : conv.type === 'group' ? 'fa-users' : conv.type === 'study_room' ? 'fa-book-open' : '';
+  const typeIconClass = conv.type === 'channel' ? 'channel' : conv.type === 'group' ? 'group' : conv.type === 'study_room' ? 'study_room' : '';
+
+  return `<div class="conv-item ${unread ? 'unread' : ''} ${conv.id === activeConvId ? 'active' : ''}" onclick="location.hash='#/c/${conv.id}'">
+    <div class="conv-avatar">${avatar ? `<img src="${avatar}">` : name.charAt(0).toUpperCase()}${typeIcon ? `<div class="type-icon ${typeIconClass}"><i class="fas ${typeIcon}"></i></div>` : ''}</div>
+    <div class="conv-body">
+      <div class="conv-top">
+        <div class="conv-name">${isPinned ? '<i class="fas fa-thumbtack conv-pinned"></i> ' : ''}${escapeHtml(name)}</div>
+        <div class="conv-time">${timeStr}</div>
+      </div>
+      <div class="conv-bottom">
+        <div class="conv-preview">${escapeHtml(preview)}</div>
+        ${unread ? '<div class="conv-badge">جديد</div>' : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function getConvDisplayName(conv) {
+  if (conv.type === 'dm') {
+    const other = (conv.memberUids || []).find(u => u !== currentUser.uid);
+    return cachedUsers[other]?.name || 'مستخدم';
+  }
+  return conv.name || CONVERSATION_TYPE_LABELS[conv.type] || 'محادثة';
+}
+
+function getConvAvatar(conv) {
+  if (conv.type === 'dm') {
+    const other = (conv.memberUids || []).find(u => u !== currentUser.uid);
+    const u = cachedUsers[other];
+    return u?.avatarUrl ? getAvatarUrl(u.avatarUrl, 100) : null;
+  }
+  return conv.avatarUrl ? getAvatarUrl(conv.avatarUrl, 100) : null;
+}
+
+/* ===== Message Requests ===== */
+function listenRequests() {
+  if (unsubs.requests) unsubs.requests();
+  try {
+    unsubs.requests = listenMessageRequests(currentUser.uid, (reqs) => {
+      messageRequests = reqs;
+      updateFilterUI();
+      if (currentFilter === 'requests') renderConversations();
+    });
+  } catch (e) { console.warn('requests listener:', e); }
+}
+
+function renderMessageRequests(container) {
+  if (messageRequests.length === 0) {
+    container.innerHTML = `<div class="empty-box"><i class="fas fa-envelope-open"></i><h3>لا توجد طلبات</h3><p>ستظهر هنا طلبات المراسلة الجديدة</p></div>`;
+    return;
+  }
+  container.innerHTML = messageRequests.map(req => `
+    <div class="conv-item" style="flex-direction:column;align-items:stretch;">
+      <div style="display:flex;gap:12px;align-items:center;">
+        <div class="conv-avatar">${req.fromAvatarUrl ? `<img src="${getAvatarUrl(req.fromAvatarUrl,100)}">` : (req.fromName || 'U').charAt(0).toUpperCase()}</div>
+        <div style="flex:1;">
+          <div style="font-weight:800;color:var(--navy);">${escapeHtml(req.fromName || 'مستخدم')}</div>
+          <div style="font-size:12px;color:var(--muted);">يريد مراسلتك</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button onclick="handleAcceptRequest('${req.id}')" style="flex:1;padding:8px;border-radius:8px;background:var(--green);color:#fff;font-weight:800;font-size:12px;"><i class="fas fa-check"></i> قبول</button>
+        <button onclick="handleRejectRequest('${req.id}')" style="flex:1;padding:8px;border-radius:8px;background:#fbeaea;color:var(--red);font-weight:800;font-size:12px;"><i class="fas fa-times"></i> رفض</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.handleAcceptRequest = async (reqId) => {
+  try { const convId = await acceptMessageRequest(reqId, currentUser.uid); showToast('تم القبول'); location.hash = `#/c/${convId}`; }
+  catch (e) { showToast(e.message || 'خطأ', 'error'); }
+};
+window.handleRejectRequest = async (reqId) => {
+  try { await rejectMessageRequest(reqId, currentUser.uid); showToast('تم الرفض'); }
+  catch (e) { showToast(e.message || 'خطأ', 'error'); }
+};
+
+/* ===== Open Conversation ===== */
+async function openConversation(convId) {
+  activeConvId = convId;
+  document.getElementById('emptyState').classList.add('hide');
+  document.getElementById('chatRoom').classList.remove('hide');
+  document.body.classList.add('mobile-room-open');
+
+  Object.keys(unsubs).forEach(k => {
+    if (k === 'conversations' || k === 'requests') return;
+    if (unsubs[k]) { try { unsubs[k](); } catch (e) {} unsubs[k] = null; }
+  });
+
+  try {
+    activeConv = await getConversation(convId);
+    if (!activeConv) { showToast('محادثة غير موجودة', 'error'); history.replaceState(null, '', '#/'); closeRoomInternal(); return; }
+    currentMembership = await getMyMembership(convId, currentUser.uid);
+    if (!currentMembership) { showToast('أنت لست عضواً', 'error'); history.replaceState(null, '', '#/'); closeRoomInternal(); return; }
+  } catch (e) { showToast('خطأ في التحميل', 'error'); return; }
+
+  renderChatHeader();
+
+  unsubs.conv = listenConversation(convId, (conv) => { if (conv) { activeConv = conv; renderChatHeader(); } });
+  unsubs.members = listenConversationMembers(convId, (mems) => { activeMembers = mems; renderChatHeader(); });
+  unsubs.messages = listenMessages(convId, (msgs) => {
+    messages = msgs;
+    renderMessages();
+    markConversationRead(convId, currentUser.uid).catch(() => {});
+    membershipsCache[convId] = { ...currentMembership, lastReadAt: new Date() };
+  });
+
+  if (activeConv.type === 'study_room') {
+    unsubs.session = listenActiveSession(convId, (session) => renderSessionWidget(session));
+  }
+
+  await loadParticipantsData(activeMembers.map(m => m.id));
+  document.getElementById('msgInput').focus();
+}
+
+async function loadParticipantsData(uids) {
+  const need = uids.filter(u => !cachedUsers[u]);
+  if (need.length === 0) return;
+  await Promise.all(need.map(async uid => { try { cachedUsers[uid] = await getUserData(uid); } catch (e) {} }));
+}
+
+function closeRoomInternal() {
+  activeConvId = null;
+  activeConv = null;
+  activeMembers = [];
+  messages = [];
+  currentMembership = null;
+  Object.keys(unsubs).forEach(k => {
+    if (k === 'conversations' || k === 'requests') return;
+    if (unsubs[k]) { try { unsubs[k](); } catch (e) {} unsubs[k] = null; }
+  });
+  document.body.classList.remove('mobile-room-open');
+}
+
+window.closeRoom = () => { history.replaceState(null, '', '#/'); closeRoomInternal(); showEmptyState(); renderConversations(); };
+
+function renderChatHeader() {
+  if (!activeConv) return;
+  const name = getConvDisplayName(activeConv);
+  const avatar = getConvAvatar(activeConv);
+  const el = document.getElementById('chatHeaderAvatar');
+  if (avatar) el.innerHTML = `<img src="${avatar}">`;
+  else el.textContent = name.charAt(0).toUpperCase();
+  document.getElementById('chatHeaderTitle').textContent = name;
+  let sub = '';
+  if (activeConv.type === 'dm') sub = 'متصل مؤخراً';
+  else {
+    const memberCount = activeConv.memberCount || activeMembers.length;
+    if (activeConv.type === 'channel') sub = `قناة • ${memberCount} مشترك`;
+    else if (activeConv.type === 'study_room') sub = `غرفة مذاكرة • ${memberCount} عضو`;
+    else sub = `${memberCount} عضو`;
+  }
+  document.getElementById('chatHeaderSub').textContent = sub;
+}
+
+window.goToUserProfile = () => {
+  if (!activeConv) return;
+  if (activeConv.type === 'dm') {
+    const other = (activeConv.memberUids || []).find(u => u !== currentUser.uid);
+    if (other) window.location.href = `profile.html?uid=${other}`;
+  } else { openChatSettings(); }
+};
+
+window.goToUserProfileById = (uid) => { if (uid && uid !== currentUser.uid) window.location.href = `profile.html?uid=${uid}`; };
+
+/* ===== Messages ===== */
+function renderMessages() {
+  const inner = document.getElementById('messagesInner');
+  if (messages.length === 0) {
+    inner.innerHTML = `<div class="empty-box" style="padding:30px;"><i class="fas fa-comment"></i><h3>ابدأ المحادثة</h3><p>أرسل أول رسالة</p></div>`;
+    updatePinnedBar();
+    return;
+  }
+  const wasAtBottom = isNearBottom();
+  let html = '';
+  let prevMsg = null;
+
+  messages.forEach((msg) => {
+    const isMine = msg.senderUid === currentUser.uid;
+    const isCont = prevMsg && prevMsg.senderUid === msg.senderUid && (toDate(msg.createdAt)?.getTime() - toDate(prevMsg.createdAt)?.getTime() < 5*60000);
+    html += renderMessage(msg, isMine, isCont);
+    prevMsg = msg;
+  });
+
+  inner.innerHTML = html;
+  if (wasAtBottom) scrollToBottom();
+  updatePinnedBar();
+  inner.querySelectorAll('[data-action]').forEach(el => {
+    el.onclick = (e) => { e.stopPropagation(); handleMsgAction(el.dataset.action, el.dataset.msgid); };
+  });
+}
+
+function renderMessage(msg, isMine, isCont) {
+  if (msg.isDeleted) return `<div class="msg-row ${isMine ? 'mine' : ''}"><div class="msg-avatar hidden"></div><div class="msg-content"><div class="msg-bubble deleted">تم حذف هذه الرسالة</div></div></div>`;
+
+  const sender = cachedUsers[msg.senderUid];
+  const senderName = sender?.name || msg.senderName || 'مستخدم';
+  const senderAvatar = sender?.avatarUrl ? getAvatarUrl(sender.avatarUrl, 64) : null;
+  const timeStr = (toDate(msg.createdAt)?.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })) || '';
+  const isConvAdmin = currentMembership?.role === 'owner' || currentMembership?.role === 'admin';
+  const canEdit = isMine && !msg.isDeleted;
+  const canDelete = isMine || isConvAdmin;
+  const canPin = isConvAdmin;
+
+  let bubbleContent = '';
+  if (msg.replyTo) bubbleContent += `<div class="msg-reply-preview"><div class="sender">${escapeHtml(msg.replyTo.senderName || 'مستخدم')}</div><div>${escapeHtml((msg.replyTo.content || '').slice(0, 80))}</div></div>`;
+
+  switch (msg.type) {
+    case 'text': bubbleContent += `<div>${escapeHtml(msg.content).replace(/\n/g, '<br>')}${msg.isEdited ? ' <span class="edited">(عُدِّلت)</span>' : ''}</div>`; break;
+    case 'image': bubbleContent += `<div class="msg-media"><img src="${msg.media?.url || ''}" onclick="openImageViewer('${msg.media?.url || ''}')" loading="lazy"></div>`; if (msg.content) bubbleContent += `<div style="margin-top:6px;">${escapeHtml(msg.content)}</div>`; break;
+    case 'file': bubbleContent += `<a href="${msg.media?.url || '#'}" target="_blank" rel="noopener" class="msg-file"><i class="fas fa-file"></i><div class="msg-file-info"><div class="msg-file-name">${escapeHtml(msg.media?.fileName || 'ملف')}</div><div class="msg-file-size">${formatFileSize(msg.media?.fileSize)}</div></div></a>`; break;
+    case 'voice': bubbleContent += `<div class="msg-voice"><audio src="${msg.media?.url || ''}" controls preload="metadata"></audio><span class="duration">${formatDuration(msg.media?.duration || 0)}</span></div>`; break;
+    case 'poll': bubbleContent += renderPollBubble(msg); break;
+    case 'task': bubbleContent += renderTaskBubble(msg); break;
+    default: bubbleContent += `<div>${escapeHtml(msg.content || '')}</div>`;
+  }
+
+  const reactionsHtml = msg.reactions && Object.keys(msg.reactions).length > 0 ? `<div class="msg-reactions">${Object.entries(msg.reactions).map(([emoji, uids]) => `<span class="reaction-chip ${uids.includes(currentUser.uid) ? 'mine' : ''}" onclick="toggleReaction('${msg.id}','${emoji}')">${emoji} ${uids.length}</span>`).join('')}</div>` : '';
+  const actionsHtml = `<div class="msg-actions">
+    <button class="msg-action-btn" data-action="react" data-msgid="${msg.id}"><i class="far fa-smile"></i></button>
+    <button class="msg-action-btn" data-action="reply" data-msgid="${msg.id}"><i class="fas fa-reply"></i></button>
+    ${canEdit ? `<button class="msg-action-btn" data-action="edit" data-msgid="${msg.id}"><i class="fas fa-edit"></i></button>` : ''}
+    ${canPin ? `<button class="msg-action-btn" data-action="pin" data-msgid="${msg.id}"><i class="fas fa-thumbtack"></i></button>` : ''}
+    ${canDelete ? `<button class="msg-action-btn danger" data-action="delete" data-msgid="${msg.id}"><i class="fas fa-trash"></i></button>` : ''}
+  </div>`;
+
+  return `<div class="msg-row ${isMine ? 'mine' : ''} ${isCont ? 'cont' : 'space'}">
+    <div class="msg-avatar ${isCont ? 'hidden' : ''}" onclick="goToUserProfileById('${msg.senderUid}')">${senderAvatar ? `<img src="${senderAvatar}">` : (senderName || 'U').charAt(0).toUpperCase()}</div>
+    <div class="msg-content" style="position:relative;">
+      ${!isCont && !isMine ? `<div class="msg-sender">${escapeHtml(senderName)}</div>` : ''}
+      <div class="msg-bubble" style="position:relative;">${bubbleContent}</div>
+      ${reactionsHtml}
+      <div class="msg-meta"><span>${timeStr}</span>${isMine ? '<i class="fas fa-check-double check"></i>' : ''}</div>
+      ${actionsHtml}
+    </div>
+  </div>`;
+}
+
+function renderPollBubble(msg) {
+  const poll = msg.poll;
+  if (!poll) return '';
+  const totalVotes = poll.totalVotes || 0;
+  const myVoted = poll.options.some(o => o.votes?.includes(currentUser.uid));
+  const opts = poll.options.map(o => {
+    const count = o.votes?.length || 0;
+    const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+    const voted = o.votes?.includes(currentUser.uid);
+    return `<div class="poll-option ${voted ? 'voted' : ''}" onclick="openPollVote('${msg.id}')"><div class="bar" style="width:${pct}%;"></div><div class="content"><span>${escapeHtml(o.text)}</span><span style="font-size:11px;color:var(--muted);">${pct}% (${count})</span></div></div>`;
+  }).join('');
+  return `<div class="msg-poll"><div class="poll-question">${escapeHtml(poll.question)}</div>${opts}<div class="poll-meta">${totalVotes} صوت • ${myVoted ? '✓ صوّت' : 'اضغط للتصويت'}</div></div>`;
+}
+
+function renderTaskBubble(msg) {
+  const task = msg.task;
+  if (!task) return '';
+  const completions = task.completions?.length || 0;
+  const total = activeMembers.length || 1;
+  const pct = Math.round((completions / total) * 100);
+  const iCompleted = (task.completions || []).some(c => c.uid === currentUser.uid);
+  const dueStr = task.dueAt ? new Date(task.dueAt).toLocaleString('ar-EG', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+  return `<div class="msg-task"><div class="task-title">✅ ${escapeHtml(task.title)}</div>${task.description ? `<div class="task-desc">${escapeHtml(task.description)}</div>` : ''}${dueStr ? `<div class="task-due"><i class="fas fa-clock"></i> ${dueStr}</div>` : ''}<div class="task-progress"><div class="task-progress-bar"><div style="width:${pct}%;"></div></div><span>${completions}/${total}</span></div><button class="task-complete-btn ${iCompleted ? 'done' : ''}" onclick="markTaskComplete('${msg.id}')">${iCompleted ? '✓ أنجزت' : 'علّم كمنجز'}</button></div>`;
+}
+
+function isNearBottom() { const s = document.getElementById('messagesScroll'); return s.scrollHeight - s.scrollTop - s.clientHeight < 150; }
+function scrollToBottom() { const s = document.getElementById('messagesScroll'); s.scrollTop = s.scrollHeight; }
+
+/* ===== Message Actions ===== */
+window.handleMsgAction = (action, msgId) => {
+  const msg = messages.find(m => m.id === msgId);
+  if (!msg) return;
+  switch (action) {
+    case 'reply': startReply(msg); break;
+    case 'edit': openEditMessage(msg); break;
+    case 'delete': confirmDeleteMessage(msg); break;
+    case 'pin': togglePin(msg); break;
+    case 'react': openReactionPicker(msg); break;
+  }
+};
+
+function startReply(msg) {
+  replyToMsg = msg;
+  document.getElementById('replyBarText').innerHTML = `<strong>${escapeHtml(cachedUsers[msg.senderUid]?.name || msg.senderName || 'مستخدم')}</strong>: ${escapeHtml((msg.content || 'رسالة').slice(0, 60))}`;
+  document.getElementById('replyBar').classList.remove('hide');
+  document.getElementById('msgInput').focus();
+}
+window.cancelReply = () => { replyToMsg = null; document.getElementById('replyBar').classList.add('hide'); };
+window.openEditMessage = (msg) => { editingMsgId = msg.id; document.getElementById('editMsgInput').value = msg.content || ''; document.getElementById('editMsgModal').classList.add('active'); };
+window.submitEditMessage = async () => {
+  const val = document.getElementById('editMsgInput').value.trim();
+  if (!val) return;
+  try { await editMessage(activeConvId, editingMsgId, val); closeModal('editMsgModal'); showToast('تم التعديل ✓'); } catch (e) { showToast('خطأ', 'error'); }
+};
+window.confirmDeleteMessage = async (msg) => { if (!confirm('حذف الرسالة؟')) return; try { await deleteMessage(activeConvId, msg.id, false); showToast('تم الحذف'); } catch (e) { showToast('خطأ', 'error'); } };
+window.togglePin = async (msg) => { try { if (msg.isPinned) { await unpinMessage(activeConvId, msg.id); showToast('تم إلغاء التثبيت'); } else { await pinMessage(activeConvId, msg.id); showToast('تم التثبيت'); } } catch (e) { showToast(e.message || 'خطأ', 'error'); } };
+window.toggleReaction = async (msgId, emoji) => { try { await reactToMessage(activeConvId, msgId, emoji, currentUser.uid); } catch (e) { showToast('خطأ', 'error'); } };
+window.openReactionPicker = (msg) => { const emojis = ['❤️', '👍', '😂', '🔥', '👏', '😮', '😢', '🎉']; const choice = prompt('اختر تفاعل:\n' + emojis.join(' '), '❤️'); if (choice) toggleReaction(msg.id, choice.trim()); };
+
+/* ===== Poll Vote ===== */
+window.openPollVote = (msgId) => {
+  const msg = messages.find(m => m.id === msgId);
+  if (!msg || !msg.poll) return;
+  if (msg.poll.closedAt) { showToast('الاستطلاع مغلق', 'error'); return; }
+  votingPollMsgId = msgId; votingPollData = msg.poll; selectedPollOptionIds = [];
+  const myVote = msg.poll.options.find(o => o.votes?.includes(currentUser.uid));
+  if (myVote) selectedPollOptionIds = [myVote.id];
+  document.getElementById('pollVoteTitle').textContent = msg.poll.question;
+  document.getElementById('pollVoteBody').innerHTML = msg.poll.options.map(o => {
+    const checked = selectedPollOptionIds.includes(o.id);
+    return `<label style="display:flex;align-items:center;gap:10px;padding:12px;border:2px solid ${checked ? 'var(--navy)' : 'var(--line)'};border-radius:10px;margin-bottom:8px;cursor:pointer;"><input type="${msg.poll.multiChoice ? 'checkbox' : 'radio'}" name="pollopt" value="${o.id}" ${checked ? 'checked' : ''} onchange="onPollVoteChange(this)"><span style="flex:1;font-weight:700;">${escapeHtml(o.text)}</span></label>`;
+  }).join('');
+  document.getElementById('pollVoteModal').classList.add('active');
+};
+window.onPollVoteChange = (input) => {
+  if (!votingPollData.multiChoice) {
+    selectedPollOptionIds = [input.value];
+    document.querySelectorAll('#pollVoteBody label').forEach(l => l.style.borderColor = 'var(--line)');
+    input.closest('label').style.borderColor = 'var(--navy)';
+  } else {
+    if (input.checked) selectedPollOptionIds.push(input.value);
+    else selectedPollOptionIds = selectedPollOptionIds.filter(id => id !== input.value);
+    input.closest('label').style.borderColor = input.checked ? 'var(--navy)' : 'var(--line)';
+  }
+};
+window.submitPollVote = async () => {
+  if (selectedPollOptionIds.length === 0) { showToast('اختر خياراً', 'error'); return; }
+  try { await votePoll(activeConvId, votingPollMsgId, selectedPollOptionIds, currentUser.uid); closeModal('pollVoteModal'); showToast('تم التصويت ✓'); } catch (e) { showToast(e.message || 'خطأ', 'error'); }
+};
+window.markTaskComplete = async (msgId) => { try { await completeTask(activeConvId, msgId, currentUser.uid); showToast('أنجزت المهمة ✓'); } catch (e) { showToast('خطأ', 'error'); } };
+
+/* ===== Composer ===== */
+function onInputChange() {
+  const input = document.getElementById('msgInput');
+  const hasText = input.value.trim().length > 0;
+  document.getElementById('sendBtn').style.display = hasText ? 'flex' : 'none';
+  document.getElementById('voiceBtn').style.display = hasText ? 'none' : 'flex';
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+}
+
+function onInputKeyDown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendTextMessage(); } }
+
+window.sendTextMessage = async () => {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text || !activeConvId) return;
+  input.value = '';
+  onInputChange();
+  try {
+    await sendMessage(activeConvId, { type: 'text', content: text, replyTo: replyToMsg ? { msgId: replyToMsg.id, senderName: cachedUsers[replyToMsg.senderUid]?.name || replyToMsg.senderName, content: replyToMsg.content } : null });
+    cancelReply();
+    scrollToBottom();
+  } catch (e) { showToast('خطأ في الإرسال', 'error'); }
+};
+
+window.toggleAttachMenu = () => { document.getElementById('attachMenu').classList.toggle('show'); document.getElementById('emojiPicker').classList.remove('show'); };
+window.toggleEmojiPicker = () => { document.getElementById('emojiPicker').classList.toggle('show'); document.getElementById('attachMenu').classList.remove('show'); };
+
+function initEmojiPicker() {
+  const emojis = ['😀','😁','😂','🤣','😊','😍','😘','😎','🤔','😅','😭','😡','🥳','🤩','😴','👍','👎','👏','🙌','🙏','❤️','💔','🔥','✨','💯','🎉','🎊','⚡','🌟','💪','🎯','📚','✏️','📝','💡','🎓','🏆','☕','🍕','🌙'];
+  document.getElementById('emojiPicker').innerHTML = emojis.map(e => `<button class="emoji-btn" onclick="insertEmoji('${e}')">${e}</button>`).join('');
+}
+
+window.insertEmoji = (emoji) => { const input = document.getElementById('msgInput'); input.value += emoji; input.focus(); onInputChange(); document.getElementById('emojiPicker').classList.remove('show'); };
+
+/* ===== Image / File ===== */
+window.pickImage = () => { document.getElementById('imageInput').click(); document.getElementById('attachMenu').classList.remove('show'); };
+window.pickFile = () => { document.getElementById('fileInput').click(); document.getElementById('attachMenu').classList.remove('show'); };
+
+window.handleImageSelected = async (e) => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file || !activeConvId) return;
+  if (file.size > 10 * 1024 * 1024) { showToast('الحد 10 ميجا', 'error'); return; }
+  showUploadProgress('جاري رفع الصورة...');
+  try { const url = await uploadChatImage(file); await sendMessage(activeConvId, { type: 'image', content: '', media: { url, fileName: file.name, fileSize: file.size, mimeType: file.type } }); hideUploadProgress(); scrollToBottom(); } catch (e) { showToast(e.message || 'فشل الرفع', 'error'); hideUploadProgress(); }
+};
+
+window.handleFileSelected = async (e) => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file || !activeConvId) return;
+  if (file.size > 10 * 1024 * 1024) { showToast('الحد 10 ميجا', 'error'); return; }
+  showUploadProgress('جاري رفع الملف...');
+  try { const url = await uploadChatFile(file); await sendMessage(activeConvId, { type: 'file', content: '', media: { url, fileName: file.name, fileSize: file.size, mimeType: file.type } }); hideUploadProgress(); scrollToBottom(); } catch (e) { showToast(e.message || 'فشل الرفع', 'error'); hideUploadProgress(); }
+};
+
+function showUploadProgress(msg) {
+  const existing = document.getElementById('uploadProg'); if (existing) existing.remove();
+  const div = document.createElement('div'); div.id = 'uploadProg'; div.className = 'upload-progress'; div.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${msg}`;
+  document.getElementById('composer').appendChild(div);
+}
+function hideUploadProgress() { const el = document.getElementById('uploadProg'); if (el) el.remove(); }
+
+/* ===== Voice ===== */
+window.startVoiceRecording = async () => {
+  if (!navigator.mediaDevices || !window.MediaRecorder) { showToast('التسجيل غير مدعوم', 'error'); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream); recordedChunks = [];
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+    mediaRecorder.start(); voiceStartTime = Date.now();
+    document.getElementById('recordingBar').classList.add('show');
+    document.getElementById('composer').querySelector('.composer-inner').style.display = 'none';
+    voiceTimerInterval = setInterval(() => {
+      const secs = Math.floor((Date.now() - voiceStartTime) / 1000);
+      document.getElementById('recordingTimer').textContent = `${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}`;
+      if (secs >= 300) stopVoiceRecording(true);
+    }, 500);
+  } catch (e) { showToast('تعذر بدء التسجيل', 'error'); }
+};
+window.cancelVoiceRecording = () => {
+  if (mediaRecorder) { mediaRecorder.stop(); mediaRecorder.stream.getTracks().forEach(t => t.stop()); mediaRecorder = null; }
+  recordedChunks = []; clearInterval(voiceTimerInterval);
+  document.getElementById('recordingBar').classList.remove('show');
+  document.getElementById('composer').querySelector('.composer-inner').style.display = 'flex';
+};
+window.stopVoiceRecording = async (send) => {
+  if (!mediaRecorder) return;
+  const duration = Math.floor((Date.now() - voiceStartTime) / 1000);
+  const recorder = mediaRecorder; const stream = recorder.stream;
+  return new Promise((resolve) => {
+    recorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop()); clearInterval(voiceTimerInterval);
+      document.getElementById('recordingBar').classList.remove('show');
+      document.getElementById('composer').querySelector('.composer-inner').style.display = 'flex';
+      if (!send || recordedChunks.length === 0 || duration < 1) { recordedChunks = []; mediaRecorder = null; resolve(); return; }
+      const blob = new Blob(recordedChunks, { type: recorder.mimeType || 'audio/webm' });
+      recordedChunks = []; mediaRecorder = null;
+      showUploadProgress('جاري رفع الرسالة الصوتية...');
+      try { const url = await uploadVoice(blob); await sendMessage(activeConvId, { type: 'voice', content: '', media: { url, duration, fileName: 'voice.webm', fileSize: blob.size, mimeType: blob.type } }); hideUploadProgress(); scrollToBottom(); } catch (e) { showToast('فشل الرفع', 'error'); hideUploadProgress(); }
+      resolve();
     };
-
-    const S = {
-      me: null,
-      chats: new Map(),        // chatId -> بيانات المحادثة
-      listRows: new Map(),     // chatId -> عنصر الصف (لإعادة الاستخدام)
-      users: new Map(),        // uid -> بيانات المستخدم (كاش)
-      userPending: new Map(),  // uid -> Promise (منع تكرار الطلب)
-      searching: false,
-      searchToken: 0,
-      searchTimer: null,
-      active: null,            // { id, otherUid, exists }
-      openToken: 0,
-      unsubChats: null,
-      unsubMsgs: null,
-      msgChatId: null,
-      msgs: new Map(),         // msgId -> { id, t, data, node }
-      order: [],               // الرسائل مرتبة تصاعدياً حسب الوقت
-      oldestCursor: null,      // أقدم وثيقة محمّلة (لصفحات الأقدم)
-      hasMore: false,
-      msgReady: false,
-      loadingOlder: false,
-      reply: null,             // { id, senderUid, name, text }
-      editId: null             // معرّف الرسالة قيد التعديل
-    };
-
-    /* ============================================================
-       أدوات مساعدة
-       ============================================================ */
-    function el(tag, cls, text) {
-      const node = document.createElement(tag);
-      if (cls) node.className = cls;
-      if (text !== undefined && text !== null) node.textContent = text;
-      return node;
-    }
-
-    function hint(text) { return el('div', 'hint', text); }
-
-    const chatIdFor = (a, b) => [a, b].sort().join('_');
-    const tsMs = t => (t?.toMillis ? t.toMillis() : (t ? new Date(t).getTime() : Date.now()));
-    const displayName = u => u?.name || u?.username || 'مستخدم';
-    const initialOf = name => (name || '?').trim().charAt(0).toUpperCase() || '?';
-    const snippet = (t, n = 120) => (t || '').replace(/\s+/g, ' ').trim().slice(0, n);
-
-    const thumb = (url, size) =>
-      (url && url.includes('res.cloudinary.com') && url.includes('/upload/'))
-        ? url.replace('/upload/', `/upload/w_${size},h_${size},c_fill,q_auto,f_auto/`)
-        : url;
-
-    function fmtTime(ts) {
-      const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : new Date());
-      const now = new Date();
-      if (d.toDateString() === now.toDateString()) {
-        return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-      }
-      if ((now - d) / 86400000 < 7) return d.toLocaleDateString('ar-EG', { weekday: 'short' });
-      return d.toLocaleDateString('ar-EG', { day: '2-digit', month: 'short' });
-    }
-
-    function openProfile(uid) {
-      location.href = `${PROFILE_PAGE}?uid=${encodeURIComponent(uid)}`;
-    }
-
-    function senderLabel(uid) {
-      return uid === S.me.uid ? 'أنت' : displayName(S.users.get(uid));
-    }
-
-    /** الصورة الشخصية: صورة إن وُجدت، وإلا الحرف الأول. النقر ينقل للملف الشخصي. */
-    function makeAvatar(user, extra = '') {
-      const a = el('div', 'av ' + extra);
-      const name = displayName(user);
-      if (user?.avatarUrl) {
-        const img = el('img');
-        img.src = thumb(user.avatarUrl, 96);
-        img.alt = name;
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        img.onerror = () => a.replaceChildren(document.createTextNode(initialOf(name)));
-        a.append(img);
-      } else {
-        a.textContent = initialOf(name);
-      }
-      if (user?.uid) {
-        a.classList.add('clickable');
-        a.title = 'عرض الملف الشخصي';
-        a.addEventListener('click', e => {
-          e.stopPropagation();
-          openProfile(user.uid);
-        });
-      }
-      return a;
-    }
-
-    /* ============================================================
-       المستخدمون (كاش + منع تكرار الطلب)
-       ============================================================ */
-    function getUser(uid) {
-      if (S.users.has(uid)) return Promise.resolve(S.users.get(uid));
-      if (S.userPending.has(uid)) return S.userPending.get(uid);
-
-      const p = getDoc(doc(db, 'users', uid))
-        .then(snap => {
-          const data = snap.exists() ? { ...snap.data(), uid } : { uid, name: 'مستخدم' };
-          S.users.set(uid, data);
-          return data;
-        })
-        .catch(err => {
-          console.warn('user read failed:', err);
-          const data = { uid, name: 'مستخدم' };
-          S.users.set(uid, data);
-          return data;
-        })
-        .finally(() => S.userPending.delete(uid));
-
-      S.userPending.set(uid, p);
-      return p;
-    }
-
-    /* ============================================================
-       تسجيل الدخول
-       ============================================================ */
-    onAuthStateChanged(auth, user => {
-      if (!user) {
-        location.replace(LOGIN_PAGE);
-        return;
-      }
-      S.me = user;
-      listenChats();
-    });
-
-    /* ============================================================
-       قائمة المحادثات
-       ============================================================ */
-    function listenChats() {
-      if (S.unsubChats) return;
-      const q = query(
-        collection(db, 'chats'),
-        where('participants', 'array-contains', S.me.uid),
-        limit(CHAT_LIST_LIMIT)
-      );
-      S.unsubChats = onSnapshot(q, snap => {
-        const changed = new Set();
-        snap.docChanges().forEach(ch => {
-          const id = ch.doc.id;
-          if (ch.type === 'removed') S.chats.delete(id);
-          else S.chats.set(id, { id, ...ch.doc.data() });
-          changed.add(id);
-        });
-        onChatsChanged();
-        renderChatList(changed);
-      }, err => {
-        console.error('chats listener error:', err);
-        showToast('تعذّر تحميل المحادثات: ' + (err.code || err.message), 'error');
-      });
-    }
-
-    function onChatsChanged() {
-      // إذا ظهرت المحادثة المفتوحة للتو (أرسل الطرف الآخر أول رسالة) نبدأ الاستماع للرسائل
-      const a = S.active;
-      if (a && !S.unsubMsgs && S.chats.has(a.id)) {
-        a.exists = true;
-        startMessages(a.id);
-      }
-    }
-
-    /** changed = null يعني إعادة رسم كاملة، أما المجموعة فتعيد رسم الصفوف المتغيرة فقط */
-    function renderChatList(changed = null) {
-      if (S.searching) return;
-
-      for (const id of [...S.listRows.keys()]) {
-        if (!S.chats.has(id)) S.listRows.delete(id);
-      }
-
-      const items = [...S.chats.values()]
-        .sort((a, b) => tsMs(b.lastMessageAt) - tsMs(a.lastMessageAt));
-
-      if (!items.length) {
-        els.list.replaceChildren(hint('لا توجد محادثات بعد. ابحث عن شخص لبدء محادثة.'));
-        return;
-      }
-
-      const frag = document.createDocumentFragment();
-      for (const chat of items) {
-        const otherUid = chat.participants.find(u => u !== S.me.uid);
-        let row = S.listRows.get(chat.id);
-        if (!row) {
-          row = el('div', 'row');
-          row.dataset.id = chat.id;
-          row.addEventListener('click', () => openChat(otherUid));
-          S.listRows.set(chat.id, row);
-          paintRow(row, chat, otherUid);
-        } else if (!changed || changed.has(chat.id)) {
-          paintRow(row, chat, otherUid);
-        }
-        frag.append(row);
-      }
-      els.list.replaceChildren(frag);
-    }
-
-    function previewOf(chat) {
-      const text = chat.lastMessage || '';
-      return chat.lastSenderUid === S.me.uid && text ? 'أنت: ' + text : text;
-    }
-
-    function paintRow(row, chat, otherUid) {
-      const other = S.users.get(otherUid);
-      if (!other) {
-        getUser(otherUid).then(() => {
-          const current = S.chats.get(chat.id);
-          if (current && S.listRows.get(chat.id) === row) paintRow(row, current, otherUid);
-        });
-      }
-
-      row.classList.toggle('active', S.active?.id === chat.id);
-
-      const body = el('div', 'row-body');
-      body.append(
-        el('div', 'row-name', displayName(other || { uid: otherUid })),
-        el('div', 'row-sub', previewOf(chat))
-      );
-
-      row.replaceChildren(
-        makeAvatar(other || { uid: otherUid }, 'av-row'),
-        body,
-        el('div', 'row-time', fmtTime(chat.lastMessageAt))
-      );
-    }
-
-    /* ============================================================
-       البحث
-       ============================================================ */
-    els.search.addEventListener('input', () => {
-      clearTimeout(S.searchTimer);
-      const text = els.search.value.trim();
-      if (!text) {
-        S.searchToken++;
-        S.searching = false;
-        renderChatList();
-        return;
-      }
-      S.searching = true;
-      S.searchTimer = setTimeout(() => runSearch(text), 250);
-    });
-
-    async function runSearch(text) {
-      const token = ++S.searchToken;
-      if (text.length < 2) {
-        els.list.replaceChildren(hint('اكتب حرفين على الأقل'));
-        return;
-      }
-      els.list.replaceChildren(hint('جارٍ البحث...'));
-
-      try {
-        const users = await searchUsers(text);
-        if (token !== S.searchToken) return;
-
-        if (!users.length) {
-          els.list.replaceChildren(hint('لا توجد نتائج'));
-          return;
-        }
-        const frag = document.createDocumentFragment();
-        users.forEach(u => {
-          S.users.set(u.uid, u);
-          frag.append(userRow(u));
-        });
-        els.list.replaceChildren(frag);
-      } catch (err) {
-        console.error('search failed:', err);
-        if (token === S.searchToken) {
-          els.list.replaceChildren(hint('تعذّر البحث: ' + (err.code || err.message)));
-        }
-      }
-    }
-
-    async function searchUsers(raw) {
-      const text = raw.trim();
-      const handle = text.replace(/^@/, '');
-      const digits = text.replace(/\D/g, '');
-      const isPhone = /^\+?[\d\s-]{6,}$/.test(text);
-      const users = collection(db, 'users');
-
-      const jobs = [
-        // بالاسم (يبدأ بالنص المكتوب، حساس لحالة الأحرف)
-        getDocs(query(users, where('name', '>=', text), where('name', '<=', text + '\uf8ff'), limit(20))),
-        // باسم المستخدم
-        getDocs(query(users, where('username', '==', handle), limit(10)))
-      ];
-
-      // برقم الهاتف كما كُتب وبالأرقام فقط
-      if (isPhone) {
-        [...new Set([text, digits])]
-          .filter(Boolean)
-          .forEach(v => jobs.push(getDocs(query(users, where('phone', '==', v), limit(10)))));
-      }
-
-      const results = await Promise.allSettled(jobs);
-      if (results.every(r => r.status === 'rejected')) throw results[0].reason;
-
-      const map = new Map();
-      results.forEach(r => {
-        if (r.status !== 'fulfilled') {
-          console.warn('search part failed:', r.reason);
-          return;
-        }
-        r.value.docs.forEach(d => {
-          if (d.id !== S.me.uid) map.set(d.id, { ...d.data(), uid: d.id });
-        });
-      });
-      return [...map.values()].slice(0, 30);
-    }
-
-    function userRow(u) {
-      const row = el('div', 'row');
-      const body = el('div', 'row-body');
-      body.append(
-        el('div', 'row-name', displayName(u)),
-        el('div', 'row-sub', u.username ? '@' + u.username : (u.phone || ''))
-      );
-      row.append(makeAvatar(u, 'av-row'), body);
-      row.addEventListener('click', () => {
-        clearTimeout(S.searchTimer);
-        S.searchToken++;
-        els.search.value = '';
-        S.searching = false;
-        openChat(u.uid);
-      });
-      return row;
-    }
-
-    /* ============================================================
-       فتح المحادثة
-       ============================================================ */
-    async function openChat(otherUid) {
-      if (!S.me || !otherUid || otherUid === S.me.uid) return;
-
-      const id = chatIdFor(S.me.uid, otherUid);
-      const token = ++S.openToken;
-
-      stopMessages();
-      resetMessageView();
-      cancelMode();
-
-      S.active = { id, otherUid, exists: false };
-      els.app.classList.add('chat-open');
-      els.empty.hidden = true;
-      els.chat.hidden = false;
-      els.input.value = '';
-      autosize();
-      showHint('جارٍ التحميل...');
-      renderChatList();
-
-      const other = await getUser(otherUid);
-      if (token !== S.openToken) return;
-      setHead(other);
-
-      let exists = S.chats.has(id);
-      if (!exists) {
-        try {
-          exists = (await getDoc(doc(db, 'chats', id))).exists();
-        } catch (err) {
-          if (token !== S.openToken) return;
-          console.error('open chat failed:', err);
-          showHint('تعذّر فتح المحادثة');
-          showToast('تعذّر فتح المحادثة: ' + (err.code || err.message), 'error');
-          return;
-        }
-      }
-      if (token !== S.openToken) return;
-
-      if (exists) {
-        S.active.exists = true;
-        startMessages(id);
-      } else if (!S.unsubMsgs) {
-        showHint('ابدأ المحادثة بأول رسالة');
-      }
-    }
-
-    function setHead(user) {
-      els.headAv.replaceChildren(makeAvatar(user, 'av-head'));
-      els.headName.textContent = displayName(user);
-    }
-
-    els.headName.addEventListener('click', () => {
-      if (S.active) openProfile(S.active.otherUid);
-    });
-
-    function closePane() {
-      S.openToken++;
-      stopMessages();
-      resetMessageView();
-      cancelMode();
-      S.active = null;
-      els.app.classList.remove('chat-open');
-      els.chat.hidden = true;
-      els.empty.hidden = false;
-      renderChatList();
-    }
-
-    els.back.addEventListener('click', closePane);
-
-    /* ============================================================
-       الرسائل: الاستماع والإدراج
-       ============================================================ */
-    function startMessages(chatId) {
-      if (S.msgChatId === chatId && S.unsubMsgs) return;
-      stopMessages();
-      S.msgChatId = chatId;
-
-      const q = query(
-        collection(db, 'chats', chatId, 'messages'),
-        orderBy('createdAt', 'desc'),
-        limit(PAGE_SIZE)
-      );
-
-      S.unsubMsgs = onSnapshot(q, snap => {
-        if (S.msgChatId !== chatId) return;
-
-        const stick = !S.msgReady || nearBottom();
-        if (!S.msgReady) {
-          S.msgReady = true;
-          S.hasMore = snap.size === PAGE_SIZE;
-        }
-        if (!S.oldestCursor && snap.docs.length) {
-          S.oldestCursor = snap.docs[snap.docs.length - 1];
-        }
-
-        // لا نعالج 'removed' لأن الوثيقة قد تخرج من نافذة الاستعلام دون أن تُحذف
-        snap.docChanges().forEach(ch => {
-          if (ch.type !== 'removed') upsertMsg(ch.doc.id, ch.doc.data());
-        });
-
-        refreshEmptyHint();
-        updateLoadMore();
-        if (stick) scrollToBottom();
-      }, err => {
-        console.error('messages listener error:', err);
-        showToast('تعذّر تحميل الرسائل: ' + (err.code || err.message), 'error');
-      });
-    }
-
-    function stopMessages() {
-      if (S.unsubMsgs) S.unsubMsgs();
-      S.unsubMsgs = null;
-      S.msgChatId = null;
-    }
-
-    function resetMessageView() {
-      S.msgs.clear();
-      S.order = [];
-      S.oldestCursor = null;
-      S.hasMore = false;
-      S.msgReady = false;
-      S.loadingOlder = false;
-      els.messages.replaceChildren(els.loadMore);
-      updateLoadMore();
-    }
-
-    function upsertMsg(id, data) {
-      const t = tsMs(data.createdAt);
-      let entry = S.msgs.get(id);
-
-      // تحديث في مكانه (تعديل/تفاعل/حذف) دون تغيير الترتيب
-      if (entry && entry.t === t) {
-        const fresh = buildBubble(id, data);
-        entry.node.replaceWith(fresh);
-        entry.node = fresh;
-        entry.data = data;
-        return;
-      }
-
-      if (entry) {
-        // تغيّر الوقت (مثلاً من محلي إلى وقت الخادم): نعيد وضعها في الترتيب
-        const i = S.order.indexOf(entry);
-        if (i !== -1) S.order.splice(i, 1);
-        entry.node.remove();
-        entry.t = t;
-        entry.data = data;
-        entry.node = buildBubble(id, data);
-      } else {
-        removeHints();
-        entry = { id, t, data, node: buildBubble(id, data) };
-        S.msgs.set(id, entry);
-      }
-      insertOrder(entry);
-    }
-
-    /** إدراج بالبحث الثنائي: O(log n) للبحث + إدراج DOM واحد */
-    function insertOrder(entry) {
-      const arr = S.order;
-      let lo = 0, hi = arr.length;
-      while (lo < hi) {
-        const mid = (lo + hi) >> 1;
-        if (arr[mid].t <= entry.t) lo = mid + 1;
-        else hi = mid;
-      }
-      arr.splice(lo, 0, entry);
-      const next = arr[lo + 1];
-      els.messages.insertBefore(entry.node, next ? next.node : null);
-    }
-
-    function removeHints() {
-      els.messages.querySelectorAll(':scope > .hint').forEach(n => n.remove());
-    }
-
-    function showHint(text) {
-      removeHints();
-      if (!S.msgs.size) els.messages.append(hint(text));
-    }
-
-    function refreshEmptyHint() {
-      removeHints();
-      if (!S.msgs.size && S.msgReady) els.messages.append(hint('لا توجد رسائل بعد'));
-    }
-
-    function updateLoadMore() {
-      els.loadMore.hidden = !S.hasMore;
-    }
-
-    async function loadOlder() {
-      const active = S.active;
-      if (!active || !S.hasMore || S.loadingOlder || !S.oldestCursor || S.msgChatId !== active.id) return;
-
-      S.loadingOlder = true;
-      els.loadMore.disabled = true;
-      els.loadMore.textContent = 'جارٍ التحميل...';
-
-      try {
-        const q = query(
-          collection(db, 'chats', active.id, 'messages'),
-          orderBy('createdAt', 'desc'),
-          startAfter(S.oldestCursor),
-          limit(PAGE_SIZE)
-        );
-        const snap = await getDocs(q);
-        if (S.active?.id !== active.id) return;
-
-        if (snap.docs.length) S.oldestCursor = snap.docs[snap.docs.length - 1];
-        S.hasMore = snap.size === PAGE_SIZE;
-
-        const prevHeight = els.messages.scrollHeight;
-        snap.docs.forEach(d => upsertMsg(d.id, d.data()));
-        // نحافظ على موضع القراءة بعد الإضافة في الأعلى
-        els.messages.scrollTop += els.messages.scrollHeight - prevHeight;
-      } catch (err) {
-        console.error('load older failed:', err);
-        showToast('تعذّر تحميل الرسائل الأقدم', 'error');
-      } finally {
-        S.loadingOlder = false;
-        els.loadMore.disabled = false;
-        els.loadMore.textContent = 'تحميل الرسائل الأقدم';
-        updateLoadMore();
-      }
-    }
-
-    els.loadMore.addEventListener('click', loadOlder);
-    els.messages.addEventListener('scroll', () => {
-      if (els.messages.scrollTop < 80) loadOlder();
-    }, { passive: true });
-
-    function nearBottom() {
-      const m = els.messages;
-      return m.scrollHeight - m.scrollTop - m.clientHeight < 140;
-    }
-
-    function scrollToBottom() {
-      requestAnimationFrame(() => {
-        els.messages.scrollTop = els.messages.scrollHeight;
-      });
-    }
-
-    function scrollToMsg(id) {
-      const entry = S.msgs.get(id);
-      if (!entry) {
-        showToast('الرسالة الأصلية أقدم من المحمّل، حمّل المزيد أولاً', 'error');
-        return;
-      }
-      entry.node.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      entry.node.classList.add('flash');
-      setTimeout(() => entry.node.classList.remove('flash'), 1200);
-    }
-
-    /* ============================================================
-       بناء الفقاعة
-       ============================================================ */
-    function buildBubble(id, d) {
-      const mine = d.senderUid === S.me.uid;
-      const row = el('div', 'msg-row ' + (mine ? 'mine' : 'theirs'));
-      row.dataset.id = id;
-
-      const bub = el('div', 'bubble');
-
-      if (d.deleted) {
-        bub.append(el('div', 'bubble-text deleted', 'تم حذف هذه الرسالة'));
-      } else {
-        if (d.replyTo) bub.append(buildQuote(d.replyTo));
-        bub.append(el('div', 'bubble-text', d.text || ''));
-        const rx = buildReactions(id, d.reactions);
-        if (rx) bub.append(rx);
-      }
-
-      const meta = el('div', 'meta');
-      if (d.isEdited && !d.deleted) meta.append(el('span', null, 'معدّلة'));
-      meta.append(el('span', null, fmtTime(d.createdAt)));
-      bub.append(meta);
-
-      bub.addEventListener('click', () => openSheet(id));
-      row.append(bub);
-      return row;
-    }
-
-    function buildQuote(rp) {
-      const q = el('div', 'quote');
-      q.append(
-        el('b', null, rp.senderUid === S.me.uid ? 'أنت' : (rp.name || 'مستخدم')),
-        el('span', null, rp.text || '')
-      );
-      q.addEventListener('click', e => {
-        e.stopPropagation();
-        scrollToMsg(rp.id);
-      });
-      return q;
-    }
-
-    function buildReactions(msgId, map) {
-      const entries = Object.entries(map || {}).filter(([, emo]) => typeof emo === 'string');
-      if (!entries.length) return null;
-
-      const counts = new Map();
-      let mine = null;
-      for (const [uid, emo] of entries) {
-        counts.set(emo, (counts.get(emo) || 0) + 1);
-        if (uid === S.me.uid) mine = emo;
-      }
-
-      const wrap = el('div', 'reacts');
-      counts.forEach((n, emo) => {
-        const chip = el('button', 'react' + (mine === emo ? ' on' : ''));
-        chip.type = 'button';
-        chip.append(el('span', null, emo), el('span', 'cnt', String(n)));
-        chip.addEventListener('click', e => {
-          e.stopPropagation();
-          toggleReaction(msgId, emo);
-        });
-        wrap.append(chip);
-      });
-      return wrap;
-    }
-
-    /* ============================================================
-       الإرسال
-       ============================================================ */
-    async function sendMessage(text) {
-      const active = S.active;
-      const replyTo = S.reply
-        ? { id: S.reply.id, senderUid: S.reply.senderUid, name: S.reply.name, text: S.reply.text }
-        : null;
-
-      // استجابة فورية: نفرّغ الحقل قبل انتظار الخادم
-      els.input.value = '';
-      S.reply = null;
-      renderCtx();
-      autosize();
-
-      try {
-        const chatRef = doc(db, 'chats', active.id);
-        const msgRef = doc(collection(db, 'chats', active.id, 'messages'));
-        const chatPatch = {
-          lastMessage: snippet(text, 120),
-          lastMessageAt: serverTimestamp(),
-          lastSenderUid: S.me.uid,
-          lastMessageId: msgRef.id
-        };
-
-        const isNew = !active.exists;
-        if (isNew) {
-          // المحادثة الجديدة تُنشأ أولاً لأن قاعدة الرسائل تتحقق من وجودها
-          await setDoc(chatRef, {
-            participants: [S.me.uid, active.otherUid].sort(),
-            createdAt: serverTimestamp(),
-            ...chatPatch
-          });
-          active.exists = true;
-        }
-
-        const batch = writeBatch(db);
-        if (!isNew) batch.update(chatRef, chatPatch);
-        batch.set(msgRef, {
-          senderUid: S.me.uid,
-          text,
-          createdAt: serverTimestamp(),
-          isEdited: false,
-          deleted: false,
-          replyTo,
-          reactions: {}
-        });
-        await batch.commit();
-
-        if (S.active === active) startMessages(active.id);
-      } catch (err) {
-        console.error('send failed:', err);
-        showToast('تعذّر إرسال الرسالة: ' + (err.code || err.message), 'error');
-        if (S.active === active && !els.input.value) {
-          els.input.value = text;
-          autosize();
-        }
-      }
-    }
-
-    async function commitEdit(text) {
-      const active = S.active;
-      const msgId = S.editId;
-      const entry = S.msgs.get(msgId);
-      cancelMode();
-      els.input.value = '';
-      autosize();
-
-      if (!active || !entry || entry.data.text === text) return;
-
-      try {
-        const batch = writeBatch(db);
-        batch.update(doc(db, 'chats', active.id, 'messages', msgId), {
-          text, isEdited: true, editedAt: serverTimestamp()
-        });
-        if (S.chats.get(active.id)?.lastMessageId === msgId) {
-          batch.update(doc(db, 'chats', active.id), { lastMessage: snippet(text, 120) });
-        }
-        await batch.commit();
-      } catch (err) {
-        console.error('edit failed:', err);
-        showToast('تعذّر تعديل الرسالة: ' + (err.code || err.message), 'error');
-      }
-    }
-
-    async function deleteMessage(msgId) {
-      const active = S.active;
-      const entry = S.msgs.get(msgId);
-      if (!active || !entry || entry.data.deleted) return;
-      if (!confirm('حذف هذه الرسالة؟')) return;
-
-      try {
-        const batch = writeBatch(db);
-        batch.update(doc(db, 'chats', active.id, 'messages', msgId), {
-          text: '', deleted: true, deletedAt: serverTimestamp()
-        });
-        if (S.chats.get(active.id)?.lastMessageId === msgId) {
-          batch.update(doc(db, 'chats', active.id), { lastMessage: 'تم حذف الرسالة' });
-        }
-        await batch.commit();
-        if (S.editId === msgId) cancelMode();
-      } catch (err) {
-        console.error('delete failed:', err);
-        showToast('تعذّر حذف الرسالة: ' + (err.code || err.message), 'error');
-      }
-    }
-
-    async function toggleReaction(msgId, emoji) {
-      const active = S.active;
-      const entry = S.msgs.get(msgId);
-      if (!active || !entry) return;
-
-      const current = entry.data.reactions?.[S.me.uid];
-      const ref = doc(db, 'chats', active.id, 'messages', msgId);
-      try {
-        await updateDoc(ref, {
-          [`reactions.${S.me.uid}`]: current === emoji ? deleteField() : emoji
-        });
-      } catch (err) {
-        console.error('reaction failed:', err);
-        showToast('تعذّر تنفيذ التفاعل', 'error');
-      }
-    }
-
-    /* ============================================================
-       وضع الرد والتعديل
-       ============================================================ */
-    function startReply(msgId) {
-      const entry = S.msgs.get(msgId);
-      if (!entry || entry.data.deleted) return;
-      S.editId = null;
-      S.reply = {
-        id: msgId,
-        senderUid: entry.data.senderUid,
-        name: senderLabel(entry.data.senderUid),
-        text: snippet(entry.data.text, 120)
-      };
-      renderCtx();
-      els.input.focus();
-    }
-
-    function startEdit(msgId) {
-      const entry = S.msgs.get(msgId);
-      if (!entry || entry.data.senderUid !== S.me.uid || entry.data.deleted) return;
-      S.reply = null;
-      S.editId = msgId;
-      els.input.value = entry.data.text || '';
-      renderCtx();
-      autosize();
-      els.input.focus();
-    }
-
-    function cancelMode() {
-      if (S.editId) els.input.value = '';
-      S.reply = null;
-      S.editId = null;
-      renderCtx();
-      autosize();
-    }
-
-    function renderCtx() {
-      if (S.reply) {
-        els.ctx.hidden = false;
-        els.ctxIcon.className = 'ctx-icon fa-solid fa-reply';
-        els.ctxTitle.textContent = 'الرد على ' + S.reply.name;
-        els.ctxText.textContent = S.reply.text || 'رسالة';
-      } else if (S.editId) {
-        const e = S.msgs.get(S.editId);
-        els.ctx.hidden = false;
-        els.ctxIcon.className = 'ctx-icon fa-solid fa-pen';
-        els.ctxTitle.textContent = 'تعديل الرسالة';
-        els.ctxText.textContent = snippet(e?.data.text, 120);
-      } else {
-        els.ctx.hidden = true;
-      }
-      const editing = !!S.editId;
-      els.send.classList.toggle('edit', editing);
-      els.sendIcon.className = editing ? 'fa-solid fa-check' : 'fa-solid fa-paper-plane';
-    }
-
-    els.ctxClose.addEventListener('click', cancelMode);
-
-    function autosize() {
-      els.input.style.height = 'auto';
-      els.input.style.height = Math.min(els.input.scrollHeight, 140) + 'px';
-    }
-
-    /* ============================================================
-       حقل الكتابة
-       ============================================================ */
-    els.composer.addEventListener('submit', e => {
-      e.preventDefault();
-      submitComposer();
-    });
-
-    els.input.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
-        e.preventDefault();
-        submitComposer();
-      }
-    });
-
-    els.input.addEventListener('input', autosize);
-
-    function submitComposer() {
-      if (!S.active) return;
-      const text = els.input.value.trim();
-      if (!text) return;
-      if (text.length > MAX_TEXT) {
-        showToast('الرسالة طويلة (الحد 2000 حرف)', 'error');
-        return;
-      }
-      if (S.editId) {
-        commitEdit(text);
-      } else {
-        sendMessage(text);
-      }
-    }
-
-    /* ============================================================
-       لوحة الخيارات
-       ============================================================ */
-    function openSheet(msgId) {
-      const entry = S.msgs.get(msgId);
-      if (!entry || entry.data.deleted) return;
-      const d = entry.data;
-      const mine = d.senderUid === S.me.uid;
-
-      els.sheetBody.replaceChildren();
-
-      const emojiRow = el('div', 'emoji-row');
-      EMOJIS.forEach(emo => {
-        const b = el('button', 'emo', emo);
-        b.type = 'button';
-        b.addEventListener('click', () => {
-          closeSheet();
-          toggleReaction(msgId, emo);
-        });
-        emojiRow.append(b);
-      });
-
-      const list = el('div', 'act-list');
-      list.append(actionBtn('fa-solid fa-reply', 'رد', () => startReply(msgId)));
-      if (mine) {
-        list.append(actionBtn('fa-solid fa-pen', 'تعديل', () => startEdit(msgId)));
-        list.append(actionBtn('fa-solid fa-trash', 'حذف', () => deleteMessage(msgId), true));
-      }
-      list.append(actionBtn('fa-regular fa-copy', 'نسخ النص', () => copyText(d.text)));
-
-      els.sheetBody.append(emojiRow, list);
-      els.overlay.classList.add('show');
-      els.sheet.classList.add('show');
-    }
-
-    function actionBtn(icon, label, fn, danger = false) {
-      const b = el('button', 'act' + (danger ? ' danger' : ''));
-      b.type = 'button';
-      const i = el('i');
-      i.className = icon;
-      b.append(i, el('span', null, label));
-      b.addEventListener('click', () => {
-        closeSheet();
-        fn();
-      });
-      return b;
-    }
-
-    function closeSheet() {
-      els.overlay.classList.remove('show');
-      els.sheet.classList.remove('show');
-    }
-
-    function copyText(t) {
-      if (!navigator.clipboard) {
-        showToast('النسخ غير متاح في هذا المتصفح', 'error');
-        return;
-      }
-      navigator.clipboard.writeText(t || '')
-        .then(() => showToast('تم النسخ'))
-        .catch(() => showToast('تعذّر النسخ', 'error'));
-    }
-
-    els.overlay.addEventListener('click', closeSheet);
-
-    document.addEventListener('keydown', e => {
-      if (e.key !== 'Escape') return;
-      if (els.sheet.classList.contains('show')) closeSheet();
-      else if (S.reply || S.editId) cancelMode();
-    });
-
-    /* ============================================================
-       بداية
-       ============================================================ */
-    updateLoadMore();
-    renderCtx();
-    autosize();
-  </script>
+    recorder.stop();
+  });
+};
+
+/* ===== Polls & Tasks ===== */
+window.openCreatePoll = () => {
+  document.getElementById('pollQuestion').value = ''; document.getElementById('pollMulti').checked = false;
+  pollOptionsCount = 0; document.getElementById('pollOptionsList').innerHTML = '';
+  addPollOption(); addPollOption();
+  document.getElementById('attachMenu').classList.remove('show');
+  document.getElementById('createPollModal').classList.add('active');
+};
+window.addPollOption = () => {
+  if (pollOptionsCount >= 10) { showToast('الحد 10 خيارات', 'error'); return; }
+  pollOptionsCount++;
+  const div = document.createElement('div'); div.style.marginBottom = '6px';
+  div.innerHTML = `<input type="text" class="poll-option-input" placeholder="خيار ${pollOptionsCount}" style="width:100%;padding:10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;">`;
+  document.getElementById('pollOptionsList').appendChild(div);
+};
+window.submitPoll = async () => {
+  const q = document.getElementById('pollQuestion').value.trim();
+  const opts = Array.from(document.querySelectorAll('.poll-option-input')).map(i => i.value.trim()).filter(Boolean);
+  if (!q) { showToast('أدخل السؤال', 'error'); return; }
+  if (opts.length < 2) { showToast('خياران على الأقل', 'error'); return; }
+  try { await createPoll(activeConvId, q, opts, { multiChoice: document.getElementById('pollMulti').checked }); closeModal('createPollModal'); showToast('تم إنشاء الاستطلاع ✓'); scrollToBottom(); } catch (e) { showToast('خطأ', 'error'); }
+};
+window.openCreateTask = () => {
+  document.getElementById('taskTitle').value = ''; document.getElementById('taskDesc').value = ''; document.getElementById('taskDue').value = '';
+  document.getElementById('attachMenu').classList.remove('show');
+  document.getElementById('createTaskModal').classList.add('active');
+};
+window.submitTask = async () => {
+  const title = document.getElementById('taskTitle').value.trim(); const desc = document.getElementById('taskDesc').value.trim(); const due = document.getElementById('taskDue').value;
+  if (!title) { showToast('أدخل عنوان المهمة', 'error'); return; }
+  try { await createTask(activeConvId, title, desc, due ? new Date(due).toISOString() : null); closeModal('createTaskModal'); showToast('تم إنشاء المهمة ✓'); scrollToBottom(); } catch (e) { showToast('خطأ', 'error'); }
+};
+
+/* ===== Chat Settings / Menu ===== */
+function updatePinnedBar() {
+  const bar = document.getElementById('pinnedBar');
+  if (!activeConv || !activeConv.pinnedMessageIds || activeConv.pinnedMessageIds.length === 0) { bar.classList.add('hide'); return; }
+  const lastPinId = activeConv.pinnedMessageIds[activeConv.pinnedMessageIds.length - 1];
+  const msg = messages.find(m => m.id === lastPinId);
+  if (!msg) { bar.classList.add('hide'); return; }
+  bar.classList.remove('hide');
+  document.getElementById('pinnedText').textContent = `📌 ${(msg.content || 'رسالة').slice(0, 80)}`;
+}
+window.scrollToPinnedMessage = () => {
+  if (!activeConv || !activeConv.pinnedMessageIds || activeConv.pinnedMessageIds.length === 0) return;
+  const lastPinId = activeConv.pinnedMessageIds[activeConv.pinnedMessageIds.length - 1];
+  const el = document.querySelector(`[data-msgid="${lastPinId}"]`);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+};
+
+window.openChatMenu = () => {
+  const body = document.getElementById('chatMenuBody');
+  const isAdmin = currentMembership?.role === 'owner' || currentMembership?.role === 'admin';
+  let items = `
+    <button onclick="openChatSettings()" style="width:100%;padding:14px;border-radius:10px;background:#fafbfc;margin-bottom:8px;text-align:right;font-weight:700;font-size:14px;"><i class="fas fa-info-circle" style="color:var(--accent);width:24px;"></i> معلومات المحادثة</button>
+    <button onclick="toggleConversationPin()" style="width:100%;padding:14px;border-radius:10px;background:#fafbfc;margin-bottom:8px;text-align:right;font-weight:700;font-size:14px;"><i class="fas fa-thumbtack" style="color:var(--accent);width:24px;"></i> ${currentMembership?.isPinned ? 'إلغاء التثبيت' : 'تثبيت المحادثة'}</button>
+  `;
+  if (isAdmin) items += `<button onclick="openMembersManagement()" style="width:100%;padding:14px;border-radius:10px;background:#fafbfc;margin-bottom:8px;text-align:right;font-weight:700;font-size:14px;"><i class="fas fa-users" style="color:var(--navy);width:24px;"></i> إدارة الأعضاء</button>`;
+  items += `<button onclick="handleLeaveConv()" style="width:100%;padding:14px;border-radius:10px;background:#fbeaea;color:var(--red);margin-top:8px;text-align:right;font-weight:700;font-size:14px;"><i class="fas fa-sign-out-alt" style="width:24px;"></i> مغادرة المحادثة</button>`;
+  body.innerHTML = items;
+  document.getElementById('chatMenuModal').classList.add('active');
+};
+
+window.toggleConversationPin = async () => {
+  try { await togglePinConversation(activeConvId, currentUser.uid, !currentMembership?.isPinned); currentMembership.isPinned = !currentMembership.isPinned; membershipsCache[activeConvId] = currentMembership; closeModal('chatMenuModal'); renderConversations(); showToast('تم'); } catch (e) {}
+};
+
+window.openChatSettings = () => {
+  closeModal('chatMenuModal');
+  const body = document.getElementById('chatSettingsBody');
+  const isAdmin = currentMembership?.role === 'owner' || currentMembership?.role === 'admin';
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#152741,#a8741a);color:#fff;font-weight:800;font-size:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;overflow:hidden;">${getConvAvatar(activeConv) ? `<img src="${getConvAvatar(activeConv)}" style="width:100%;height:100%;object-fit:cover;">` : getConvDisplayName(activeConv).charAt(0).toUpperCase()}</div>
+      <div style="font-size:18px;font-weight:800;color:var(--navy);">${escapeHtml(getConvDisplayName(activeConv))}</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:4px;">${CONVERSATION_TYPE_LABELS[activeConv.type]} • ${activeMembers.length} عضو</div>
+    </div>
+  `;
+  document.getElementById('chatSettingsModal').classList.add('active');
+};
+
+window.openMembersManagement = () => {
+  closeModal('chatMenuModal');
+  const body = document.getElementById('chatSettingsBody');
+  const isOwner = currentMembership?.role === 'owner';
+  body.innerHTML = `<h4 style="margin:0 0 12px;color:var(--navy);font-size:14px;">الأعضاء (${activeMembers.length})</h4>
+    ${activeMembers.map(m => {
+      const u = cachedUsers[m.id]; const name = u?.name || 'مستخدم'; const isSelf = m.id === currentUser.uid;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;margin-bottom:6px;background:#fafbfc;">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#152741,#a8741a);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;cursor:pointer;" onclick="goToUserProfileById('${m.id}')">${u?.avatarUrl ? `<img src="${getAvatarUrl(u.avatarUrl,72)}" style="width:100%;height:100%;object-fit:cover;">` : name.charAt(0).toUpperCase()}</div>
+        <div style="flex:1;"><div style="font-weight:800;font-size:13px;color:var(--navy);">${escapeHtml(name)}${isSelf ? ' (أنت)' : ''}</div><div style="font-size:11px;color:var(--accent);font-weight:700;">${MEMBER_ROLE_LABELS[m.role] || 'عضو'}</div></div>
+        ${isOwner && !isSelf ? `<div style="display:flex;gap:4px;">${m.role !== 'admin' && m.role !== 'owner' ? `<button onclick="promoteMember('${m.id}')" style="padding:4px 8px;border-radius:6px;background:#e7f5ff;color:#0d47a1;font-size:11px;font-weight:800;"><i class="fas fa-arrow-up"></i></button>` : ''}${m.role === 'admin' ? `<button onclick="demoteMember('${m.id}')" style="padding:4px 8px;border-radius:6px;background:#fef3c7;color:#92400e;font-size:11px;font-weight:800;"><i class="fas fa-arrow-down"></i></button>` : ''}<button onclick="removeMember('${m.id}')" style="padding:4px 8px;border-radius:6px;background:#fbeaea;color:var(--red);font-size:11px;font-weight:800;"><i class="fas fa-times"></i></button></div>` : ''}
+      </div>`;
+    }).join('')}
+  `;
+  document.getElementById('chatSettingsModal').classList.add('active');
+};
+
+window.promoteMember = async (uid) => { try { await updateMemberRole(activeConvId, uid, 'admin', currentUser.uid); showToast('تمت الترقية'); openMembersManagement(); } catch (e) { showToast(e.message || 'خطأ', 'error'); } };
+window.demoteMember = async (uid) => { try { await updateMemberRole(activeConvId, uid, 'member', currentUser.uid); showToast('تم'); openMembersManagement(); } catch (e) { showToast(e.message || 'خطأ', 'error'); } };
+window.removeMember = async (uid) => { if (!confirm('طرد هذا العضو؟')) return; try { await kickMember(activeConvId, uid, currentUser.uid); showToast('تم الطرد'); openMembersManagement(); } catch (e) { showToast(e.message || 'خطأ', 'error'); } };
+
+window.handleLeaveConv = async () => {
+  if (!confirm('مغادرة المحادثة؟')) return;
+  try { await leaveConversation(activeConvId, currentUser.uid); closeModal('chatMenuModal'); history.replaceState(null, '', '#/'); closeRoomInternal(); showEmptyState(); showToast('غادرت المحادثة'); } catch (e) { showToast(e.message || 'خطأ', 'error'); }
+};
+
+/* ===== New Chat ===== */
+window.openNewChatModal = () => {
+  newChatType = 'dm';
+  document.querySelectorAll('[data-new-type]').forEach(t => t.classList.toggle('active', t.dataset.newType === 'dm'));
+  renderNewChatBody();
+  document.getElementById('newChatModal').classList.add('active');
+};
+window.setNewChatType = (t) => {
+  newChatType = t;
+  document.querySelectorAll('[data-new-type]').forEach(b => b.classList.toggle('active', b.dataset.newType === t));
+  renderNewChatBody();
+};
+
+function renderNewChatBody() {
+  const body = document.getElementById('newChatBody');
+  if (newChatType === 'dm') {
+    body.innerHTML = `
+      <div class="form-group"><label>ابحث عن مستخدم</label><input type="text" id="dmSearchInput" placeholder="اكتب اسم..." oninput="searchDmUsers(this.value)"></div>
+      <div id="dmSearchResults" style="max-height:300px;overflow-y:auto;"></div>
+    `;
+  } else {
+    body.innerHTML = `
+      <div class="form-group"><label>اسم ال${CONVERSATION_TYPE_LABELS[newChatType]}</label><input type="text" id="newConvName" placeholder="اسم واضح"></div>
+      <div class="form-group"><label>الوصف (اختياري)</label><input type="text" id="newConvDesc" placeholder="وصف مختصر"></div>
+      <button onclick="submitCreateConversation()" style="width:100%;padding:13px;border-radius:10px;background:var(--navy);color:#fff;font-weight:800;font-size:14.5px;margin-top:8px;"><i class="fas fa-plus"></i> إنشاء</button>
+    `;
+  }
+}
+
+let dmSearchTimeout;
+window.searchDmUsers = (val) => {
+  clearTimeout(dmSearchTimeout);
+  if (!val || val.trim().length < 2) { document.getElementById('dmSearchResults').innerHTML = ''; return; }
+  dmSearchTimeout = setTimeout(async () => {
+    try {
+      const snap = await getDocs(query(collection(db, 'users'), limit(50)));
+      const users = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(u => u.id !== currentUser.uid && (u.name || '').toLowerCase().includes(val.trim().toLowerCase())).slice(0, 20);
+      const results = document.getElementById('dmSearchResults');
+      if (users.length === 0) { results.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">لا نتائج</p>'; return; }
+      results.innerHTML = users.map(u => `
+        <div class="user-row" onclick="startDM('${u.id}')">
+          <div class="u-av">${u.avatarUrl ? `<img src="${getAvatarUrl(u.avatarUrl,80)}">` : (u.name||'U').charAt(0).toUpperCase()}</div>
+          <div class="u-info"><div class="u-name">${escapeHtml(u.name || '')}</div><div class="u-sub">${escapeHtml(u.role === 'ta' ? 'معيد' : u.role === 'doctor' ? 'دكتور' : 'طالب')}</div></div>
+        </div>`).join('');
+    } catch (e) { console.error(e); }
+  }, 400);
+};
+
+window.startDM = async (uid) => {
+  try { const convId = await getOrCreateDM(currentUser.uid, uid); closeModal('newChatModal'); location.hash = `#/c/${convId}`; } catch (e) { showToast(e.message || 'خطأ', 'error'); }
+};
+
+window.submitCreateConversation = async () => {
+  const name = document.getElementById('newConvName').value.trim();
+  const desc = document.getElementById('newConvDesc').value.trim();
+  if (!name) { showToast('أدخل الاسم', 'error'); return; }
+  try { const convId = await createConversation(newChatType, name, { description: desc, creatorUid: currentUser.uid }); closeModal('newChatModal'); location.hash = `#/c/${convId}`; } catch (e) { showToast(e.message || 'خطأ', 'error'); }
+};
+
+/* ===== Notifications ===== */
+function updateNotifBadge() {
+  const unread = userNotifs.filter(n => !n.read).length;
+  const b1 = document.getElementById('notifDot'); if (b1) { b1.classList.toggle('show', unread > 0); b1.textContent = unread > 9 ? '9+' : unread; }
+  const b2 = document.getElementById('notifBadgeRail'); if (b2) { b2.style.display = unread > 0 ? 'flex' : 'none'; b2.textContent = unread > 9 ? '9+' : unread; }
+}
+function renderNotifPanel() {
+  const body = document.getElementById('notifBody'); if (!body) return;
+  if (userNotifs.length === 0) { body.innerHTML = `<p style="text-align:center;color:var(--muted);padding:40px;">لا توجد إشعارات</p>`; return; }
+  body.innerHTML = userNotifs.map(n => {
+    let time = ''; try { time = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleString('ar-EG') : ''; } catch (e) {}
+    return `<div class="notif-item ${n.read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}', '${n.link || ''}')"><div class="n-title">${escapeHtml(n.title || '')}</div><div class="n-msg">${escapeHtml(n.message || '')}</div><div class="n-time">${time}</div></div>`;
+  }).join('');
+}
+window.handleNotifClick = async (id, link) => { try { await markNotificationRead(currentUser.uid, id); } catch (e) {} closeNotifications(); if (link) window.location.href = link; };
+window.openNotifications = () => { document.getElementById('notifPanel').classList.add('active'); document.getElementById('notifOverlay').classList.add('active'); };
+window.closeNotifications = () => { document.getElementById('notifPanel').classList.remove('active'); document.getElementById('notifOverlay').classList.remove('active'); };
+
+/* ===== Helpers ===== */
+window.closeModal = (id) => { document.getElementById(id).classList.remove('active'); };
+window.openImageViewer = (url) => { document.getElementById('viewerImage').src = url; document.getElementById('imageViewerModal').classList.add('active'); };
+function formatFileSize(bytes) { if (!bytes) return '0 B'; const k = 1024, sizes = ['B', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i]; }
+function formatDuration(seconds) { const m = Math.floor(seconds / 60), s = Math.floor(seconds % 60); return `${m}:${String(s).padStart(2, '0')}`; }
+</script>
 </body>
 </html>
