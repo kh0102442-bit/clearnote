@@ -1,4 +1,4 @@
-// ClearNote shared.js v4.0 — Chat System
+// ClearNote shared.js v4.1 — Chat System (fixed permissions flow)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp, collection, getDocs, addDoc, query, where, orderBy, limit, startAfter, onSnapshot, writeBatch, increment, arrayUnion, arrayRemove, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -15,6 +15,7 @@ export const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
 export const ROLES = { ADMIN: "admin", STUDENT: "student", TA: "ta", DOCTOR: "doctor" };
 
 /* ============================================================
@@ -59,17 +60,21 @@ async function cloudinaryUpload(file, resourceType, folder, onProgress) {
   }
 
   const res = await fetch(url, { method: 'POST', body: fd });
-  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error?.message || 'فشل الرفع'); }
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    throw new Error(e.error?.message || 'فشل الرفع');
+  }
   return (await res.json()).secure_url;
 }
 
 export async function uploadToCloudinary(file, type = 'post', onProgress) {
   if (!file) throw new Error('لم يتم اختيار ملف');
   const maxSize = LIMITS[type] || LIMITS.post;
-  if (file.size > maxSize) throw new Error(`حجم الملف كبير (الحد ${(maxSize/1024/1024).toFixed(0)} ميجا)`);
+  if (file.size > maxSize) throw new Error(`حجم الملف كبير (الحد ${(maxSize / 1024 / 1024).toFixed(0)} ميجا)`);
 
   let rt = 'image';
   let folder = 'clearnote/posts';
+
   if (file.type === 'application/pdf' || type === 'pdf' || type === 'chat_file') { rt = 'raw'; folder = 'clearnote/files'; }
   else if (file.type.startsWith('video/') || type === 'video') { rt = 'video'; folder = 'clearnote/videos'; }
   else if (file.type.startsWith('audio/') || type === 'chat_voice') { rt = 'video'; folder = 'clearnote/voice'; }
@@ -84,6 +89,7 @@ export async function uploadAvatar(file) { return uploadToCloudinary(file, 'avat
 export async function uploadVideo(file, onProgress) { return uploadToCloudinary(file, 'video', onProgress); }
 export async function uploadChatImage(file) { return uploadToCloudinary(file, 'chat_image'); }
 export async function uploadChatFile(file) { return uploadToCloudinary(file, 'chat_file'); }
+
 export async function uploadVoice(blob) {
   if (!blob) throw new Error('لا يوجد تسجيل');
   const ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
@@ -101,26 +107,34 @@ export function showToast(msg, type = "success") {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3500);
 }
+
 export function escapeHtml(t) {
   if (!t) return '';
   return String(t).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 }
+
 export function withTimeout(promise, ms = 10000, label = '') {
-  return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error('انتهت المهلة: ' + label)), ms))]);
+  return Promise.race([
+    promise,
+    new Promise((_, rej) => setTimeout(() => rej(new Error('انتهت المهلة: ' + label)), ms))
+  ]);
 }
+
 export function toDate(v) {
   try { if (!v) return null; return v.toDate ? v.toDate() : new Date(v); }
   catch { return null; }
 }
+
 export function formatChatTime(date) {
   if (!date) return '';
   const d = date.toDate ? date.toDate() : new Date(date);
   const now = new Date();
   const diff = now - d;
   if (diff < 60000) return 'الآن';
-  if (diff < 3600000) return Math.floor(diff/60000) + ' د';
+  if (diff < 3600000) return Math.floor(diff / 60000) + ' د';
   if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-  const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
   if (d.toDateString() === yesterday.toDateString()) return 'أمس';
   if (diff < 7 * 86400000) return d.toLocaleDateString('ar-EG', { weekday: 'short' });
   return d.toLocaleDateString('ar-EG', { day: '2-digit', month: 'short' });
@@ -144,21 +158,37 @@ export async function signUp(email, password, name, extraData = {}) {
     },
     createdAt: serverTimestamp()
   });
-  await createAdminNotification('new_student', 'طالب جديد', `${name} سجّل حساب (${extraData.role === 'ta' ? 'معيد' : extraData.role === 'doctor' ? 'دكتور' : 'طالب'})`, 'admin.html', { uid: cred.user.uid }).catch(() => {});
+  await createAdminNotification(
+    'new_student', 'طالب جديد',
+    `${name} سجّل حساب (${extraData.role === 'ta' ? 'معيد' : extraData.role === 'doctor' ? 'دكتور' : 'طالب'})`,
+    'admin.html', { uid: cred.user.uid }
+  ).catch(() => {});
   return cred.user;
 }
-export async function signIn(email, password) { return (await signInWithEmailAndPassword(auth, email, password)).user; }
-export async function signOutUser() { await signOut(auth); }
-export async function getUserData(uid) {
-  try { const s = await getDoc(doc(db, "users", uid)); return s.exists() ? { id: uid, ...s.data() } : null; }
-  catch (e) { console.warn('getUserData failed:', e); return null; }
+
+export async function signIn(email, password) {
+  return (await signInWithEmailAndPassword(auth, email, password)).user;
 }
+
+export async function signOutUser() { await signOut(auth); }
+
+export async function getUserData(uid) {
+  try {
+    const s = await getDoc(doc(db, "users", uid));
+    return s.exists() ? { id: uid, ...s.data() } : null;
+  } catch (e) {
+    console.warn('getUserData failed:', e);
+    return null;
+  }
+}
+
 export function onAuth(cb) {
   return onAuthStateChanged(auth, async (user) => {
     if (!user) return cb(null, null);
     cb(user, await getUserData(user.uid));
   });
 }
+
 export function isAdmin(u) { return u && u.role === 'admin'; }
 export function goTo(page) { window.location.href = page; }
 
@@ -166,13 +196,17 @@ export function goTo(page) { window.location.href = page; }
    Device Fingerprint (v2)
    ============================================================ */
 const FP_STORAGE_KEY = 'clearnote_device_fp_v2';
+
 export async function getDeviceFingerprint() {
   try {
     let fp = localStorage.getItem(FP_STORAGE_KEY);
     if (fp && fp.length >= 20) return fp;
   } catch (e) {}
+
   try {
-    const random = crypto.randomUUID ? crypto.randomUUID().replace(/-/g, '') : Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    const random = crypto.randomUUID
+      ? crypto.randomUUID().replace(/-/g, '')
+      : Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
     const raw = `${random}|${navigator.platform || 'x'}|${navigator.hardwareConcurrency || 0}|${(Intl.DateTimeFormat().resolvedOptions().timeZone || 'x').replace(/[^a-zA-Z]/g, '')}`;
     const buf = new TextEncoder().encode(raw);
     const hash = await crypto.subtle.digest('SHA-256', buf);
@@ -196,20 +230,27 @@ export async function checkDeviceStatus(uid) {
       const d = devSnap.data();
       return { status: d.status, fp, isPrimary: d.isPrimary || false };
     }
+
     const snap = await getDocs(collection(db, 'devices', uid, 'list'));
     const existing = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     const approvedCount = existing.filter(d => d.status === 'approved').length;
     const autoApprove = existing.length === 0 || approvedCount === 0;
     const newStatus = autoApprove ? 'approved' : 'pending';
     const isPrimary = existing.length === 0;
+
     await setDoc(devRef, {
       deviceId: fp, userAgent: navigator.userAgent, platform: navigator.platform || '',
       status: newStatus, isPrimary,
       createdAt: serverTimestamp(), lastSeen: serverTimestamp()
     });
+
     if (!autoApprove) {
       const userData = await getUserData(uid);
-      await createAdminNotification('new_device', 'طلب جهاز جديد', `${userData?.name || 'طالب'} يحاول الدخول من جهاز جديد`, 'admin.html', { uid, deviceId: fp, kind: 'device' }).catch(() => {});
+      await createAdminNotification(
+        'new_device', 'طلب جهاز جديد',
+        `${userData?.name || 'طالب'} يحاول الدخول من جهاز جديد`,
+        'admin.html', { uid, deviceId: fp, kind: 'device' }
+      ).catch(() => {});
     }
     return { status: newStatus, fp, isPrimary };
   } catch (e) {
@@ -252,9 +293,11 @@ export async function updateUserProfile(uid, updates, editedBy = 'self') {
   });
 
   if (changedFields.length === 0) return [];
+
   const finalUpdates = { ...updates, updatedAt: serverTimestamp() };
   if (updates.privacy && oldData.privacy) finalUpdates.privacy = { ...oldData.privacy, ...updates.privacy };
   if (updates.chatPrivacy && oldData.chatPrivacy) finalUpdates.chatPrivacy = { ...oldData.chatPrivacy, ...updates.chatPrivacy };
+
   batch.update(userRef, finalUpdates);
   await batch.commit();
   return changedFields;
@@ -265,7 +308,10 @@ export async function getProfileHistory(uid, max = 50) {
     const q = query(collection(db, 'users', uid, 'profile_history'), orderBy('editedAt', 'desc'), limit(max));
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch (e) { console.warn('getProfileHistory failed:', e); return []; }
+  } catch (e) {
+    console.warn('getProfileHistory failed:', e);
+    return [];
+  }
 }
 
 export function canViewField(field, targetUser, viewerUid, isFollowing) {
@@ -283,10 +329,18 @@ export function canViewField(field, targetUser, viewerUid, isFollowing) {
    ============================================================ */
 export async function requestSubscription(uid, userName, subjectId, subjectName, notes) {
   const ref = doc(collection(db, 'subscription_requests'));
-  await setDoc(ref, { id: ref.id, uid, userName, subjectId, subjectName, notes, status: 'pending', createdAt: serverTimestamp() });
-  await createAdminNotification('new_subscription_request', 'طلب اشتراك جديد', `${userName} يطلب الاشتراك في "${subjectName}"`, 'admin.html', { reqId: ref.id, uid, kind: 'subscription' }).catch(() => {});
+  await setDoc(ref, {
+    id: ref.id, uid, userName, subjectId, subjectName, notes,
+    status: 'pending', createdAt: serverTimestamp()
+  });
+  await createAdminNotification(
+    'new_subscription_request', 'طلب اشتراك جديد',
+    `${userName} يطلب الاشتراك في "${subjectName}"`,
+    'admin.html', { reqId: ref.id, uid, kind: 'subscription' }
+  ).catch(() => {});
   return ref.id;
 }
+
 export async function activateSubscription(uid, subjectId, durationDays = 30) {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + durationDays);
@@ -300,15 +354,19 @@ export async function activateSubscription(uid, subjectId, durationDays = 30) {
    ============================================================ */
 export async function followUser(myUid, targetUid) {
   if (myUid === targetUid) throw new Error('لا يمكن متابعة نفسك');
-  await setDoc(doc(db, 'follows', `${myUid}_${targetUid}`), { followerUid: myUid, followedUid: targetUid, createdAt: serverTimestamp() });
+  await setDoc(doc(db, 'follows', `${myUid}_${targetUid}`), {
+    followerUid: myUid, followedUid: targetUid, createdAt: serverTimestamp()
+  });
   await updateDoc(doc(db, 'users', myUid), { followingCount: increment(1) });
   await updateDoc(doc(db, 'users', targetUid), { followersCount: increment(1) });
 }
+
 export async function unfollowUser(myUid, targetUid) {
   await deleteDoc(doc(db, 'follows', `${myUid}_${targetUid}`));
   await updateDoc(doc(db, 'users', myUid), { followingCount: increment(-1) });
   await updateDoc(doc(db, 'users', targetUid), { followersCount: increment(-1) });
 }
+
 export async function checkIfFollowing(myUid, targetUid) {
   try { return (await getDoc(doc(db, 'follows', `${myUid}_${targetUid}`))).exists(); }
   catch (e) { return false; }
@@ -321,9 +379,16 @@ export async function requestVerification(uid, userName, role, type, plan, price
   try {
     const snap = await getDocs(query(collection(db, 'verification_requests'), where('uid', '==', uid)));
     if (snap.docs.some(d => d.data().status === 'pending')) throw new Error('لديك طلب قيد المراجعة');
-  } catch (e) { if (e.message.includes('قيد المراجعة')) throw e; }
+  } catch (e) {
+    if (e.message.includes('قيد المراجعة')) throw e;
+  }
+
   const ref = doc(collection(db, 'verification_requests'));
-  await setDoc(ref, { id: ref.id, uid, userName, role, type, plan, price, durationDays, notes, status: 'pending', createdAt: serverTimestamp() });
+  await setDoc(ref, {
+    id: ref.id, uid, userName, role, type, plan, price, durationDays, notes,
+    status: 'pending', createdAt: serverTimestamp()
+  });
+
   const roleLabel = role === 'ta' ? 'معيد' : role === 'doctor' ? 'دكتور' : 'طالب';
   await createAdminNotification(
     'new_verification_request',
@@ -333,21 +398,33 @@ export async function requestVerification(uid, userName, role, type, plan, price
   ).catch(() => {});
   return ref.id;
 }
+
 export async function activateVerification(uid, durationDays) {
   const updates = { isVerified: true, verifiedAt: serverTimestamp() };
-  if (durationDays > 0) { const e = new Date(); e.setDate(e.getDate() + durationDays); updates.verifiedUntil = e; }
-  else updates.verifiedUntil = null;
+  if (durationDays > 0) {
+    const e = new Date();
+    e.setDate(e.getDate() + durationDays);
+    updates.verifiedUntil = e;
+  } else {
+    updates.verifiedUntil = null;
+  }
   await updateDoc(doc(db, 'users', uid), updates);
 }
+
 export async function rejectVerification(reqId, uid, reason = '') {
-  await updateDoc(doc(db, 'verification_requests', reqId), { status: 'rejected', rejectReason: reason, reviewedAt: serverTimestamp() });
+  await updateDoc(doc(db, 'verification_requests', reqId), {
+    status: 'rejected', rejectReason: reason, reviewedAt: serverTimestamp()
+  });
   await createNotification(uid, 'verification_rejected', '❌ تم رفض طلب التوثيق', reason || 'تواصل مع الإدارة', 'profile.html');
 }
+
 export async function checkPendingVerification(uid) {
   try {
     const snap = await getDocs(query(collection(db, 'verification_requests'), where('uid', '==', uid)));
     return snap.docs.some(d => d.data().status === 'pending');
-  } catch (e) { return false; }
+  } catch (e) {
+    return false;
+  }
 }
 
 /* ============================================================
@@ -358,33 +435,62 @@ export async function createNotification(uid, type, title, message, link = '', m
   await setDoc(ref, { id: ref.id, type, title, message, link, meta, read: false, createdAt: serverTimestamp() });
   return ref.id;
 }
+
 export async function createAdminNotification(type, title, message, link = '', meta = {}) {
   const ref = doc(collection(db, 'admin_notifications'));
   await setDoc(ref, { id: ref.id, type, title, message, link, meta, read: false, createdAt: serverTimestamp() });
   return ref.id;
 }
+
 export function listenUserNotifications(uid, cb) {
   const q = query(collection(db, 'notifications', uid, 'items'), orderBy('createdAt', 'desc'), limit(50));
-  return onSnapshot(q, s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))), e => { console.warn(e); cb([]); });
+  return onSnapshot(q,
+    s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))),
+    e => { console.warn(e); cb([]); }
+  );
 }
+
 export function listenAdminNotifications(cb) {
   const q = query(collection(db, 'admin_notifications'), orderBy('createdAt', 'desc'), limit(80));
-  return onSnapshot(q, s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))), e => { console.warn(e); cb([]); });
+  return onSnapshot(q,
+    s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))),
+    e => { console.warn(e); cb([]); }
+  );
 }
-export async function markNotificationRead(uid, id) { await updateDoc(doc(db, 'notifications', uid, 'items', id), { read: true }); }
-export async function markAdminNotificationRead(id) { await updateDoc(doc(db, 'admin_notifications', id), { read: true }); }
+
+export async function markNotificationRead(uid, id) {
+  await updateDoc(doc(db, 'notifications', uid, 'items', id), { read: true });
+}
+
+export async function markAdminNotificationRead(id) {
+  await updateDoc(doc(db, 'admin_notifications', id), { read: true });
+}
+
 export async function markAllNotificationsRead(uid, notifs) {
-  const b = writeBatch(db); let c = false;
-  notifs.forEach(n => { if (!n.read) { b.update(doc(db, 'notifications', uid, 'items', n.id), { read: true }); c = true; } });
+  const b = writeBatch(db);
+  let c = false;
+  notifs.forEach(n => {
+    if (!n.read) { b.update(doc(db, 'notifications', uid, 'items', n.id), { read: true }); c = true; }
+  });
   if (c) await b.commit();
 }
+
 export async function markAllAdminNotificationsRead(notifs) {
-  const b = writeBatch(db); let c = false;
-  notifs.forEach(n => { if (!n.read) { b.update(doc(db, 'admin_notifications', n.id), { read: true }); c = true; } });
+  const b = writeBatch(db);
+  let c = false;
+  notifs.forEach(n => {
+    if (!n.read) { b.update(doc(db, 'admin_notifications', n.id), { read: true }); c = true; }
+  });
   if (c) await b.commit();
 }
-export async function deleteNotification(uid, id) { await deleteDoc(doc(db, 'notifications', uid, 'items', id)); }
-export async function deleteAdminNotification(id) { await deleteDoc(doc(db, 'admin_notifications', id)); }
+
+export async function deleteNotification(uid, id) {
+  await deleteDoc(doc(db, 'notifications', uid, 'items', id));
+}
+
+export async function deleteAdminNotification(id) {
+  await deleteDoc(doc(db, 'admin_notifications', id));
+}
 
 /* ============================================================
    Subscriptions & Devices Listeners (existing)
@@ -405,8 +511,12 @@ export function listenUserSubscriptions(uid, cb) {
     cb(subs);
   }, e => { console.warn(e); cb({}); });
 }
+
 export function listenUserDevices(uid, cb) {
-  return onSnapshot(collection(db, 'devices', uid, 'list'), s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))), e => { console.warn(e); cb([]); });
+  return onSnapshot(collection(db, 'devices', uid, 'list'),
+    s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))),
+    e => { console.warn(e); cb([]); }
+  );
 }
 
 /* ============================================================
@@ -415,24 +525,23 @@ export function listenUserDevices(uid, cb) {
 
 /**
  * إنشاء محادثة جديدة (مجموعة، قناة، غرفة مذاكرة، أو DM)
+ * الترتيب مهم: تُنشأ المحادثة وعضوية المالك أولاً، لأن القواعد تتحقق من عضوية المنشئ.
  * @returns {convId, isNew}
  */
 export async function createConversation(uid, data) {
   const {
     type, name, description = '', avatarUrl = '',
     visibility = 'public',
-    memberUids = [],  // يستثني المالك (يُضاف تلقائياً)
+    memberUids = [],
     settings = {},
     studyRoom = null
   } = data;
 
   if (!['group', 'channel', 'study_room', 'dm'].includes(type)) throw new Error('نوع غير صالح');
-
   const userData = await getUserData(uid);
   if (!userData) throw new Error('المستخدم غير موجود');
 
   const convRef = doc(collection(db, 'conversations'));
-
   const defaultSettings = {
     whoCanWrite: type === 'channel' ? 'admins' : 'all',
     whoCanInvite: 'all',
@@ -443,12 +552,13 @@ export async function createConversation(uid, data) {
     ...settings
   };
 
+  const others = memberUids.filter(u => u !== uid);
   const convData = {
     type, name: name || 'بدون اسم', description, avatarUrl,
     ownerUid: uid, ownerName: userData.name || '',
     visibility,
-    memberCount: 1 + memberUids.length,
-    memberUids: [uid, ...memberUids.filter(u => u !== uid)],
+    memberCount: 1 + others.length,
+    memberUids: [uid, ...others],
     settings: defaultSettings,
     pinnedMessageIds: [],
     lastMessageAt: serverTimestamp(),
@@ -457,36 +567,36 @@ export async function createConversation(uid, data) {
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   };
-
   if (studyRoom) convData.studyRoom = studyRoom;
 
+  // 1) المحادثة + عضوية المالك
   await setDoc(convRef, convData);
-
-  const batch = writeBatch(db);
-  const myMemRef = doc(db, 'conversations', convRef.id, 'members', uid);
-  batch.set(myMemRef, {
+  await setDoc(doc(db, 'conversations', convRef.id, 'members', uid), {
     uid, role: 'owner', joinedAt: serverTimestamp(),
     lastReadAt: serverTimestamp(), notifMode: 'all', isPinned: false
   });
 
-  memberUids.filter(u => u !== uid).forEach(muid => {
-    const memRef = doc(db, 'conversations', convRef.id, 'members', muid);
-    batch.set(memRef, {
-      uid: muid, role: 'member', joinedAt: serverTimestamp(),
-      lastReadAt: null, notifMode: 'all', isPinned: false
+  // 2) باقي الأعضاء + إشعاراتهم
+  if (others.length) {
+    const batch = writeBatch(db);
+    others.forEach(muid => {
+      batch.set(doc(db, 'conversations', convRef.id, 'members', muid), {
+        uid: muid, role: 'member', joinedAt: serverTimestamp(),
+        lastReadAt: null, notifMode: 'all', isPinned: false
+      });
+      const notifRef = doc(collection(db, 'notifications', muid, 'items'));
+      batch.set(notifRef, {
+        id: notifRef.id, type: 'chat_added',
+        title: 'أضفتك إلى محادثة',
+        message: `${userData.name} أضافك إلى "${name}"`,
+        link: `chat.html#/c/${convRef.id}`,
+        meta: { convId: convRef.id },
+        read: false, createdAt: serverTimestamp()
+      });
     });
-    const notifRef = doc(collection(db, 'notifications', muid, 'items'));
-    batch.set(notifRef, {
-      id: notifRef.id, type: 'chat_added',
-      title: 'أضفتك إلى محادثة',
-      message: `${userData.name} أضافك إلى "${name}"`,
-      link: `chat.html#/c/${convRef.id}`,
-      meta: { convId: convRef.id },
-      read: false, createdAt: serverTimestamp()
-    });
-  });
+    await batch.commit();
+  }
 
-  await batch.commit();
   return { convId: convRef.id, isNew: true };
 }
 
@@ -517,7 +627,8 @@ export async function getOrCreateDM(uid, targetUid) {
   }
 
   // التحقق من طلب معلق
-  const reqQ = query(collection(db, 'message_requests'),
+  const reqQ = query(
+    collection(db, 'message_requests'),
     where('fromUid', '==', uid),
     where('toUid', '==', targetUid),
     where('status', '==', 'pending')
@@ -528,8 +639,8 @@ export async function getOrCreateDM(uid, targetUid) {
   // التحقق من خصوصية المستلم
   const targetData = await getUserData(targetUid);
   if (!targetData) throw new Error('المستخدم غير موجود');
-
   const policy = targetData.chatPrivacy?.messageRequestPolicy || 'everyone';
+
   if (policy === 'nobody') return { status: 'blocked', reason: 'لا يقبل طلبات مراسلة' };
 
   if (policy === 'followers') {
@@ -553,16 +664,18 @@ export async function getOrCreateDM(uid, targetUid) {
     toUid: targetUid, initialMessage: '',
     status: 'pending', createdAt: serverTimestamp()
   });
-
-  await createNotification(targetUid, 'message_request', '📩 طلب مراسلة جديد',
+  await createNotification(
+    targetUid, 'message_request', '📩 طلب مراسلة جديد',
     `${myData.name} يريد مراسلتك`,
-    'chat.html#/requests', { requestId: reqRef.id }).catch(() => {});
+    'chat.html#/requests', { requestId: reqRef.id }
+  ).catch(() => {});
 
   return { requestId: reqRef.id, status: 'request_sent' };
 }
 
 /**
- * قبول طلب مراسلة → ينشئ DM
+ * قبول طلب مراسلة → ينشئ DM والمستقبِل هو المنشئ (ownerUid)
+ * الترتيب: المحادثة + عضوية المنشئ أولاً، ثم الطرف الآخر والطلب والإشعار.
  */
 export async function acceptMessageRequest(reqId, myUid) {
   const reqRef = doc(db, 'message_requests', reqId);
@@ -574,12 +687,12 @@ export async function acceptMessageRequest(reqId, myUid) {
 
   const myData = await getUserData(myUid);
 
-  // إنشاء DM
+  // 1) المحادثة + عضوية المستقبِل
   const convRef = doc(collection(db, 'conversations'));
   await setDoc(convRef, {
     type: 'dm',
     name: '', description: '', avatarUrl: '',
-    ownerUid: req.fromUid, ownerName: req.fromName || '',
+    ownerUid: myUid, ownerName: myData?.name || '',
     visibility: 'private',
     memberCount: 2,
     memberUids: [req.fromUid, myUid].sort(),
@@ -590,35 +703,41 @@ export async function acceptMessageRequest(reqId, myUid) {
     pinnedMessageIds: [],
     lastMessageAt: serverTimestamp(),
     lastMessagePreview: 'بدأت المحادثة',
-    lastMessageSender: myData.name || '',
+    lastMessageSender: myData?.name || '',
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   });
-
-  const batch = writeBatch(db);
-  batch.set(doc(db, 'conversations', convRef.id, 'members', myUid), {
-    uid: myUid, role: 'member', joinedAt: serverTimestamp(),
+  await setDoc(doc(db, 'conversations', convRef.id, 'members', myUid), {
+    uid: myUid, role: 'owner', joinedAt: serverTimestamp(),
     lastReadAt: serverTimestamp(), notifMode: 'all', isPinned: false
   });
+
+  // 2) الطرف الآخر + تحديث الطلب + الإشعار
+  const batch = writeBatch(db);
   batch.set(doc(db, 'conversations', convRef.id, 'members', req.fromUid), {
     uid: req.fromUid, role: 'member', joinedAt: serverTimestamp(),
     lastReadAt: null, notifMode: 'all', isPinned: false
   });
   batch.update(reqRef, { status: 'accepted', reviewedAt: serverTimestamp(), convId: convRef.id });
-  batch.set(doc(collection(db, 'notifications', req.fromUid, 'items')), {
-    id: 'notif_' + Date.now(), type: 'message_request_accepted',
+  const notifRef = doc(collection(db, 'notifications', req.fromUid, 'items'));
+  batch.set(notifRef, {
+    id: notifRef.id, type: 'message_request_accepted',
     title: '✅ تم قبول طلب المراسلة',
-    message: `${myData.name} قبل طلبك`,
+    message: `${myData?.name || ''} قبل طلبك`,
     link: `chat.html#/c/${convRef.id}`,
     meta: { convId: convRef.id },
     read: false, createdAt: serverTimestamp()
   });
-
   await batch.commit();
+
   return convRef.id;
 }
 
-export async function rejectMessageRequest(reqId, myUid, blockUser = false) {
+/**
+ * رفض طلب مراسلة (مع خيار الحظر)
+ * ملاحظة: المعامل أُعيدت تسميته إلى alsoBlock حتى لا يحجب الدالة blockUser.
+ */
+export async function rejectMessageRequest(reqId, myUid, alsoBlock = false) {
   const reqRef = doc(db, 'message_requests', reqId);
   const reqSnap = await getDoc(reqRef);
   if (!reqSnap.exists()) throw new Error('الطلب غير موجود');
@@ -626,14 +745,12 @@ export async function rejectMessageRequest(reqId, myUid, blockUser = false) {
   if (req.toUid !== myUid) throw new Error('غير مصرح');
 
   await updateDoc(reqRef, { status: 'rejected', reviewedAt: serverTimestamp() });
-
-  if (blockUser) {
-    await blockUser(myUid, req.fromUid);
-  }
+  if (alsoBlock) await blockUser(myUid, req.fromUid);
 }
 
 export function listenMessageRequests(uid, cb) {
-  const q = query(collection(db, 'message_requests'),
+  const q = query(
+    collection(db, 'message_requests'),
     where('toUid', '==', uid),
     where('status', '==', 'pending'),
     orderBy('createdAt', 'desc')
@@ -689,15 +806,21 @@ export async function getMyMembership(convId, uid) {
   return snap.exists() ? { id: uid, ...snap.data() } : null;
 }
 
-export async function joinConversation(convId, uid) {
+/**
+ * الانضمام لمحادثة.
+ * viaInvite = true عند الانضمام عبر رابط دعوة (يسمح مع invite-only).
+ */
+export async function joinConversation(convId, uid, viaInvite = false) {
   const convRef = doc(db, 'conversations', convId);
   const convSnap = await getDoc(convRef);
   if (!convSnap.exists()) throw new Error('المحادثة غير موجودة');
   const conv = convSnap.data();
-  if (conv.visibility === 'private' || conv.visibility === 'invite-only') throw new Error('لا يمكن الانضمام مباشرة');
+
+  if (!viaInvite && (conv.visibility === 'private' || conv.visibility === 'invite-only')) {
+    throw new Error('لا يمكن الانضمام مباشرة');
+  }
   if (conv.memberUids?.includes(uid)) return;
 
-  const userData = await getUserData(uid);
   const batch = writeBatch(db);
   batch.set(doc(db, 'conversations', convId, 'members', uid), {
     uid, role: 'member', joinedAt: serverTimestamp(),
@@ -729,10 +852,12 @@ export async function leaveConversation(convId, uid) {
 export async function kickMember(convId, targetUid, byUid) {
   const myMem = await getMyMembership(convId, byUid);
   if (!myMem || !['owner', 'admin'].includes(myMem.role)) throw new Error('غير مصرح');
+
   if (myMem.role === 'admin') {
     const targetMem = await getMyMembership(convId, targetUid);
     if (targetMem && targetMem.role === 'owner') throw new Error('لا يمكن طرد المالك');
   }
+
   const batch = writeBatch(db);
   batch.delete(doc(db, 'conversations', convId, 'members', targetUid));
   batch.update(doc(db, 'conversations', convId), {
@@ -752,6 +877,7 @@ export async function updateMemberRole(convId, targetUid, newRole, byUid) {
 export async function updateConversationSettings(convId, updates, byUid) {
   const myMem = await getMyMembership(convId, byUid);
   if (!myMem || !['owner', 'admin'].includes(myMem.role)) throw new Error('غير مصرح');
+
   const convRef = doc(db, 'conversations', convId);
   const convSnap = await getDoc(convRef);
   const conv = convSnap.data();
@@ -781,7 +907,8 @@ export async function createInviteLink(convId, options = {}) {
     type, maxUses, usedCount: 0
   };
   if (expiresInHours) {
-    const exp = new Date(); exp.setHours(exp.getHours() + expiresInHours);
+    const exp = new Date();
+    exp.setHours(exp.getHours() + expiresInHours);
     data.expiresAt = exp;
   }
   await setDoc(ref, data);
@@ -800,7 +927,7 @@ export async function acceptInvite(code, uid) {
   if (invite.type === 'once' && invite.usedCount >= 1) throw new Error('استُخدم الرابط مسبقاً');
   if (invite.type === 'limited' && invite.usedCount >= (invite.maxUses || 0)) throw new Error('بلغ الرابط الحد الأقصى');
 
-  await joinConversation(invite.convId, uid);
+  await joinConversation(invite.convId, uid, true);
   await updateDoc(doc(db, 'invites', code), { usedCount: increment(1) });
   return invite.convId;
 }
@@ -814,14 +941,13 @@ export async function sendMessage(convId, msgData) {
   const convRef = doc(db, 'conversations', convId);
   const convSnap = await getDoc(convRef);
   if (!convSnap.exists()) throw new Error('المحادثة غير موجودة');
-  const conv = convSnap.data();
 
   const msgRef = doc(collection(db, 'conversations', convId, 'messages'));
   const msg = {
     id: msgRef.id,
     senderUid: uid,
-    senderName: userData.name || '',
-    senderAvatarUrl: userData.avatarUrl || '',
+    senderName: userData?.name || '',
+    senderAvatarUrl: userData?.avatarUrl || '',
     type: msgData.type || 'text',
     content: msgData.content || '',
     media: msgData.media || null,
@@ -851,7 +977,7 @@ export async function sendMessage(convId, msgData) {
   batch.update(convRef, {
     lastMessageAt: serverTimestamp(),
     lastMessagePreview: preview,
-    lastMessageSender: userData.name || '',
+    lastMessageSender: userData?.name || '',
     updatedAt: serverTimestamp()
   });
   batch.update(doc(db, 'conversations', convId, 'members', uid), { lastReadAt: serverTimestamp() });
@@ -864,7 +990,7 @@ export async function sendMessage(convId, msgData) {
       batch.set(notifRef, {
         id: notifRef.id, type: 'mention',
         title: 'أشار إليك',
-        message: `${userData.name}: ${preview}`,
+        message: `${userData?.name || ''}: ${preview}`,
         link: `chat.html#/c/${convId}`,
         meta: { convId, msgId: msgRef.id },
         read: false, createdAt: serverTimestamp()
@@ -922,18 +1048,14 @@ export async function deleteMessage(convId, msgId, hardDelete = false) {
 
 export async function pinMessage(convId, msgId) {
   const convRef = doc(db, 'conversations', convId);
-  await updateDoc(convRef, {
-    pinnedMessageIds: arrayUnion(msgId)
-  });
+  await updateDoc(convRef, { pinnedMessageIds: arrayUnion(msgId) });
   await updateDoc(doc(db, 'conversations', convId, 'messages', msgId), {
     isPinned: true, pinnedAt: serverTimestamp(), pinnedBy: auth.currentUser.uid
   });
 }
 
 export async function unpinMessage(convId, msgId) {
-  await updateDoc(doc(db, 'conversations', convId), {
-    pinnedMessageIds: arrayRemove(msgId)
-  });
+  await updateDoc(doc(db, 'conversations', convId), { pinnedMessageIds: arrayRemove(msgId) });
   await updateDoc(doc(db, 'conversations', convId, 'messages', msgId), {
     isPinned: false, pinnedAt: null, pinnedBy: null
   });
@@ -946,6 +1068,7 @@ export async function reactToMessage(convId, msgId, emoji, uid) {
   const msg = msgSnap.data();
   const reactions = { ...(msg.reactions || {}) };
   const current = reactions[emoji] || [];
+
   if (current.includes(uid)) {
     reactions[emoji] = current.filter(u => u !== uid);
     if (reactions[emoji].length === 0) delete reactions[emoji];
@@ -994,7 +1117,7 @@ export async function votePoll(convId, msgId, optionIds, uid) {
   if (!msg.poll) throw new Error('ليس استطلاعاً');
   if (msg.poll.closedAt) throw new Error('الاستطلاع مغلق');
 
-  const poll = { ...msg.poll };
+  const poll = JSON.parse(JSON.stringify(msg.poll));
   const alreadyVoted = poll.options.some(o => o.votes.includes(uid));
   if (alreadyVoted && !poll.allowRevote) throw new Error('صوتت مسبقاً');
 
@@ -1064,9 +1187,11 @@ export async function blockUser(blockerUid, blockedUid) {
     blockerUid, blockedUid, createdAt: serverTimestamp()
   });
 }
+
 export async function unblockUser(blockerUid, blockedUid) {
   await deleteDoc(doc(db, 'blocks', `${blockerUid}_${blockedUid}`));
 }
+
 export async function isBlocked(blockerUid, blockedUid) {
   return (await getDoc(doc(db, 'blocks', `${blockerUid}_${blockedUid}`))).exists();
 }
@@ -1080,9 +1205,11 @@ export async function reportMessage(convId, msgId, reporterUid, reason, descript
     id: ref.id, reporterUid, convId, msgId, reason, description,
     status: 'pending', createdAt: serverTimestamp()
   });
-  await createAdminNotification('new_report', 'بلاغ جديد',
+  await createAdminNotification(
+    'new_report', 'بلاغ جديد',
     `بلاغ عن رسالة في محادثة`,
-    'admin.html', { reportId: ref.id, convId, msgId }).catch(() => {});
+    'admin.html', { reportId: ref.id, convId, msgId }
+  ).catch(() => {});
   return ref.id;
 }
 
@@ -1119,16 +1246,25 @@ export function listenActiveSession(convId, cb) {
 }
 
 export async function pauseStudySession(convId, sessionId) {
-  await updateDoc(doc(db, 'conversations', convId, 'sessions', sessionId), { status: 'paused', pausedAt: serverTimestamp() });
+  await updateDoc(doc(db, 'conversations', convId, 'sessions', sessionId), {
+    status: 'paused', pausedAt: serverTimestamp()
+  });
 }
+
 export async function resumeStudySession(convId, sessionId, remainingMinutes) {
   const endsAt = new Date();
   endsAt.setMinutes(endsAt.getMinutes() + remainingMinutes);
-  await updateDoc(doc(db, 'conversations', convId, 'sessions', sessionId), { status: 'active', endsAt, pausedAt: null });
+  await updateDoc(doc(db, 'conversations', convId, 'sessions', sessionId), {
+    status: 'active', endsAt, pausedAt: null
+  });
 }
+
 export async function endStudySession(convId, sessionId) {
-  await updateDoc(doc(db, 'conversations', convId, 'sessions', sessionId), { status: 'done', endedAt: serverTimestamp() });
+  await updateDoc(doc(db, 'conversations', convId, 'sessions', sessionId), {
+    status: 'done', endedAt: serverTimestamp()
+  });
 }
+
 export async function recordStudyCompletion(convId, sessionId, uid, notes = '') {
   const ref = doc(db, 'conversations', convId, 'sessions', sessionId);
   const snap = await getDoc(ref);
@@ -1157,8 +1293,7 @@ export async function updateChatPrivacy(uid, updates) {
    ============================================================ */
 export async function searchUsersByName(queryText, max = 20) {
   if (!queryText || queryText.length < 2) return [];
-  const q = queryText.toLowerCase();
-  // Firestore doesn't support case-insensitive search natively, use >= and <=
+  // Firestore لا يدعم البحث غير الحساس لحالة الأحرف، لذا نستخدم >= و <=
   const snap = await getDocs(query(
     collection(db, 'users'),
     where('name', '>=', queryText),
