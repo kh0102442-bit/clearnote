@@ -2,242 +2,287 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ClearNote — الدردشات</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#152741">
+<title>ClearNote · الدردشات</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --navy:#152741; --navy-dark:#0f1e33; --accent:#a8741a;
-  --bg:#f4f6f8; --card:#fff; --text:#1a1a1a; --muted:#5b6472;
-  --line:#e9ecef; --line-soft:#f0f2f5; --red:#b91c1c;
-  --chat-bg:#efeae2; --mine:#d9fdd3;
+  --bg:#f4f6f8; --chat-bg:#efeae2; --mine:#d9fdd3; --red:#b91c1c;
+  --line:#e6e9ee; --muted:#6b7480; --text:#1b2433;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--bg);font-family:'Cairo',sans-serif;font-size:15px;line-height:1.5;overflow:hidden}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;padding:0}
-input,textarea{font-family:inherit}
-a{text-decoration:none;color:inherit}
-.hide{display:none!important}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
+html,body{height:100%}
+body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;direction:rtl}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none}
 
-/* ===== Layout ===== */
-.app{position:relative;height:100vh;height:100dvh;width:100%;overflow:hidden;display:flex}
-.list-col{width:100%;height:100%;display:flex;flex-direction:column;background:var(--card);min-width:0;border-left:1px solid var(--line)}
-.topbar{background:var(--navy);color:#fff;height:56px;display:flex;align-items:center;gap:8px;padding:0 12px;flex-shrink:0}
-.brand{font-family:Georgia,serif;font-weight:700;letter-spacing:1px;font-size:16px}
-.brand span{color:var(--accent)}
-.spacer{flex:1}
-.icon-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.icon-btn:active{background:rgba(255,255,255,.25)}
+.app{height:100vh;height:100dvh;display:flex;overflow:hidden}
 
-/* ===== Avatar ===== */
-.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--accent));color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;cursor:pointer}
-.av img{width:100%;height:100%;object-fit:cover}
-.av.hide{visibility:hidden}
-.top-av{width:36px;height:36px;font-size:13px}
-.head-av{width:42px;height:42px;font-size:16px}
+/* ================= القائمة ================= */
+.list-col{width:100%;height:100%;display:flex;flex-direction:column;background:#fff;min-width:0}
+.lhdr{height:56px;flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--navy);color:#fff}
+.lhdr h1{font-size:18px;font-weight:800;flex:1}
+.hbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.hbtn:hover{background:rgba(255,255,255,.12)}
+.search{margin:10px 12px 6px;position:relative;flex:0 0 auto}
+.search i{position:absolute;inset-inline-start:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.search input{width:100%;height:40px;border:1px solid var(--line);border-radius:20px;padding:0 38px 0 14px;background:#f5f7f9;outline:none}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 12px 8px;scrollbar-width:none;flex:0 0 auto;border-bottom:1px solid var(--line)}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:6px 12px;border-radius:16px;background:#eef1f5;color:#334;font-size:13px;font-weight:600;white-space:nowrap}
+.tab.on{background:var(--navy);color:#fff}
+.list-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.sec-title{padding:10px 14px 4px;font-size:12px;color:var(--muted);font-weight:700}
+.res-hint{padding:6px 14px;font-size:12px;color:var(--muted)}
+.item{display:flex;align-items:center;gap:12px;padding:10px 12px;cursor:pointer;border-bottom:1px solid #f1f3f6;content-visibility:auto;contain-intrinsic-size:auto 68px}
+.item:hover{background:#f7f9fb}
+.item.sel{background:#eef3f9}
+.item .av{width:50px;height:50px;border-radius:50%;flex:0 0 50px;overflow:hidden;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}
+.item .av img{width:100%;height:100%;object-fit:cover}
+.info{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.top,.bot{display:flex;align-items:center;gap:6px;min-width:0}
+.nm{flex:1;min-width:0;display:flex;align-items:center;gap:4px;font-weight:700;font-size:15px}
+.nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tm{font-size:12px;color:var(--muted);flex:0 0 auto}
+.pv{flex:1;min-width:0;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item.unread .pv.strong{color:#111;font-weight:700}
+.item.unread .tm{color:var(--accent);font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:0 0 auto}
+.tag{flex:0 0 auto;font-size:11px;padding:2px 8px;border-radius:10px;background:#eef1f5;color:#334;font-weight:700;white-space:nowrap}
+.tag.gold{background:#fbf1de;color:#7a4f0c}
+.tag.red{background:#fde8e8;color:var(--red)}
+.vbadge{color:var(--accent);font-size:14px;flex:0 0 auto}
+.empty{padding:40px 24px;text-align:center;color:var(--muted);font-size:14px;line-height:1.9}
+.empty i{font-size:34px;color:#c6ccd4;display:block;margin-bottom:10px}
+.bottom-nav{display:flex;border-top:1px solid var(--line);background:#fff;flex:0 0 auto;padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav a{flex:1;text-align:center;padding:8px 0 10px;font-size:12px;color:var(--muted);text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bottom-nav a i{font-size:18px}
+.bottom-nav a.on{color:var(--navy);font-weight:800}
 
-/* ===== Search & list ===== */
-.search{padding:10px 12px;border-bottom:1px solid var(--line);flex-shrink:0}
-.search input{width:100%;padding:9px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--line-soft);font-size:13.5px;outline:none}
-.search input:focus{border-color:var(--navy);background:#fff}
-.chat-list{flex:1;overflow-y:auto;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
-.chat-row{display:flex;gap:12px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line-soft);cursor:pointer;transition:background .15s}
-.chat-row:hover{background:var(--line-soft)}
-.chat-row.active{background:#eef2fa}
-.chat-row .av{width:50px;height:50px;font-size:18px}
-.cbody{flex:1;min-width:0}
-.ctop{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px}
-.cname{font-weight:800;color:var(--navy);font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ctime{font-size:11px;color:var(--muted);flex-shrink:0}
-.cprev{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hint{text-align:center;color:var(--muted);padding:24px 12px;font-size:13px}
-.hint.big i{font-size:44px;color:#cbd5e0;display:block;margin-bottom:10px}
-.hint.big h3{margin:0 0 4px;font-size:15px;color:var(--navy);font-weight:800}
-.hint.big p{margin:0}
-
-/* ===== Mobile nav ===== */
-.fab{position:fixed;left:18px;bottom:80px;width:56px;height:56px;border-radius:50%;background:var(--navy);color:#fff;font-size:20px;box-shadow:0 4px 16px rgba(21,39,65,.4);z-index:30;display:flex;align-items:center;justify-content:center}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:64px;padding-bottom:env(safe-area-inset-bottom);background:var(--card);border-top:1px solid var(--line);display:flex;z-index:200;box-shadow:0 -2px 12px rgba(21,39,65,.08)}
-.bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:700;color:#8a94a3;position:relative}
-.bottom-nav i{font-size:19px}
-.bottom-nav a.active{color:var(--navy)}
-.bottom-nav a.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:3px;background:var(--accent);border-radius:0 0 3px 3px}
-body.room-open .fab,body.room-open .bottom-nav{display:none}
-
-/* ===== Main / room ===== */
-.main{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;background:var(--chat-bg);transform:translateX(100%);transition:transform .25s ease;min-width:0}
+/* ================= الغرفة ================= */
+.main{position:fixed;inset:0;z-index:20;background:var(--chat-bg);transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;min-width:0}
 body.room-open .main{transform:none}
-.empty-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);padding:30px}
-.empty-main i{font-size:72px;color:#cbd5e0;margin-bottom:14px}
-.empty-main h2{font-size:22px;color:var(--navy);margin:0 0 8px;font-weight:800}
-.empty-main p{margin:0 0 20px;font-size:14px;max-width:340px}
+.empty-main{display:none;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#5b6472;text-align:center;padding:20px}
+.empty-main i{font-size:48px;color:#b8c0ca}
 .room{flex:1;display:flex;flex-direction:column;min-height:0}
-.room-head{background:var(--navy);color:#fff;height:62px;display:flex;align-items:center;gap:10px;padding:0 10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.back-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.1);color:#fff;display:none;align-items:center;justify-content:center;flex-shrink:0}
-.head-body{flex:1;min-width:0;cursor:pointer}
-.head-name{font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.head-sub{font-size:11.5px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rhdr{height:60px;flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:0 10px;background:var(--navy);color:#fff}
+.back-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;flex:0 0 auto}
+.rav{width:42px;height:42px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.18);display:grid;place-items:center;font-weight:800;cursor:pointer;flex:0 0 42px}
+.rav img{width:100%;height:100%;object-fit:cover}
+.rinfo{flex:1;min-width:0;cursor:pointer}
+.rname{font-weight:800;font-size:15px;display:flex;align-items:center;gap:5px;min-width:0}
+.rname span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rname .vbadge{color:#e0b25a}
+.rsub{font-size:12px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-.messages{flex:1;overflow-y:auto;position:relative;padding:14px 10px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.msgs-inner{max-width:800px;margin:0 auto;display:flex;flex-direction:column}
-.chat-hint{text-align:center;color:var(--muted);font-size:13px;padding:30px 10px}
+.thread-wrap{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
+.thread{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;overflow-anchor:none;padding:6px 10px 12px}
 
-/* ===== Message rows ===== */
-.msg-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:10px;content-visibility:auto;contain-intrinsic-size:auto 60px}
-.msg-row.cont{margin-bottom:2px}
-.msg-row.mine{flex-direction:row-reverse}
-.msg-row.flash .bubble{box-shadow:0 0 0 3px rgba(168,116,26,.5)}
-.mcol{max-width:78%;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
-.msg-row.mine .mcol{align-items:flex-end}
-.bubble{background:#fff;border-radius:12px;padding:8px 12px;font-size:14px;line-height:1.55;color:var(--text);word-wrap:break-word;overflow-wrap:anywhere;box-shadow:0 1px 2px rgba(0,0,0,.06);cursor:pointer;max-width:100%}
-.msg-row.mine .bubble{background:var(--mine)}
-.bubble.deleted{font-style:italic;color:var(--muted);background:#f0f2f5;cursor:default}
-.quote{background:rgba(0,0,0,.05);border-right:3px solid var(--accent);border-radius:6px;padding:4px 8px;margin-bottom:4px;font-size:12px;color:var(--muted);cursor:pointer;max-width:100%;overflow:hidden}
-.quote b{display:block;color:var(--accent);font-size:11.5px}
-.quote div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.edited{font-size:11px;opacity:.7;font-style:italic}
-.rxs{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
-.rx{background:#fff;border:1px solid var(--line);border-radius:12px;padding:2px 8px;font-size:12px;cursor:pointer}
-.rx.mine{background:#e7f5ff;border-color:#b6e0fe;color:#0d47a1}
-.meta{font-size:10.5px;color:var(--muted);margin-top:3px;padding:0 4px;display:flex;gap:4px;align-items:center}
-.meta .fa-check-double{color:#2980b9}
+.intro{display:flex;flex-direction:column;align-items:center;text-align:center;padding:22px 16px 16px;gap:6px}
+.intro-av{width:104px;height:104px;border-radius:50%;overflow:hidden;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:36px;font-weight:800;margin-bottom:6px;box-shadow:0 4px 14px rgba(0,0,0,.12);cursor:pointer}
+.intro-av img{width:100%;height:100%;object-fit:cover}
+.intro-name{font-size:20px;font-weight:800;display:flex;align-items:center;gap:6px;cursor:pointer}
+.intro-role{font-size:13px;color:var(--accent);font-weight:700}
+.intro-stats{display:flex;gap:28px;margin-top:6px}
+.intro-stats div{display:flex;flex-direction:column;align-items:center}
+.intro-stats b{font-size:16px}
+.intro-stats span{font-size:12px;color:var(--muted)}
+.intro-hint{font-size:12px;color:#5b6472;background:rgba(255,255,255,.75);border-radius:10px;padding:6px 12px;margin-top:8px;max-width:360px;line-height:1.7}
 
-/* ===== Composer ===== */
-.composer{background:#fff;border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom));flex-shrink:0}
-.ctx{max-width:800px;margin:0 auto 8px;background:#e7f5ff;border-right:3px solid #2980b9;border-radius:8px;padding:6px 10px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;color:#0d47a1}
-.ctx.edit{background:#fff8e1;border-color:var(--accent);color:#7b5c00}
-.ctx-text{flex:1;min-width:0}
-.ctx-text div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ctx button{color:var(--red);padding:4px 6px}
-.composer-inner{max-width:800px;margin:0 auto;display:flex;gap:8px;align-items:flex-end}
-.composer textarea{flex:1;min-height:42px;max-height:120px;padding:10px 14px;border-radius:22px;border:1.5px solid var(--line);background:var(--line-soft);font-size:14px;resize:none;outline:none;line-height:1.4}
-.composer textarea:focus{border-color:var(--navy);background:#fff}
-.send-btn{width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.send-btn:active{background:var(--navy-dark)}
+.row{content-visibility:auto;contain-intrinsic-size:auto 60px}
+.day{display:flex;justify-content:center;margin:12px 0 6px}
+.day span{background:rgba(255,255,255,.9);padding:3px 12px;border-radius:9px;font-size:12px;color:#4d5663;box-shadow:0 1px 1px rgba(0,0,0,.05)}
+.mrow{display:flex;margin:1px 0}
+.mrow.head{margin-top:8px}
+.mrow.mine{justify-content:flex-end}
+.bubble{max-width:min(80%,540px);min-width:0;background:#fff;border-radius:12px;padding:6px 9px 4px;box-shadow:0 1px 1px rgba(0,0,0,.08);cursor:pointer;transition:box-shadow .2s}
+.theirs.tail .bubble{border-top-right-radius:3px}
+.mine .bubble{background:var(--mine)}
+.mine.tail .bubble{border-top-left-radius:3px}
+.bubble.flash{box-shadow:0 0 0 3px rgba(168,116,26,.55)}
+.txt{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.6}
+.deleted{font-style:italic;color:#7a808a;font-size:14px}
+.quote{display:flex;flex-direction:column;gap:2px;border-inline-start:3px solid var(--accent);background:rgba(0,0,0,.05);border-radius:6px;padding:4px 8px;margin-bottom:4px;cursor:pointer;min-width:0}
+.quote b{font-size:12px;color:var(--accent)}
+.quote span{font-size:13px;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:11px;color:#7a808a;margin-top:2px}
+.ticks{font-size:12px;color:#8a929c}
+.ticks.seen{color:#34b7f1}
+.rxs{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.rx{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1px 7px;font-size:13px}
+.rx.on{border-color:var(--accent);background:#fff8ea}
+.rx small{font-size:11px;color:var(--muted)}
+.att-img{display:block;margin-bottom:4px;border-radius:8px;overflow:hidden;max-width:100%}
+.att-img img{display:block;max-width:100%;max-height:340px;border-radius:8px;object-fit:cover}
+.att-file{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.05);border-radius:8px;padding:8px 10px;margin-bottom:4px;text-decoration:none;color:inherit;min-width:0}
+.att-file i{font-size:24px;color:var(--navy)}
+.att-file span{display:flex;flex-direction:column;min-width:0}
+.att-file b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
+.att-file small{font-size:12px;color:var(--muted)}
 
-/* ===== Overlays ===== */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:flex-end;justify-content:center}
-.overlay.open{display:flex}
-.box{background:#fff;width:100%;max-width:520px;border-radius:20px 20px 0 0;padding:20px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto;animation:up .22s ease}
-@keyframes up{from{transform:translateY(100%)}to{transform:none}}
-.box h3{margin:0 0 14px;text-align:center;color:var(--navy);font-size:17px;font-weight:800}
-.sheet-emojis{display:flex;justify-content:space-around;background:var(--line-soft);border-radius:14px;padding:8px;margin-bottom:12px}
-.sheet-emojis button{font-size:26px;width:44px;height:44px;border-radius:50%}
-.sheet-emojis button:active{background:#e4e8ee}
-.sheet-btn{width:100%;padding:13px 14px;border-radius:10px;background:#fafbfc;margin-bottom:6px;display:flex;align-items:center;gap:12px;font-weight:700;font-size:14px;color:var(--navy)}
-.sheet-btn i{width:20px;text-align:center;color:var(--accent)}
-.sheet-btn.danger,.sheet-btn.danger i{color:var(--red)}
-.btn{width:100%;padding:13px;border-radius:10px;font-weight:800;font-size:14.5px;margin-top:6px}
-.btn.cancel{background:#e9ecef;color:var(--muted)}
-.field{position:relative;margin-bottom:12px}
-.field i{position:absolute;top:50%;right:12px;transform:translateY(-50%);color:var(--muted);pointer-events:none}
-.field input{width:100%;padding:12px 40px 12px 14px;border:2px solid var(--line);border-radius:10px;font-size:14px;background:#fafbfc;outline:none}
-.field input:focus{border-color:var(--navy)}
-.results{max-height:52vh;overflow-y:auto}
-.user-row{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer}
-.user-row:hover{background:var(--line-soft)}
-.user-row .av{width:42px;height:42px;font-size:16px}
-.uinfo{flex:1;min-width:0}
-.uname{font-weight:800;color:var(--navy);font-size:14px}
-.usub{font-size:12px;color:var(--muted)}
+.jump{position:absolute;bottom:12px;inset-inline-end:14px;width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);display:grid;place-items:center;color:var(--navy);z-index:5}
+.jump b{position:absolute;top:-6px;inset-inline-start:-4px;background:var(--accent);color:#fff;border-radius:10px;font-size:11px;padding:1px 6px;min-width:20px;text-align:center}
 
-/* ===== Desktop: two columns ===== */
+.composer-wrap{flex:0 0 auto;background:#f0f2f5;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
+.ctx{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:8px 10px;border-inline-start:4px solid var(--accent)}
+.ctx > div{flex:1;min-width:0;display:flex;flex-direction:column}
+.ctx b{font-size:13px;color:var(--accent)}
+.ctx span{font-size:13px;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-x{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#667;flex:0 0 auto}
+.filechip{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:8px 10px;position:relative;overflow:hidden}
+.filechip .fi{font-size:22px;color:var(--navy)}
+.filechip .fn{flex:1;min-width:0;display:flex;flex-direction:column}
+.filechip .fn b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.filechip .fn small{font-size:12px;color:var(--muted)}
+.fbar{position:absolute;bottom:0;inset-inline-start:0;height:3px;background:var(--accent);width:0;transition:width .15s}
+.notice{background:#fff;border-radius:10px;padding:12px;text-align:center;font-size:14px;color:#44505e;line-height:1.7}
+.notice.red{color:var(--red)}
+.decide{background:#fff;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.decide p{font-size:14px;text-align:center}
+.decide .btns{display:flex;gap:8px}
+.btn{flex:1;height:40px;border-radius:10px;font-weight:700;font-size:14px}
+.btn.ok{background:var(--navy);color:#fff}
+.btn.no{background:#fde8e8;color:var(--red)}
+.inputrow{display:flex;align-items:flex-end;gap:6px}
+.attach{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#5a6470;flex:0 0 auto;font-size:18px}
+.inputrow textarea{flex:1;min-width:0;resize:none;border:none;outline:none;border-radius:20px;padding:11px 14px;background:#fff;max-height:140px;line-height:1.5;font-size:15px}
+.send{width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;flex:0 0 auto;font-size:16px}
+.send:disabled{opacity:.45;cursor:default}
+
+/* ================= لوحة الخيارات ================= */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+.sheet-bg.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;bottom:0;left:50%;width:min(440px,100%);transform:translate(-50%,105%);background:#fff;border-radius:18px 18px 0 0;z-index:51;padding:10px 14px calc(16px + env(safe-area-inset-bottom));transition:transform .22s ease;box-shadow:0 -6px 24px rgba(0,0,0,.15)}
+.sheet.open{transform:translate(-50%,0)}
+.sh-grip{width:40px;height:4px;border-radius:2px;background:#d6dbe2;margin:0 auto 10px}
+.sh-emojis{display:flex;justify-content:space-between;gap:4px;margin-bottom:8px}
+.sh-emojis button{font-size:26px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center}
+.sh-emojis button.on{background:#fff3da;box-shadow:inset 0 0 0 2px var(--accent)}
+.sh-actions{display:flex;flex-direction:column}
+.sh-actions button{display:flex;align-items:center;gap:12px;padding:12px 8px;font-size:15px;border-radius:10px;text-align:start}
+.sh-actions button:hover{background:#f4f6f8}
+.sh-actions i{width:20px;text-align:center;color:var(--navy)}
+.sh-actions .danger,.sh-actions .danger i{color:var(--red)}
+
+/* ================= الشاشات الواسعة ================= */
 @media (min-width:900px){
-  .list-col{width:360px;flex-shrink:0}
-  .main{position:relative;inset:auto;transform:none;flex:1;z-index:auto}
-  .bottom-nav,.fab{display:none!important}
-  .chat-list{padding-bottom:0}
-}
-@media (max-width:899px){
-  .back-btn{display:flex}
-}
-@media (min-width:600px){
-  .overlay{align-items:center}
-  .box{border-radius:20px}
+  .list-col{width:360px;flex:0 0 360px;border-inline-end:1px solid var(--line)}
+  .bottom-nav{display:none}
+  .back-btn{display:none}
+  .main{position:relative;inset:auto;transform:none;flex:1;transition:none;z-index:auto}
+  body:not(.has-room) .empty-main{display:flex}
+  body:not(.has-room) .room{display:none}
 }
 </style>
 </head>
 <body>
 <div class="app">
 
-  <section class="list-col" id="listCol">
-    <header class="topbar">
-      <div class="brand">CLEAR<span>NOTE</span></div>
-      <div class="spacer"></div>
-      <button class="icon-btn" id="newChatBtn" title="محادثة جديدة"><i class="fas fa-plus"></i></button>
-      <a class="icon-btn" href="app.html" title="الرئيسية"><i class="fas fa-home"></i></a>
-      <div class="av top-av" id="topAv" title="حسابي"></div>
+  <aside class="list-col" id="listCol">
+    <header class="lhdr">
+      <a class="hbtn" href="app.html" title="الرئيسية"><i class="fa-solid fa-house"></i></a>
+      <h1>الدردشات</h1>
     </header>
+
     <div class="search">
-      <input id="listSearch" type="text" placeholder="ابحث في الدردشات...">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="search" type="search" placeholder="ابحث بالاسم أو اسم المستخدم أو الهاتف" autocomplete="off">
     </div>
-    <div class="chat-list" id="chatList"></div>
-  </section>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab on" data-tab="all">الكل</button>
+      <button class="tab" data-tab="unread">غير المقروءة</button>
+      <button class="tab" data-tab="direct">الخاص</button>
+      <button class="tab" data-tab="groups">الجروبات</button>
+      <button class="tab" data-tab="channels">القنوات</button>
+      <button class="tab" data-tab="communities">المجتمعات</button>
+      <button class="tab" data-tab="study">غرف المذاكرة</button>
+    </nav>
+
+    <div class="list-scroll" id="listScroll">
+      <section id="resultsWrap" hidden>
+        <div class="sec-title">المستخدمون</div>
+        <div class="res-hint" id="resHint" hidden>اكتب حرفين على الأقل</div>
+        <div id="results"></div>
+        <div class="res-hint" id="resEmpty" hidden>لا يوجد مستخدم مطابق</div>
+      </section>
+      <div id="chatList"></div>
+      <div class="empty" id="listEmpty" hidden></div>
+      <div class="empty" id="placeholder" hidden></div>
+    </div>
+
+    <nav class="bottom-nav">
+      <a href="app.html"><i class="fa-solid fa-house"></i>الرئيسية</a>
+      <a href="chat.html" class="on"><i class="fa-solid fa-comments"></i>الدردشات</a>
+      <a href="profile.html"><i class="fa-solid fa-user"></i>حسابي</a>
+    </nav>
+  </aside>
 
   <main class="main" id="main">
-    <div class="empty-main" id="emptyMain">
-      <i class="fas fa-comments"></i>
-      <h2>الدردشات</h2>
-      <p>اختر محادثة من القائمة، أو ابحث عن مستخدم بالاسم أو اسم المستخدم أو رقم الهاتف</p>
-      <button class="btn primary" id="emptyNewBtn" style="background:var(--navy);color:#fff;width:auto;padding:12px 22px;border-radius:10px;font-weight:800;">محادثة جديدة</button>
+    <div class="empty-main">
+      <i class="fa-regular fa-comments"></i>
+      <p>اختر محادثة للبدء</p>
     </div>
 
-    <div class="room hide" id="room">
-      <header class="room-head">
-        <button class="back-btn" id="backBtn" title="رجوع"><i class="fas fa-arrow-right"></i></button>
-        <div class="av head-av" id="hAv" title="الملف الشخصي"></div>
-        <div class="head-body" id="hBody">
-          <div class="head-name" id="hName"></div>
-          <div class="head-sub" id="hSub"></div>
+    <section class="room" id="room">
+      <header class="rhdr">
+        <button class="back-btn" id="backBtn" title="رجوع"><i class="fa-solid fa-arrow-right"></i></button>
+        <div class="rav" id="rav"></div>
+        <div class="rinfo" id="rinfo">
+          <div class="rname"><span id="rname"></span><i class="fa-solid fa-circle-check vbadge" id="rverified" hidden></i></div>
+          <div class="rsub" id="rsub"></div>
         </div>
       </header>
-      <div class="messages" id="messages">
-        <div class="chat-hint hide" id="chatHint">ابدأ المحادثة بإرسال أول رسالة</div>
-        <div class="msgs-inner" id="msgsInner"></div>
+
+      <div class="thread-wrap">
+        <div class="thread" id="thread"></div>
+        <button class="jump" id="jump" hidden><i class="fa-solid fa-chevron-down"></i><b id="jumpN" hidden>0</b></button>
       </div>
-      <div class="composer">
-        <div class="ctx hide" id="ctx">
-          <div class="ctx-text" id="ctxText"></div>
-          <button id="ctxClose" title="إلغاء"><i class="fas fa-times"></i></button>
+
+      <div class="composer-wrap" id="composer" hidden>
+        <div class="ctx" id="ctx" hidden>
+          <div><b id="ctxTitle"></b><span id="ctxText"></span></div>
+          <button class="icon-x" id="ctxClose" title="إلغاء"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div class="composer-inner">
-          <textarea id="msgInput" rows="1" placeholder="اكتب رسالة..."></textarea>
-          <button class="send-btn" id="sendBtn" title="إرسال"><i class="fas fa-paper-plane"></i></button>
+
+        <div class="filechip" id="filechip" hidden>
+          <i class="fa-solid fa-file fi" id="fchipIcon"></i>
+          <div class="fn"><b id="fchipName"></b><small id="fchipSize"></small></div>
+          <button class="icon-x" id="fchipX" title="إزالة"><i class="fa-solid fa-xmark"></i></button>
+          <div class="fbar" id="fbar"></div>
+        </div>
+
+        <div class="notice" id="notice" hidden></div>
+
+        <div class="decide" id="decide" hidden>
+          <p id="decideText"></p>
+          <div class="btns">
+            <button class="btn ok" id="acceptBtn">موافقة</button>
+            <button class="btn no" id="blockBtn">حظر</button>
+          </div>
+        </div>
+
+        <div class="inputrow" id="inputrow">
+          <button class="attach" id="attach" title="إرفاق ملف"><i class="fa-solid fa-paperclip"></i></button>
+          <textarea id="input" rows="1" maxlength="2000" placeholder="اكتب رسالة"></textarea>
+          <button class="send" id="send" disabled title="إرسال"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
       </div>
-    </div>
+    </section>
   </main>
-
-  <button class="fab" id="fab" title="محادثة جديدة"><i class="fas fa-plus"></i></button>
-
-  <nav class="bottom-nav">
-    <a href="app.html"><i class="fas fa-home"></i><span>الرئيسية</span></a>
-    <a href="app.html"><i class="fas fa-book-open"></i><span>المحتوى</span></a>
-    <a href="chat.html" class="active"><i class="fas fa-comments"></i><span>دردشات</span></a>
-    <a href="app.html"><i class="fas fa-clock"></i><span>بومودورو</span></a>
-    <a href="profile.html"><i class="fas fa-user"></i><span>حسابي</span></a>
-  </nav>
 </div>
 
-<div class="overlay" id="sheet">
-  <div class="box">
-    <div id="sheetBody"></div>
-    <button class="btn cancel" id="sheetClose">إغلاق</button>
-  </div>
-</div>
+<input type="file" id="fileInput" hidden>
 
-<div class="overlay" id="newModal">
-  <div class="box">
-    <h3>محادثة جديدة</h3>
-    <div class="field">
-      <i class="fas fa-search"></i>
-      <input id="userSearch" type="text" placeholder="الاسم أو اسم المستخدم أو رقم الهاتف">
-    </div>
-    <div class="results" id="searchResults"></div>
-    <button class="btn cancel" id="newClose">إغلاق</button>
-  </div>
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog">
+  <div class="sh-grip"></div>
+  <div class="sh-emojis" id="shEmojis"></div>
+  <div class="sh-actions" id="shActions"></div>
 </div>
 
 <script type="module">
@@ -245,861 +290,1339 @@ import { auth, db, showToast } from './shared.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
   collection, doc, getDoc, getDocs, onSnapshot, query, where, orderBy, limit,
-  writeBatch, updateDoc, serverTimestamp, deleteField, Timestamp
+  writeBatch, updateDoc, serverTimestamp, deleteField
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-/* ===== Constants ===== */
+/* ================= ثوابت ================= */
 const LOGIN_PAGE = 'index.html';
 const PROFILE_PAGE = 'profile.html';
 const PAGE_SIZE = 30;
 const CHAT_LIST_LIMIT = 300;
 const MAX_TEXT = 2000;
+const MAX_FILE = 10 * 1024 * 1024;
 const GROUP_GAP_MS = 5 * 60 * 1000;
-const MAX_SAFE = Number.MAX_SAFE_INTEGER;
 const EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+const CLOUD_URL = 'https://api.cloudinary.com/v1_1/nopxs3zt/auto/upload';
+const CLOUD_PRESET = 'clearnote_unsigned';
+const FOLLOWERS_KEY = 'followersCount';
+const POSTS_KEY = 'postsCount';
+const PLACEHOLDER_TABS = {
+  groups: 'الجروبات قريباً',
+  channels: 'القنوات قريباً',
+  communities: 'المجتمعات قريباً',
+  study: 'غرف المذاكرة قريباً'
+};
+const ROLE_LABEL = { admin: 'مشرف', moderator: 'مشرف', founder: 'المؤسس', member: 'عضو', user: 'عضو' };
 
-/* ===== State ===== */
+/* ================= الحالة ================= */
 const S = {
   me: null,
-  token: 0,
+  tab: 'all',
+  listQuery: '',
   chats: new Map(),
-  chatUnsub: null,
-  listSearch: '',
+  listUnsub: null,
 
   activeId: null,
   otherUid: null,
   chatExists: false,
   chatData: null,
-  chatLoaded: false,
+  otherReadMs: 0,
   roomUnsub: null,
   msgUnsub: null,
 
-  boundaryMs: null,
+  windowSize: PAGE_SIZE,
   hasMore: true,
   loadingOlder: false,
-  anchor: null,
-  forceBottom: false,
+  anchorH: null,
+  ready: false,
+  forceBottom: true,
+  newBelow: 0,
 
-  msgOrder: [],
-  msgEntry: new Map(),
-  msgData: new Map(),
-  msgEls: new Map(),
-  sig: new Map(),
+  order: [],
+  map: new Map(),
 
   reply: null,
   editingId: null,
-  sheetId: null
+  sheetId: null,
+  pendingFile: null,
+  uploading: false,
+
+  thread: null,
+  intro: null
 };
-const userCache = new Map();
-const userPending = new Map();
+
+/* ================= أدوات ================= */
 const $ = (id) => document.getElementById(id);
 
-/* ===== Helpers ===== */
-function esc(s) {
-  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
 }
-function msTime(ts) {
-  if (!ts) return null;
-  if (typeof ts.toMillis === 'function') return ts.toMillis();
-  if (ts instanceof Date) return ts.getTime();
+
+const toMs = (v) => {
+  if (!v) return null;
+  if (typeof v === 'number') return v;
+  if (typeof v.toMillis === 'function') return v.toMillis();
+  if (typeof v.seconds === 'number') return v.seconds * 1000;
   return null;
+};
+
+const chatIdFor = (a, b) => [a, b].sort().join('_');
+const otherOf = (d) => (d.participants || []).find((x) => x !== S.me) || null;
+const initialOf = (name) => (name || '?').trim().charAt(0) || '?';
+const fmtTime = (ms) => new Date(ms).toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
+const dayKey = (ms) => { const d = new Date(ms); return d.getFullYear() * 400 + d.getMonth() * 32 + d.getDate(); };
+const fmtNum = (n) => Number(n || 0).toLocaleString('ar');
+const roleLabel = (r) => ROLE_LABEL[r] || r || 'عضو';
+
+function dayLabel(ms) {
+  const now = Date.now();
+  if (dayKey(ms) === dayKey(now)) return 'اليوم';
+  if (dayKey(ms) === dayKey(now - 86400000)) return 'أمس';
+  const d = new Date(ms);
+  return d.toLocaleDateString('ar', {
+    weekday: 'long', day: 'numeric', month: 'long',
+    year: d.getFullYear() === new Date(now).getFullYear() ? undefined : 'numeric'
+  });
 }
-function fmtTime(ms) {
-  if (!ms) return '';
-  const d = new Date(ms), n = new Date();
-  return d.toDateString() === n.toDateString()
-    ? d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
-    : d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+
+function shortTime(ms) {
+  return dayKey(ms) === dayKey(Date.now())
+    ? fmtTime(ms)
+    : new Date(ms).toLocaleDateString('ar', { day: 'numeric', month: 'numeric' });
 }
-function fmtClock(ms) {
-  return ms ? new Date(ms).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
+
+function fmtSize(b) {
+  if (!b) return '';
+  if (b < 1024 * 1024) return Math.max(1, Math.round(b / 1024)) + ' KB';
+  return (b / (1024 * 1024)).toFixed(1) + ' MB';
 }
-function thumb(url, size) {
-  if (!url || !url.includes('/upload/')) return url || '';
-  return url.replace('/upload/', `/upload/w_${size},h_${size},c_fill,q_auto,f_auto/`);
+
+function transformUrl(url, t) {
+  return url && url.includes('/upload/') ? url.replace('/upload/', `/upload/${t}/`) : url;
 }
-function displayName(u) {
-  return (u && (u.name || u.username)) || 'مستخدم';
+const avatarSrc = (u, s) => (u && u.avatarUrl ? transformUrl(u.avatarUrl, `w_${s},h_${s},c_fill,q_auto,f_auto`) : '');
+const thumbSrc = (url) => transformUrl(url, 'w_520,h_360,c_limit,q_auto,f_auto');
+
+function fillAv(node, u, size) {
+  const src = avatarSrc(u, size);
+  const key = src + '|' + (u?.name || '');
+  if (node._key === key) return;
+  node._key = key;
+  node.textContent = '';
+  if (src) {
+    const img = new Image();
+    img.alt = '';
+    img.decoding = 'async';
+    img.loading = 'lazy';
+    img.onerror = () => { img.remove(); node.textContent = initialOf(u.name); };
+    img.src = src;
+    node.appendChild(img);
+  } else {
+    node.textContent = initialOf(u?.name);
+  }
 }
-function nameOf(uid) {
-  return displayName(userCache.get(uid));
-}
-function avatarInner(u, size) {
-  if (u && u.avatarUrl) return `<img src="${esc(thumb(u.avatarUrl, size))}" alt="" loading="lazy">`;
-  const base = (u && (u.name || u.username)) || 'U';
-  return esc(String(base).trim().charAt(0).toUpperCase());
-}
-function chatIdFor(a, b) {
-  return [a, b].sort().join('_');
-}
-function otherOf(id) {
-  if (!S.me) return null;
-  const parts = id.split('_');
-  if (parts.length !== 2 || !parts.includes(S.me)) return null;
-  return parts[0] === S.me ? parts[1] : parts[0];
-}
-function otherOfChat(c) {
-  return (c.participants || []).find(p => p !== S.me) || otherOf(c.id);
-}
+
 function goProfile(uid) {
   if (!uid) return;
   location.href = uid === S.me ? PROFILE_PAGE : `${PROFILE_PAGE}?uid=${encodeURIComponent(uid)}`;
 }
-function sigOf(d) {
-  return [
-    d.text, d.isEdited ? 1 : 0, d.deleted ? 1 : 0,
-    d.replyTo ? d.replyTo.text : '', JSON.stringify(d.reactions || {}),
-    d.createdAt ? 1 : 0
-  ].join('\u0001');
-}
-function autoGrow() {
-  const t = $('msgInput');
-  t.style.height = 'auto';
-  t.style.height = Math.min(t.scrollHeight, 120) + 'px';
+
+/* ================= المستخدمون (كاش) ================= */
+const userCache = new Map();
+const userPending = new Map();
+
+function normUser(uid, d) {
+  return {
+    uid,
+    name: d.name || d.username || 'مستخدم',
+    username: d.username || '',
+    avatarUrl: d.avatarUrl || '',
+    role: d.role || '',
+    verified: d.verified === true || d.isVerified === true,
+    followers: Number(d[FOLLOWERS_KEY]) || 0,
+    posts: Number(d[POSTS_KEY]) || 0
+  };
 }
 
-/* ===== Users (cached, deduplicated) ===== */
-function loadUser(uid) {
-  if (userCache.has(uid)) return Promise.resolve(userCache.get(uid));
+const placeholder = (uid) => normUser(uid, { name: '…' });
+
+function fetchUser(uid) {
   if (userPending.has(uid)) return userPending.get(uid);
   const p = getDoc(doc(db, 'users', uid))
-    .then(s => {
-      const d = s.exists() ? s.data() : {};
-      userCache.set(uid, d);
-      return d;
-    })
-    .catch(() => ({}))
-    .finally(() => userPending.delete(uid));
+    .then((s) => normUser(uid, s.exists() ? s.data() : {}))
+    .catch(() => normUser(uid, { name: 'مستخدم' }))
+    .then((u) => {
+      userCache.set(uid, u);
+      userPending.delete(uid);
+      onUserLoaded(uid);
+      return u;
+    });
   userPending.set(uid, p);
   return p;
 }
 
-/* ===== Auth ===== */
-onAuthStateChanged(auth, async (user) => {
-  if (!user) { location.replace(LOGIN_PAGE); return; }
-  S.me = user.uid;
-  const me = await loadUser(S.me);
-  renderTopAvatar(me);
-  listenChats();
-  route();
-});
-window.addEventListener('hashchange', route);
-
-function renderTopAvatar(me) {
-  const el = $('topAv');
-  el.innerHTML = avatarInner(me, 80);
+function cachedUser(uid) {
+  if (!uid) return null;
+  const u = userCache.get(uid);
+  if (u) return u;
+  if (!userPending.has(uid)) fetchUser(uid);
+  return null;
 }
 
-/* ===== Routing ===== */
-function route() {
-  if (!S.me) return;
-  const m = location.hash.match(/^#\/c\/([^/]+)$/);
-  if (m) openChat(decodeURIComponent(m[1]));
-  else closeRoomUI();
+function onUserLoaded(uid) {
+  scheduleList();
+  if (S.otherUid === uid) { renderHeader(); renderIntro(); }
 }
 
-/* ===== Chat list ===== */
-function listenChats() {
-  if (S.chatUnsub) S.chatUnsub();
-  const q = query(
-    collection(db, 'chats'),
-    where('participants', 'array-contains', S.me),
-    limit(CHAT_LIST_LIMIT)
-  );
-  S.chatUnsub = onSnapshot(q, (snap) => {
-    snap.docChanges().forEach(ch => {
-      if (ch.type === 'removed') S.chats.delete(ch.doc.id);
-      else S.chats.set(ch.doc.id, { id: ch.doc.id, ...ch.doc.data() });
-    });
-    S.chats.forEach(c => {
-      const o = otherOfChat(c);
-      if (o && !userCache.has(o)) loadUser(o).then(scheduleList);
-    });
-    scheduleList();
-  }, (err) => {
-    console.error(err);
-    showToast('تعذر تحميل الدردشات', 'error');
-  });
+/* ================= الحالة والصلاحيات ================= */
+function needsRead(d) {
+  if (!d || !S.me) return false;
+  if ((d.status || 'active') === 'blocked') return false;
+  if (d.lastSenderUid === S.me) return false;
+  const last = toMs(d.lastMessageAt) ?? Date.now();
+  const rv = d.readAt ? d.readAt[S.me] : undefined;
+  const read = rv === undefined ? 0 : (toMs(rv) ?? Date.now());
+  return last > read;
 }
 
-let listRaf = 0;
+function roomState() {
+  if (!S.activeId) return 'none';
+  if (!S.chatExists || !S.chatData) return 'new';
+  const st = S.chatData.status || 'active';
+  if (st === 'blocked') return 'blocked';
+  if (st === 'pending') return S.chatData.requesterUid === S.me ? 'wait' : 'decide';
+  return 'active';
+}
+
+const canSend = () => { const s = roomState(); return s === 'new' || s === 'active'; };
+
+/* ================= قائمة الدردشات ================= */
+const listEls = new Map();
+let listScheduled = false;
+
 function scheduleList() {
-  if (listRaf) return;
-  listRaf = requestAnimationFrame(() => { listRaf = 0; renderList(); });
+  if (listScheduled) return;
+  listScheduled = true;
+  requestAnimationFrame(() => { listScheduled = false; renderList(); });
 }
-const sortKey = (c) => msTime(c.lastMessageAt) ?? Date.now();
-function chatTitle(c) {
-  return displayName(userCache.get(otherOfChat(c)));
+
+function visibleChats() {
+  const q = S.listQuery.toLowerCase();
+  const out = [];
+  for (const [id, d] of S.chats) {
+    if (!d.participants || !d.participants.includes(S.me)) continue;
+    const st = d.status || 'active';
+    if (st === 'blocked') continue;
+    if (S.tab === 'direct' && st !== 'active') continue;
+    if (S.tab === 'unread' && !needsRead(d)) continue;
+    if (q) {
+      const u = cachedUser(otherOf(d));
+      if (!u || !(u.name.toLowerCase().includes(q) || u.username.toLowerCase().includes(q))) continue;
+    }
+    out.push({ id, d, ms: toMs(d.lastMessageAt) ?? Date.now() });
+  }
+  out.sort((a, b) => b.ms - a.ms);
+  return out;
 }
+
+function makeListRow() {
+  const row = el('div', 'item');
+  const av = el('div', 'av');
+  av.dataset.profile = '';
+  const info = el('div', 'info');
+  const top = el('div', 'top');
+  const nm = el('div', 'nm');
+  const nmText = el('span');
+  const vb = el('i', 'fa-solid fa-circle-check vbadge');
+  nm.append(nmText, vb);
+  const tm = el('span', 'tm');
+  top.append(nm, tm);
+  const bot = el('div', 'bot');
+  const pv = el('div', 'pv');
+  const tag = el('span', 'tag');
+  const dot = el('span', 'dot');
+  bot.append(pv, tag, dot);
+  info.append(top, bot);
+  row.append(av, info);
+  row._r = { av, nm: nmText, vb, tm, pv, tag, dot };
+  return row;
+}
+
+function previewOf(d) {
+  const t = d.lastMessage || '';
+  return d.lastSenderUid === S.me ? 'أنت: ' + t : t;
+}
+
+function paintListRow(row, id, d) {
+  const r = row._r;
+  const other = otherOf(d);
+  const u = cachedUser(other);
+  row.dataset.id = id;
+  row.dataset.uid = other || '';
+  row.classList.toggle('sel', id === S.activeId);
+  fillAv(r.av, u || placeholder(other), 100);
+  r.nm.textContent = u ? u.name : '…';
+  r.vb.hidden = !(u && u.verified);
+  r.tm.textContent = shortTime(toMs(d.lastMessageAt) ?? Date.now());
+  const st = d.status || 'active';
+  const incoming = st === 'pending' && d.requesterUid !== S.me;
+  r.tag.hidden = st !== 'pending';
+  r.tag.className = 'tag' + (incoming ? ' gold' : '');
+  r.tag.textContent = incoming ? 'طلب مراسلة' : 'بانتظار الرد';
+  const unread = needsRead(d);
+  row.classList.toggle('unread', unread);
+  r.dot.hidden = !unread;
+  r.pv.classList.toggle('strong', unread);
+  r.pv.textContent = previewOf(d);
+}
+
 function renderList() {
-  let items = [...S.chats.values()].filter(c => Array.isArray(c.participants));
-  items.sort((a, b) => sortKey(b) - sortKey(a));
-  if (S.listSearch) items = items.filter(c => chatTitle(c).toLowerCase().includes(S.listSearch));
-  const el = $('chatList');
+  if (!S.me) return;
+  const list = $('chatList'), empty = $('listEmpty'), ph = $('placeholder');
+  const phText = PLACEHOLDER_TABS[S.tab];
+  list.hidden = !!phText;
+  ph.hidden = !phText;
+  empty.hidden = true;
+  if (phText) {
+    ph.textContent = '';
+    ph.append(el('i', 'fa-solid fa-hourglass-half'), phText);
+    return;
+  }
+  const items = visibleChats();
+  const frag = document.createDocumentFragment();
+  const seen = new Set();
+  for (const it of items) {
+    let row = listEls.get(it.id);
+    if (!row) { row = makeListRow(); listEls.set(it.id, row); }
+    paintListRow(row, it.id, it.d);
+    seen.add(it.id);
+    frag.appendChild(row);
+  }
+  for (const [id, row] of listEls) {
+    if (!seen.has(id)) { row.remove(); listEls.delete(id); }
+  }
+  list.replaceChildren(frag);
   if (!items.length) {
-    el.innerHTML = `<div class="hint big"><i class="fas fa-comments"></i><h3>لا توجد محادثات</h3><p>ابدأ محادثة جديدة بالبحث عن مستخدم</p></div>`;
-    return;
+    empty.hidden = false;
+    empty.textContent = S.tab === 'unread'
+      ? 'لا توجد رسائل غير مقروءة'
+      : 'لا توجد محادثات بعد. ابحث باسم شخص أو اسم مستخدمه لبدء المراسلة.';
   }
-  el.innerHTML = items.map(chatRowHtml).join('');
-}
-function chatRowHtml(c) {
-  const other = otherOfChat(c);
-  const u = userCache.get(other);
-  const preview = c.lastMessage
-    ? ((c.lastSenderUid === S.me ? 'أنت: ' : '') + c.lastMessage)
-    : 'لا توجد رسائل بعد';
-  return `<div class="chat-row${c.id === S.activeId ? ' active' : ''}" data-chat="${esc(c.id)}">
-    <div class="av" data-profile="${esc(other)}">${avatarInner(u, 100)}</div>
-    <div class="cbody">
-      <div class="ctop">
-        <span class="cname">${esc(displayName(u))}</span>
-        <span class="ctime">${fmtTime(msTime(c.lastMessageAt))}</span>
-      </div>
-      <div class="cprev">${esc(preview)}</div>
-    </div>
-  </div>`;
 }
 
-/* ===== Open / close room ===== */
-function showRoom() {
-  $('emptyMain').classList.add('hide');
-  $('room').classList.remove('hide');
-  document.body.classList.add('room-open');
+function startList() {
+  if (S.listUnsub) S.listUnsub();
+  S.listUnsub = onSnapshot(
+    query(collection(db, 'chats'), where('participants', 'array-contains', S.me), limit(CHAT_LIST_LIMIT)),
+    (snap) => {
+      for (const ch of snap.docChanges()) {
+        if (ch.type === 'removed') S.chats.delete(ch.doc.id);
+        else S.chats.set(ch.doc.id, ch.doc.data());
+      }
+      scheduleList();
+    },
+    () => showToast('تعذر تحميل الدردشات')
+  );
 }
-function showEmptyMain() {
-  $('room').classList.add('hide');
-  $('emptyMain').classList.remove('hide');
-  document.body.classList.remove('room-open');
+
+/* ================= البحث عن مستخدمين ================= */
+let searchTimer = 0;
+let searchSeq = 0;
+
+function makeUserItem(u) {
+  const row = el('div', 'item');
+  row.dataset.uid = u.uid;
+  const av = el('div', 'av');
+  av.dataset.profile = '';
+  fillAv(av, u, 100);
+  const info = el('div', 'info');
+  const top = el('div', 'top');
+  const nm = el('div', 'nm');
+  const sp = el('span', null, u.name);
+  const vb = el('i', 'fa-solid fa-circle-check vbadge');
+  vb.hidden = !u.verified;
+  nm.append(sp, vb);
+  top.appendChild(nm);
+  const bot = el('div', 'bot');
+  const sub = (u.username ? '@' + u.username : '') + (u.role ? ' · ' + roleLabel(u.role) : '');
+  bot.appendChild(el('div', 'pv', sub));
+  info.append(top, bot);
+  row.append(av, info);
+  return row;
 }
-function openChat(id) {
-  if (S.activeId === id) { showRoom(); return; }
-  const other = otherOf(id);
-  if (!other) {
-    showToast('محادثة غير صالحة', 'error');
-    closeRoomUI();
-    return;
+
+async function runSearch(raw) {
+  const seq = ++searchSeq;
+  const wrap = $('resultsWrap'), hint = $('resHint'), empty = $('resEmpty');
+  if (!raw) { wrap.hidden = true; $('results').replaceChildren(); return; }
+  const q = raw.replace(/^@/, '').trim();
+  const lower = q.toLowerCase();
+  const digits = raw.replace(/\D/g, '');
+  const canName = q.length >= 2;
+  const canPhone = digits.length >= 6;
+  wrap.hidden = false;
+  empty.hidden = true;
+  hint.hidden = canName || canPhone;
+  if (!canName && !canPhone) { $('results').replaceChildren(); return; }
+
+  const usersRef = collection(db, 'users');
+  const jobs = [];
+  if (canName) {
+    jobs.push(getDocs(query(usersRef, where('name', '>=', q), where('name', '<=', q + '\uf8ff'), limit(10))));
+    jobs.push(getDocs(query(usersRef, where('lower', 'in', [lower]), limit(5))));
+    jobs.push(getDocs(query(usersRef, where('term', 'in', [q, lower]), limit(10))));
   }
-  teardownRoom();
-  S.activeId = id;
-  S.otherUid = other;
-  const token = S.token;
-  S.forceBottom = true;
-  showRoom();
-  renderHeader();
-  updateHint();
+  if (canPhone) jobs.push(getDocs(query(usersRef, where('digits', 'in', [digits]), limit(5))));
 
-  loadUser(other).then(() => {
-    if (token !== S.token) return;
-    renderHeader();
-    repaintFor(other);
-    scheduleList();
-  });
+  const snaps = await Promise.all(jobs.map((p) => p.catch(() => null)));
+  if (seq !== searchSeq) return;
 
-  S.roomUnsub = onSnapshot(doc(db, 'chats', id), (snap) => {
-    if (token !== S.token) return;
-    S.chatLoaded = true;
-    S.chatExists = snap.exists();
-    S.chatData = snap.exists() ? snap.data() : null;
-    if (snap.exists() && !S.msgUnsub && !snap.metadata.hasPendingWrites) subscribeMessages(token);
-    updateHint();
-  }, (err) => {
-    console.error(err);
-    showToast('تعذر فتح المحادثة', 'error');
-  });
+  const found = new Map();
+  for (const s of snaps) {
+    if (!s) continue;
+    s.forEach((d) => {
+      if (d.id !== S.me && !found.has(d.id)) found.set(d.id, normUser(d.id, d.data()));
+    });
+  }
+  const frag = document.createDocumentFragment();
+  for (const u of found.values()) {
+    if (!userCache.has(u.uid)) userCache.set(u.uid, u);
+    frag.appendChild(makeUserItem(u));
+  }
+  $('results').replaceChildren(frag);
+  empty.hidden = found.size > 0;
+}
 
-  scheduleList();
+function openWith(uid) {
+  if (!uid || uid === S.me) return;
+  openRoomFor(chatIdFor(S.me, uid), uid);
 }
-function closeRoom() {
-  history.replaceState(null, '', location.pathname + location.search);
-  closeRoomUI();
+
+/* ================= الغرفة: فتح وإغلاق ================= */
+function makeIntro() {
+  const root = el('div', 'intro');
+  const av = el('div', 'intro-av');
+  av.dataset.profile = '';
+  const name = el('div', 'intro-name');
+  name.dataset.profile = '';
+  const nm = el('span');
+  const vb = el('i', 'fa-solid fa-circle-check vbadge');
+  name.append(nm, vb);
+  const role = el('div', 'intro-role');
+  const stats = el('div', 'intro-stats');
+  const stat = (label) => {
+    const box = el('div');
+    const b = el('b', null, '0');
+    box.append(b, el('span', null, label));
+    stats.appendChild(box);
+    return b;
+  };
+  const followers = stat('متابع');
+  const posts = stat('منشور');
+  const hint = el('div', 'intro-hint');
+  root.append(av, name, role, stats, hint);
+  return { root, av, name: nm, vb, role, followers, posts, hint };
 }
-function closeRoomUI() {
-  teardownRoom();
-  showEmptyMain();
-  scheduleList();
-}
+
 function teardownRoom() {
-  S.token++;
   if (S.roomUnsub) { S.roomUnsub(); S.roomUnsub = null; }
   if (S.msgUnsub) { S.msgUnsub(); S.msgUnsub = null; }
   S.activeId = null;
   S.otherUid = null;
   S.chatExists = false;
   S.chatData = null;
-  S.chatLoaded = false;
-  S.boundaryMs = null;
-  S.hasMore = true;
+  S.otherReadMs = 0;
+  S.order = [];
+  S.map = new Map();
+  S.anchorH = null;
   S.loadingOlder = false;
-  S.anchor = null;
-  S.forceBottom = false;
-  S.msgOrder = [];
-  S.msgEntry.clear();
-  S.msgData.clear();
-  S.msgEls.clear();
-  S.sig.clear();
-  $('msgsInner').innerHTML = '';
+  S.ready = false;
+  S.newBelow = 0;
+  S.forceBottom = true;
+  S.hasMore = true;
+  S.windowSize = PAGE_SIZE;
   S.reply = null;
   S.editingId = null;
-  $('ctx').classList.add('hide');
-  $('msgInput').value = '';
-  autoGrow();
-  closeSheet();
+  clearChip();
+  S.thread.replaceChildren(S.intro.root);
+  $('input').value = '';
+  $('ctx').hidden = true;
+  autoSize();
+  updateSendBtn();
+  updateJump();
 }
+
+function openRoomFor(chatId, uid) {
+  if (!chatId || !uid) return;
+  if (S.activeId === chatId) {
+    document.body.classList.add('room-open', 'has-room');
+    return;
+  }
+  teardownRoom();
+  S.activeId = chatId;
+  S.otherUid = uid;
+  const cached = S.chats.get(chatId) || null;
+  S.chatExists = !!cached;
+  S.chatData = cached;
+  document.body.classList.add('room-open', 'has-room');
+  renderHeader();
+  renderIntro();
+  renderComposer();
+  if (S.chatExists) subscribeMessages();
+  fetchUser(uid).then(() => {
+    if (S.activeId === chatId) { renderHeader(); renderIntro(); }
+  });
+  S.roomUnsub = onSnapshot(
+    doc(db, 'chats', chatId),
+    (snap) => { if (S.activeId === chatId) onRoomChat(snap); },
+    () => showToast('تعذر فتح المحادثة')
+  );
+  scheduleList();
+}
+
+function closeRoom() {
+  teardownRoom();
+  document.body.classList.remove('room-open', 'has-room');
+  scheduleList();
+}
+
+function onRoomChat(snap) {
+  S.chatExists = snap.exists();
+  S.chatData = snap.exists() ? snap.data() : null;
+  if (S.chatExists && !S.msgUnsub) subscribeMessages();
+  const om = toMs(S.chatData?.readAt?.[S.otherUid]) ?? 0;
+  if (om !== S.otherReadMs) {
+    S.otherReadMs = om;
+    refreshTicks();
+  }
+  renderHeader();
+  renderIntro();
+  renderComposer();
+  maybeMarkRead();
+}
+
+/* ================= الغرفة: العرض ================= */
 function renderHeader() {
-  const u = S.otherUid ? userCache.get(S.otherUid) : null;
-  $('hAv').innerHTML = avatarInner(u, 84);
-  $('hName').textContent = displayName(u);
-  $('hSub').textContent = u && u.username ? '@' + u.username : '';
-}
-function updateHint() {
-  const show = !!S.activeId && S.chatLoaded && S.msgOrder.length === 0;
-  $('chatHint').classList.toggle('hide', !show);
-}
-
-/* ===== Messages: subscription ===== */
-// المرحلة 1: آخر PAGE_SIZE رسالة (بدون where).
-// بعد أول رد من السيرفر: نافذة مستمرة من أقدم رسالة محمّلة حتى الآن،
-// فتصل التعديلات والتفاعلات لكل الرسائل المحمّلة لحظياً.
-function subscribeMessages(token) {
-  if (S.msgUnsub) S.msgUnsub();
-  S.msgUnsub = null;
-  const col = collection(db, 'chats', S.activeId, 'messages');
-  const q = S.boundaryMs === null
-    ? query(col, orderBy('createdAt', 'desc'), limit(PAGE_SIZE))
-    : query(col, where('createdAt', '>=', Timestamp.fromMillis(S.boundaryMs)), orderBy('createdAt', 'asc'));
-  S.msgUnsub = onSnapshot(q, (snap) => {
-    if (token !== S.token) return;
-    applyMessageChanges(snap);
-  }, (err) => {
-    console.error(err);
-    showToast('تعذر تحميل الرسائل', 'error');
-  });
+  if (!S.otherUid) return;
+  const u = userCache.get(S.otherUid) || placeholder(S.otherUid);
+  fillAv($('rav'), u, 96);
+  $('rname').textContent = u.name;
+  $('rverified').hidden = !u.verified;
+  const st = roomState();
+  $('rsub').textContent =
+    st === 'wait' ? 'بانتظار الموافقة' :
+    st === 'decide' ? 'طلب مراسلة' :
+    st === 'blocked' ? 'محظورة' :
+    (u.username ? '@' + u.username : roleLabel(u.role));
 }
 
-function applyMessageChanges(snap) {
-  const fromServer = !snap.metadata.fromCache;
-  const anchor = S.anchor;
-  const wasNear = isNearBottom();
+function renderIntro() {
+  const I = S.intro;
+  if (!I || !S.otherUid) return;
+  const u = userCache.get(S.otherUid) || placeholder(S.otherUid);
+  fillAv(I.av, u, 208);
+  I.name.textContent = u.name;
+  I.vb.hidden = !u.verified;
+  I.role.textContent = roleLabel(u.role) + (u.username ? ' · @' + u.username : '');
+  I.followers.textContent = fmtNum(u.followers);
+  I.posts.textContent = fmtNum(u.posts);
+  const hints = {
+    new: 'أول رسالة تُرسل تكون طلب مراسلة يحتاج موافقة.',
+    wait: 'أرسلت طلب مراسلة، وستبدأ المحادثة بعد موافقته.',
+    decide: 'أرسل إليك طلب مراسلة. وافق لتبدأ المحادثة.'
+  };
+  const txt = hints[roomState()] || '';
+  I.hint.hidden = !txt;
+  I.hint.textContent = txt;
+}
 
-  snap.docChanges().forEach(ch => {
-    if (ch.type !== 'removed') upsertMessage(ch.doc.id, ch.doc.data());
-  });
+function renderComposer() {
+  const st = roomState();
+  $('composer').hidden = st === 'none';
+  $('inputrow').hidden = !(st === 'new' || st === 'active');
+  $('decide').hidden = st !== 'decide';
+  const notice = $('notice');
+  notice.hidden = !(st === 'wait' || st === 'blocked');
+  notice.classList.toggle('red', st === 'blocked');
+  if (st === 'wait') {
+    notice.textContent = 'بانتظار موافقة الطرف الآخر على طلب المراسلة. لا يمكنك إرسال رسالة أخرى قبل أن يرد.';
+  } else if (st === 'blocked') {
+    notice.textContent = S.chatData?.blockedBy === S.me
+      ? 'حظرت هذا المستخدم. لا يمكن إرسال الرسائل في هذه المحادثة.'
+      : 'لا يمكن إرسال الرسائل في هذه المحادثة.';
+  }
+  if (st === 'decide') {
+    const name = userCache.get(S.otherUid)?.name || 'هذا المستخدم';
+    $('decideText').textContent = `أرسل إليك ${name} طلب مراسلة. وافق لتبدأ المحادثة أو احظر.`;
+  }
+  updateSendBtn();
+}
 
-  if (S.boundaryMs === null && fromServer) {
-    let min = null;
-    snap.docs.forEach(d => {
-      const t = msTime(d.data().createdAt);
-      if (t !== null && (min === null || t < min)) min = t;
-    });
-    S.boundaryMs = min === null ? 0 : min;
-    S.hasMore = snap.size === PAGE_SIZE;
-    subscribeMessages(S.token);
+function updateJump() {
+  const far = !nearBottom();
+  $('jump').hidden = !(far || S.newBelow > 0);
+  const b = $('jumpN');
+  b.hidden = !S.newBelow;
+  b.textContent = S.newBelow;
+}
+
+const nearBottom = () => {
+  const t = S.thread;
+  return t.scrollHeight - t.scrollTop - t.clientHeight < 140;
+};
+
+/* ================= الرسائل: الترتيب والإدراج ================= */
+const sigOf = (d) => [
+  d.text || '',
+  d.deleted ? 1 : 0,
+  d.isEdited ? 1 : 0,
+  d.attachment?.url || '',
+  d.replyTo?.id || '',
+  d.replyTo?.text || '',
+  JSON.stringify(d.reactions || {})
+].join('\u0001');
+
+function fileIcon(a) {
+  const m = a.mime || '';
+  if (m.includes('pdf')) return 'fa-file-pdf';
+  if (m.startsWith('video/')) return 'fa-file-video';
+  if (m.startsWith('audio/')) return 'fa-file-audio';
+  return 'fa-file';
+}
+
+function buildAttachment(a) {
+  if (a.kind === 'image') {
+    const link = el('a', 'att-img');
+    link.href = a.url;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    const img = new Image();
+    img.alt = a.name || '';
+    img.decoding = 'async';
+    img.loading = 'lazy';
+    if (a.w && a.h) img.style.aspectRatio = `${a.w} / ${a.h}`;
+    img.src = thumbSrc(a.url);
+    link.appendChild(img);
+    return link;
+  }
+  const f = el('a', 'att-file');
+  f.href = a.url;
+  f.target = '_blank';
+  f.rel = 'noopener';
+  f.download = a.name || '';
+  const info = el('span');
+  info.append(el('b', null, a.name || 'ملف'), el('small', null, fmtSize(a.size)));
+  f.append(el('i', 'fa-solid ' + fileIcon(a)), info);
+  return f;
+}
+
+function buildReactions(reacts) {
+  const wrap = el('div', 'rxs');
+  const counts = new Map();
+  for (const emo of Object.values(reacts)) counts.set(emo, (counts.get(emo) || 0) + 1);
+  const mine = reacts[S.me];
+  for (const [emo, n] of counts) {
+    const chip = el('span', 'rx' + (mine === emo ? ' on' : ''), emo);
+    if (n > 1) chip.appendChild(el('small', null, ' ' + n));
+    wrap.appendChild(chip);
+  }
+  return wrap;
+}
+
+function makeEntry(id, ms, data) {
+  const row = el('div', 'row');
+  row.dataset.id = id;
+  const day = el('div', 'day');
+  const dspan = el('span');
+  day.appendChild(dspan);
+  const mrow = el('div', 'mrow');
+  const bubble = el('div', 'bubble');
+  mrow.appendChild(bubble);
+  row.append(day, mrow);
+  return { id, ms, data, row, day, dspan, mrow, bubble, tick: null, sig: '' };
+}
+
+function setTick(e) {
+  if (!e.tick) return;
+  const seen = !!S.otherReadMs && e.ms <= S.otherReadMs;
+  e.tick.className = 'fa-solid ticks ' + (seen ? 'fa-check-double seen' : 'fa-check');
+}
+
+function refreshTicks() {
+  for (const e of S.order) if (e.tick) setTick(e);
+}
+
+function paintEntry(e) {
+  const d = e.data;
+  const sig = sigOf(d);
+  if (sig === e.sig) return;
+  e.sig = sig;
+  const mine = d.senderUid === S.me;
+  e.mrow.classList.toggle('mine', mine);
+  e.mrow.classList.toggle('theirs', !mine);
+  const b = e.bubble;
+  b.textContent = '';
+  e.tick = null;
+
+  if (d.replyTo && !d.deleted) {
+    const q = el('div', 'quote');
+    q.dataset.jump = d.replyTo.id;
+    q.append(el('b', null, d.replyTo.name || 'رسالة'), el('span', null, d.replyTo.text || '📎 مرفق'));
+    b.appendChild(q);
   }
 
-  if (S.loadingOlder) {
-    if (anchor) restoreAnchor(anchor);
-    if (fromServer) { S.loadingOlder = false; S.anchor = null; }
-  } else if (S.forceBottom && snap.size > 0) {
-    scrollBottom();
-    S.forceBottom = false;
-  } else if (wasNear) {
-    scrollBottom();
+  if (d.deleted) {
+    b.appendChild(el('div', 'txt deleted', 'تم حذف الرسالة'));
+  } else {
+    if (d.attachment) b.appendChild(buildAttachment(d.attachment));
+    if (d.text) b.appendChild(el('div', 'txt', d.text));
+    if (d.reactions && Object.keys(d.reactions).length) b.appendChild(buildReactions(d.reactions));
   }
-  updateHint();
+
+  const meta = el('div', 'meta');
+  if (d.isEdited && !d.deleted) meta.appendChild(el('span', null, 'معدّلة'));
+  meta.appendChild(el('span', null, fmtTime(e.ms)));
+  if (mine) {
+    e.tick = el('i');
+    meta.appendChild(e.tick);
+    setTick(e);
+  }
+  b.appendChild(meta);
 }
 
-/* ===== Messages: ordered DOM (binary search, minimal repaint) ===== */
-function lowerBound(e) {
-  let lo = 0, hi = S.msgOrder.length;
+function lowerBound(ms, id) {
+  let lo = 0, hi = S.order.length;
   while (lo < hi) {
     const mid = (lo + hi) >> 1;
-    const m = S.msgOrder[mid];
-    const less = m.t !== e.t ? m.t < e.t : m.id < e.id;
-    if (less) lo = mid + 1; else hi = mid;
+    const m = S.order[mid];
+    if (m.ms < ms || (m.ms === ms && m.id < id)) lo = mid + 1;
+    else hi = mid;
   }
   return lo;
 }
-function upsertMessage(id, data) {
-  const t = msTime(data.createdAt) ?? MAX_SAFE;
-  const entry = S.msgEntry.get(id);
-  S.msgData.set(id, data);
-  if (!entry) {
-    const e = { id, t };
-    S.msgEntry.set(id, e);
-    const el = document.createElement('div');
-    el.className = 'msg-row';
-    el.dataset.id = id;
-    S.msgEls.set(id, el);
-    placeEntry(e);
-    return;
-  }
-  if (entry.t !== t) {
-    detachEntry(entry);
-    entry.t = t;
-    placeEntry(entry);
-    return;
-  }
-  if (S.sig.get(id) !== sigOf(data)) paintAt(lowerBound(entry));
-}
-function placeEntry(e) {
-  const idx = lowerBound(e);
-  S.msgOrder.splice(idx, 0, e);
-  const el = S.msgEls.get(e.id);
-  const next = S.msgOrder[idx + 1];
-  $('msgsInner').insertBefore(el, next ? S.msgEls.get(next.id) : null);
-  paintAt(idx);
-  paintAt(idx + 1);
-}
-function detachEntry(e) {
-  const idx = lowerBound(e);
-  if (S.msgOrder[idx] !== e) return;
-  S.msgOrder.splice(idx, 1);
-  const el = S.msgEls.get(e.id);
-  if (el) el.remove();
-  paintAt(idx);
-}
-function paintAt(i) {
-  const e = S.msgOrder[i];
-  if (!e) return;
-  const el = S.msgEls.get(e.id);
-  if (!el) return;
-  const d = S.msgData.get(e.id);
-  const prevE = i > 0 ? S.msgOrder[i - 1] : null;
-  const prevD = prevE ? S.msgData.get(prevE.id) : null;
-  const cont = !!prevD && prevD.senderUid === d.senderUid && (e.t - prevE.t) < GROUP_GAP_MS;
-  const mine = d.senderUid === S.me;
-  el.className = 'msg-row' + (mine ? ' mine' : '') + (cont ? ' cont' : '');
-  el.innerHTML = rowHtml(e.id, d, mine, cont);
-  S.sig.set(e.id, sigOf(d));
-}
-function repaintFor(uid) {
-  for (let i = 0; i < S.msgOrder.length; i++) {
-    const d = S.msgData.get(S.msgOrder[i].id);
-    if (d && d.senderUid === uid) paintAt(i);
-  }
-}
-function rowHtml(id, d, mine, cont) {
-  let avatar = '';
-  if (!mine) {
-    const u = userCache.get(d.senderUid);
-    avatar = `<div class="av${cont ? ' hide' : ''}" data-profile="${esc(d.senderUid)}">${avatarInner(u, 64)}</div>`;
-  }
-  let body;
-  if (d.deleted) {
-    body = `<div class="bubble deleted">تم حذف هذه الرسالة</div>`;
-  } else {
-    const quote = d.replyTo
-      ? `<div class="quote" data-jump="${esc(d.replyTo.id)}"><b>${esc(d.replyTo.name || '')}</b><div>${esc(d.replyTo.text || '')}</div></div>`
-      : '';
-    const text = esc(d.text || '').replace(/\n/g, '<br>');
-    body = `${quote}<div class="bubble" data-msg="${esc(id)}">${text}${d.isEdited ? ' <span class="edited">(معدّلة)</span>' : ''}</div>`;
-  }
-  const rx = d.deleted ? '' : reactionsHtml(id, d.reactions);
-  const time = fmtClock(msTime(d.createdAt));
-  return `${avatar}<div class="mcol">${body}${rx}<div class="meta">${time}${mine ? ' <i class="fas fa-check-double"></i>' : ''}</div></div>`;
-}
-function reactionsHtml(id, rx) {
-  if (!rx) return '';
-  const counts = new Map();
-  Object.values(rx).forEach(emo => counts.set(emo, (counts.get(emo) || 0) + 1));
-  if (!counts.size) return '';
-  const mineEmo = rx[S.me] || null;
-  let h = '<div class="rxs">';
-  counts.forEach((n, emo) => {
-    h += `<button class="rx${emo === mineEmo ? ' mine' : ''}" data-rx="${esc(emo)}" data-msg="${esc(id)}">${esc(emo)} ${n}</button>`;
-  });
-  return h + '</div>';
+
+function findIdx(e) {
+  const i = lowerBound(e.ms, e.id);
+  return S.order[i] === e ? i : S.order.indexOf(e);
 }
 
-/* ===== Scrolling ===== */
-function isNearBottom() {
-  const sc = $('messages');
-  return sc.scrollHeight - sc.scrollTop - sc.clientHeight < 150;
-}
-function scrollBottom() {
-  const sc = $('messages');
-  sc.scrollTop = sc.scrollHeight;
-}
-function captureAnchor() {
-  const sc = $('messages');
-  const top = sc.scrollTop;
-  const rows = $('msgsInner').children;
-  for (let i = 0; i < rows.length; i++) {
-    const r = rows[i];
-    if (r.offsetTop + r.offsetHeight > top) return { el: r, off: r.offsetTop - top };
-  }
-  return null;
-}
-function restoreAnchor(a) {
-  if (!a || !a.el.isConnected) return;
-  $('messages').scrollTop = a.el.offsetTop - a.off;
-}
-$('messages').addEventListener('scroll', () => {
-  if (!S.activeId || S.boundaryMs === null || !S.hasMore || S.loadingOlder) return;
-  if ($('messages').scrollTop < 120) loadOlder();
-}, { passive: true });
-
-async function loadOlder() {
-  const token = S.token;
-  const id = S.activeId;
-  S.loadingOlder = true;
-  S.anchor = captureAnchor();
-  try {
-    const col = collection(db, 'chats', id, 'messages');
-    const snap = await getDocs(query(
-      col,
-      where('createdAt', '<', Timestamp.fromMillis(S.boundaryMs)),
-      orderBy('createdAt', 'desc'),
-      limit(PAGE_SIZE)
-    ));
-    if (token !== S.token) return;
-    if (snap.empty) {
-      S.hasMore = false;
-      S.loadingOlder = false;
-      S.anchor = null;
-      return;
+function relayout(from, to) {
+  const arr = S.order;
+  const lo = Math.max(0, from), hi = Math.min(arr.length - 1, to);
+  for (let i = lo; i <= hi; i++) {
+    const e = arr[i], p = arr[i - 1];
+    const newDay = !p || dayKey(p.ms) !== dayKey(e.ms);
+    const head = newDay || p.data.senderUid !== e.data.senderUid || e.ms - p.ms > GROUP_GAP_MS;
+    if (newDay) {
+      e.day.hidden = false;
+      e.dspan.textContent = dayLabel(e.ms);
+    } else {
+      e.day.hidden = true;
     }
-    const oldest = msTime(snap.docs[snap.docs.length - 1].data().createdAt);
-    S.hasMore = snap.size === PAGE_SIZE;
-    if (oldest !== null) S.boundaryMs = oldest;
-    subscribeMessages(token);
-  } catch (e) {
-    console.error(e);
+    e.mrow.classList.toggle('head', head);
+    e.mrow.classList.toggle('tail', head);
+  }
+}
+
+function detach(e) {
+  const i = findIdx(e);
+  if (i < 0) return;
+  S.order.splice(i, 1);
+  e.row.remove();
+  relayout(i - 1, i);
+}
+
+function attach(e) {
+  const i = lowerBound(e.ms, e.id);
+  S.order.splice(i, 0, e);
+  const next = S.order[i + 1];
+  S.thread.insertBefore(e.row, next ? next.row : null);
+  relayout(i - 1, i + 1);
+}
+
+function upsertMessage(id, d) {
+  const ms = toMs(d.createdAt) ?? Date.now();
+  let e = S.map.get(id);
+  if (e) {
+    e.data = d;
+    if (e.ms === ms) { paintEntry(e); return; }
+    detach(e);
+    e.ms = ms;
+  } else {
+    e = makeEntry(id, ms, d);
+    S.map.set(id, e);
+  }
+  paintEntry(e);
+  attach(e);
+}
+
+/* ================= الرسائل: الاشتراك والتحميل ================= */
+function subscribeMessages() {
+  if (S.msgUnsub) { S.msgUnsub(); S.msgUnsub = null; }
+  const chatId = S.activeId;
+  if (!chatId) return;
+  const q = query(
+    collection(db, 'chats', chatId, 'messages'),
+    orderBy('createdAt', 'desc'),
+    limit(S.windowSize)
+  );
+  S.msgUnsub = onSnapshot(
+    q,
+    (snap) => { if (S.activeId === chatId) applySnapshot(snap); },
+    () => {
+      S.loadingOlder = false;
+      S.anchorH = null;
+      if (S.activeId === chatId) showToast('تعذر تحميل الرسائل');
+    }
+  );
+}
+
+function applySnapshot(snap) {
+  const thread = S.thread;
+  const wasBottom = S.forceBottom || nearBottom();
+  let incoming = 0;
+  for (const ch of snap.docChanges()) {
+    if (ch.type === 'removed') continue;
+    const id = ch.doc.id, d = ch.doc.data();
+    const isNew = !S.map.has(id);
+    upsertMessage(id, d);
+    if (isNew && d.senderUid !== S.me) incoming++;
+  }
+  if (!snap.metadata.fromCache) S.hasMore = snap.size >= S.windowSize;
+  S.ready = true;
+
+  if (S.anchorH != null) {
+    thread.scrollTop += thread.scrollHeight - S.anchorH;
+    S.anchorH = null;
     S.loadingOlder = false;
-    S.anchor = null;
-    showToast('تعذر تحميل رسائل أقدم', 'error');
+  } else if (wasBottom) {
+    thread.scrollTop = thread.scrollHeight;
+    S.forceBottom = false;
+    S.newBelow = 0;
+  } else if (incoming) {
+    S.newBelow += incoming;
   }
+  updateJump();
+  if (wasBottom) maybeMarkRead();
 }
 
-/* ===== Message interactions (delegation) ===== */
-$('msgsInner').addEventListener('click', (e) => {
-  const av = e.target.closest('[data-profile]');
-  if (av) { goProfile(av.dataset.profile); return; }
-  const rx = e.target.closest('[data-rx]');
-  if (rx) { toggleReaction(rx.dataset.msg, rx.dataset.rx); return; }
-  const jump = e.target.closest('[data-jump]');
-  if (jump) { scrollToMsg(jump.dataset.jump); return; }
-  const b = e.target.closest('[data-msg]');
-  if (b) openSheet(b.dataset.msg);
-});
+function loadOlder() {
+  if (S.loadingOlder || !S.hasMore || !S.ready || !S.activeId) return;
+  S.loadingOlder = true;
+  S.anchorH = S.thread.scrollHeight;
+  S.windowSize += PAGE_SIZE;
+  subscribeMessages();
+}
+
 function scrollToMsg(id) {
-  const el = S.msgEls.get(id);
-  if (!el) { showToast('الرسالة الأصلية أقدم من المحمّل، مرّر للأعلى', 'error'); return; }
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  el.classList.add('flash');
-  setTimeout(() => el.classList.remove('flash'), 1200);
+  const e = S.map.get(id);
+  if (!e) { showToast('الرسالة أقدم من المحمّل. مرّر للأعلى لتحميل المزيد'); return; }
+  e.row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  e.bubble.classList.add('flash');
+  setTimeout(() => e.bubble.classList.remove('flash'), 1200);
 }
 
-/* ===== Bottom sheet ===== */
-function openSheet(id) {
-  const d = S.msgData.get(id);
-  if (!d || d.deleted) return;
-  S.sheetId = id;
-  const mine = d.senderUid === S.me;
-  const emojis = `<div class="sheet-emojis">${EMOJIS.map(e => `<button data-act="react" data-emoji="${esc(e)}">${e}</button>`).join('')}</div>`;
-  const items = [
-    `<button class="sheet-btn" data-act="reply"><i class="fas fa-reply"></i>رد</button>`,
-    mine ? `<button class="sheet-btn" data-act="edit"><i class="fas fa-pen"></i>تعديل</button>` : '',
-    `<button class="sheet-btn" data-act="copy"><i class="fas fa-copy"></i>نسخ النص</button>`,
-    mine ? `<button class="sheet-btn danger" data-act="delete"><i class="fas fa-trash"></i>حذف</button>` : ''
-  ].join('');
-  $('sheetBody').innerHTML = emojis + items;
-  $('sheet').classList.add('open');
-}
-function closeSheet() {
-  $('sheet').classList.remove('open');
-  S.sheetId = null;
-}
-$('sheetBody').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-act]');
-  if (!b) return;
-  const id = S.sheetId;
-  const act = b.dataset.act;
-  const emoji = b.dataset.emoji;
-  closeSheet();
-  if (!id) return;
-  if (act === 'react') toggleReaction(id, emoji);
-  else if (act === 'reply') startReply(id);
-  else if (act === 'edit') startEdit(id);
-  else if (act === 'copy') copyText(id);
-  else if (act === 'delete') confirmDelete(id);
-});
-$('sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') closeSheet(); });
-$('sheetClose').addEventListener('click', closeSheet);
+/* ================= القراءة ================= */
+let marking = false;
 
-function copyText(id) {
-  const d = S.msgData.get(id);
-  if (!d || !navigator.clipboard) return;
-  navigator.clipboard.writeText(d.text || '')
-    .then(() => showToast('تم النسخ'))
-    .catch(() => showToast('تعذر النسخ', 'error'));
+function maybeMarkRead() {
+  if (S.activeId && S.chatData && needsRead(S.chatData) && nearBottom()) markRead();
 }
 
-/* ===== Reply / edit context ===== */
-function showCtx(title, text, edit) {
-  const bar = $('ctx');
-  bar.classList.remove('hide');
-  bar.classList.toggle('edit', edit);
-  $('ctxText').innerHTML = `<b>${esc(title)}</b><div>${esc(text)}</div>`;
-}
-function cancelCtx() {
-  const wasEdit = !!S.editingId;
-  S.reply = null;
-  S.editingId = null;
-  $('ctx').classList.add('hide');
-  if (wasEdit) { $('msgInput').value = ''; autoGrow(); }
-}
-$('ctxClose').addEventListener('click', cancelCtx);
-
-function startReply(id) {
-  const d = S.msgData.get(id);
-  if (!d || d.deleted) return;
-  S.editingId = null;
-  S.reply = { id, senderUid: d.senderUid, name: nameOf(d.senderUid), text: (d.text || '').slice(0, 120) };
-  showCtx('الرد على ' + S.reply.name, S.reply.text, false);
-  $('msgInput').focus();
-}
-function startEdit(id) {
-  const d = S.msgData.get(id);
-  if (!d || d.senderUid !== S.me || d.deleted) return;
-  S.reply = null;
-  S.editingId = id;
-  const input = $('msgInput');
-  input.value = d.text || '';
-  autoGrow();
-  showCtx('تعديل الرسالة', d.text || '', true);
-  input.focus();
-}
-
-/* ===== Send / edit / delete / react ===== */
-$('msgInput').addEventListener('input', autoGrow);
-$('msgInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
-    e.preventDefault();
-    onSend();
+async function markRead() {
+  if (marking || !S.activeId) return;
+  marking = true;
+  const chatId = S.activeId;
+  try {
+    await updateDoc(doc(db, 'chats', chatId), { [`readAt.${S.me}`]: serverTimestamp() });
+  } catch (err) {
+    console.warn('markRead', err);
+  } finally {
+    marking = false;
   }
-});
-$('sendBtn').addEventListener('click', onSend);
+}
+
+/* ================= طلب المراسلة ================= */
+async function acceptRequest() {
+  if (!S.activeId) return;
+  try {
+    await updateDoc(doc(db, 'chats', S.activeId), { status: 'active', acceptedAt: serverTimestamp() });
+  } catch (err) {
+    console.error(err);
+    showToast('تعذر قبول الطلب');
+  }
+}
+
+async function blockRequest() {
+  if (!S.activeId) return;
+  if (!confirm('حظر هذا المستخدم؟ لن تصلك رسائله بعد الآن.')) return;
+  try {
+    await updateDoc(doc(db, 'chats', S.activeId), {
+      status: 'blocked', blockedBy: S.me, blockedAt: serverTimestamp()
+    });
+  } catch (err) {
+    console.error(err);
+    showToast('تعذر تنفيذ الحظر');
+  }
+}
+
+/* ================= الرفع ================= */
+function uploadAttachment(file) {
+  return new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', CLOUD_PRESET);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', CLOUD_URL);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) $('fbar').style.width = Math.round((e.loaded / e.total) * 100) + '%';
+    };
+    xhr.onload = () => {
+      let j = null;
+      try { j = JSON.parse(xhr.responseText); } catch (_) { j = null; }
+      if (xhr.status >= 200 && xhr.status < 300 && j && j.secure_url) {
+        resolve({
+          kind: (file.type || '').startsWith('image/') ? 'image' : 'file',
+          url: j.secure_url,
+          name: file.name,
+          size: file.size,
+          mime: file.type || '',
+          w: j.width || null,
+          h: j.height || null
+        });
+      } else {
+        reject(new Error('upload failed'));
+      }
+    };
+    xhr.onerror = () => reject(new Error('network'));
+    xhr.send(fd);
+  });
+}
+
+function showChip(f) {
+  const isImg = (f.type || '').startsWith('image/');
+  $('fchipIcon').className = 'fa-solid fi ' + (isImg ? 'fa-image' : 'fa-file');
+  $('fchipName').textContent = f.name;
+  $('fchipSize').textContent = fmtSize(f.size);
+  $('fbar').style.width = '0';
+  $('filechip').hidden = false;
+}
+
+function clearChip() {
+  S.pendingFile = null;
+  $('fileInput').value = '';
+  $('filechip').hidden = true;
+  $('fbar').style.width = '0';
+  updateSendBtn();
+}
+
+/* ================= الإرسال ================= */
+function autoSize() {
+  const t = $('input');
+  t.style.height = 'auto';
+  t.style.height = Math.min(t.scrollHeight, 140) + 'px';
+}
+
+function updateSendBtn() {
+  const has = $('input').value.trim().length > 0 || !!S.pendingFile;
+  $('send').disabled = S.uploading || !has;
+}
 
 async function onSend() {
-  const input = $('msgInput');
+  if (S.uploading) return;
+  const input = $('input');
   const text = input.value.trim();
-  if (!text || !S.activeId) return;
-  if (text.length > MAX_TEXT) { showToast(`الحد الأقصى ${MAX_TEXT} حرف`, 'error'); return; }
+
   if (S.editingId) { await saveEdit(text); return; }
 
-  const id = S.activeId;
-  const otherUid = S.otherUid;
-  const reply = S.reply;
-  input.value = '';
-  autoGrow();
-  S.reply = null;
-  $('ctx').classList.add('hide');
-  S.forceBottom = true;
+  const file = S.pendingFile;
+  if (!text && !file) return;
+  if (text.length > MAX_TEXT) { showToast('الرسالة طويلة جداً (الحد 2000 حرف)'); return; }
+  if (!canSend()) return;
 
-  const chatRef = doc(db, 'chats', id);
-  const msgRef = doc(collection(db, 'chats', id, 'messages'));
-  const meta = {
-    lastMessage: text.slice(0, 120),
-    lastMessageAt: serverTimestamp(),
-    lastSenderUid: S.me,
-    lastMessageId: msgRef.id
-  };
-  const batch = writeBatch(db);
-  const wasExists = S.chatExists;
-  if (wasExists) {
-    batch.update(chatRef, meta);
-  } else {
-    batch.set(chatRef, { participants: [S.me, otherUid].sort(), createdAt: serverTimestamp(), ...meta });
+  const chatId = S.activeId, other = S.otherUid, me = S.me;
+  let attachment = null;
+
+  if (file) {
+    S.uploading = true;
+    updateSendBtn();
+    try {
+      attachment = await uploadAttachment(file);
+    } catch (err) {
+      console.error(err);
+      showToast('تعذر رفع الملف، حاول مرة أخرى');
+      S.uploading = false;
+      updateSendBtn();
+      return;
+    }
+    S.uploading = false;
   }
-  batch.set(msgRef, {
-    senderUid: S.me,
+
+  if (S.activeId !== chatId || !canSend()) { updateSendBtn(); return; }
+
+  const reply = S.reply;
+  const chatRef = doc(db, 'chats', chatId);
+  const msgRef = doc(collection(db, 'chats', chatId, 'messages'));
+  const replyTo = reply
+    ? { id: reply.id, senderUid: reply.senderUid, name: reply.name, text: reply.text }
+    : null;
+  const payload = {
+    senderUid: me,
     text,
     createdAt: serverTimestamp(),
     isEdited: false,
     deleted: false,
-    replyTo: reply ? { id: reply.id, senderUid: reply.senderUid, name: reply.name || '', text: reply.text || '' } : null,
-    reactions: {}
-  });
-  S.chatExists = true;
+    replyTo,
+    reactions: {},
+    attachment
+  };
+  const preview = (text || (attachment
+    ? (attachment.kind === 'image' ? '📷 صورة' : '📎 ' + attachment.name)
+    : '')).slice(0, 120);
+  const meta = {
+    lastMessage: preview,
+    lastMessageAt: serverTimestamp(),
+    lastSenderUid: me,
+    lastMessageId: msgRef.id
+  };
+
+  const batch = writeBatch(db);
+  const creating = !S.chatExists;
+  if (S.chatExists) {
+    batch.update(chatRef, meta);
+  } else {
+    batch.set(chatRef, {
+      participants: [me, other].sort(),
+      createdAt: serverTimestamp(),
+      status: 'pending',
+      requesterUid: me,
+      readAt: { [me]: serverTimestamp() },
+      ...meta
+    });
+  }
+  batch.set(msgRef, payload);
+
+  if (creating) {
+    S.chatExists = true;
+    S.chatData = {
+      participants: [me, other].sort(),
+      status: 'pending',
+      requesterUid: me,
+      lastSenderUid: me,
+      lastMessage: preview
+    };
+  }
+
+  input.value = '';
+  autoSize();
+  clearChip();
+  S.reply = null;
+  $('ctx').hidden = true;
+  renderComposer();
+  renderHeader();
+  renderIntro();
+  S.forceBottom = true;
 
   try {
     await batch.commit();
-  } catch (e) {
-    console.error(e);
-    S.chatExists = wasExists;
-    if (S.activeId === id) {
-      input.value = text;
-      autoGrow();
-      S.reply = reply;
-      if (reply) showCtx('الرد على ' + reply.name, reply.text, false);
+    if (!S.msgUnsub && S.activeId === chatId) subscribeMessages();
+  } catch (err) {
+    console.error(err);
+    showToast('تعذر الإرسال');
+    if (creating && S.activeId === chatId) {
+      S.chatExists = false;
+      S.chatData = null;
+      if (S.msgUnsub) { S.msgUnsub(); S.msgUnsub = null; }
+      renderComposer();
     }
-    showToast('فشل الإرسال', 'error');
+    if (S.activeId === chatId && !input.value) {
+      input.value = text;
+      autoSize();
+    }
+    updateSendBtn();
   }
+}
+
+/* ================= التعديل والحذف والتفاعل ================= */
+function showCtx(title, text) {
+  $('ctxTitle').textContent = title;
+  $('ctxText').textContent = text;
+  $('ctx').hidden = false;
+}
+
+function clearCtx() {
+  const wasEdit = S.editingId !== null;
+  S.reply = null;
+  S.editingId = null;
+  $('ctx').hidden = true;
+  if (wasEdit) $('input').value = '';
+  autoSize();
+  updateSendBtn();
+}
+
+function startReply(id) {
+  const e = S.map.get(id);
+  if (!e) return;
+  const d = e.data;
+  const name = d.senderUid === S.me ? 'أنت' : (userCache.get(S.otherUid)?.name || 'الطرف الآخر');
+  const text = d.text || (d.attachment
+    ? (d.attachment.kind === 'image' ? '📷 صورة' : '📎 ' + (d.attachment.name || 'ملف'))
+    : '');
+  S.reply = { id, senderUid: d.senderUid, name, text: text.slice(0, 140) };
+  S.editingId = null;
+  showCtx('الرد على ' + name, S.reply.text);
+  $('input').focus();
+}
+
+function startEdit(id) {
+  const e = S.map.get(id);
+  if (!e) return;
+  S.reply = null;
+  S.editingId = id;
+  clearChip();
+  showCtx('تعديل الرسالة', e.data.text);
+  const input = $('input');
+  input.value = e.data.text;
+  autoSize();
+  input.focus();
+  updateSendBtn();
 }
 
 async function saveEdit(text) {
   const id = S.editingId;
-  const d = S.msgData.get(id);
-  const input = $('msgInput');
-  if (!d || d.senderUid !== S.me || d.deleted) { cancelCtx(); return; }
-  if (text === (d.text || '').trim()) { cancelCtx(); return; }
-
+  const e = S.map.get(id);
+  if (!e || !text) return;
+  if (text === e.data.text) { clearCtx(); return; }
+  if (text.length > MAX_TEXT) { showToast('الرسالة طويلة جداً'); return; }
   const chatId = S.activeId;
-  S.editingId = null;
-  $('ctx').classList.add('hide');
-  input.value = '';
-  autoGrow();
-
   const batch = writeBatch(db);
-  batch.update(doc(db, 'chats', chatId, 'messages', id), { text, isEdited: true, editedAt: serverTimestamp() });
-  if (S.chatData && S.chatData.lastMessageId === id) {
+  batch.update(doc(db, 'chats', chatId, 'messages', id), {
+    text, isEdited: true, editedAt: serverTimestamp()
+  });
+  if (S.chatData?.lastMessageId === id) {
     batch.update(doc(db, 'chats', chatId), { lastMessage: text.slice(0, 120) });
   }
+  S.editingId = null;
+  $('input').value = '';
+  clearCtx();
   try {
     await batch.commit();
-  } catch (e) {
-    console.error(e);
-    input.value = text;
-    autoGrow();
-    S.editingId = id;
-    showCtx('تعديل الرسالة', d.text || '', true);
-    showToast('تعذر حفظ التعديل', 'error');
+  } catch (err) {
+    console.error(err);
+    showToast('تعذر حفظ التعديل');
   }
 }
 
-async function deleteMessage(id) {
-  const d = S.msgData.get(id);
-  if (!d || d.senderUid !== S.me || d.deleted || !S.activeId) return;
+async function deleteMsg(id) {
+  if (!confirm('حذف هذه الرسالة؟')) return;
   const chatId = S.activeId;
+  if (!chatId) return;
   const batch = writeBatch(db);
-  batch.update(doc(db, 'chats', chatId, 'messages', id), { text: '', deleted: true, deletedAt: serverTimestamp() });
-  if (S.chatData && S.chatData.lastMessageId === id) {
+  batch.update(doc(db, 'chats', chatId, 'messages', id), {
+    text: '', deleted: true, deletedAt: serverTimestamp()
+  });
+  if (S.chatData?.lastMessageId === id) {
     batch.update(doc(db, 'chats', chatId), { lastMessage: 'تم حذف الرسالة' });
   }
   try {
     await batch.commit();
-  } catch (e) {
-    console.error(e);
-    showToast('تعذر حذف الرسالة', 'error');
+  } catch (err) {
+    console.error(err);
+    showToast('تعذر الحذف');
   }
 }
 
-function confirmDelete(id) {
-  if (!confirm('حذف هذه الرسالة؟')) return;
-  deleteMessage(id);
-}
-
-async function toggleReaction(id, emoji) {
-  const d = S.msgData.get(id);
-  if (!d || d.deleted || !S.activeId) return;
-  const cur = d.reactions ? d.reactions[S.me] : undefined;
-  const value = cur === emoji ? deleteField() : emoji;
+async function toggleReaction(id, emo) {
+  const e = S.map.get(id);
+  if (!e || e.data.deleted || !S.activeId) return;
+  const ref = doc(db, 'chats', S.activeId, 'messages', id);
+  const cur = e.data.reactions?.[S.me];
   try {
-    await updateDoc(doc(db, 'chats', S.activeId, 'messages', id), { [`reactions.${S.me}`]: value });
-  } catch (e) {
-    console.error(e);
-    showToast('تعذر تنفيذ التفاعل', 'error');
+    await updateDoc(ref, { [`reactions.${S.me}`]: cur === emo ? deleteField() : emo });
+  } catch (err) {
+    console.error(err);
+    showToast('تعذر إضافة التفاعل');
   }
 }
 
-/* ===== Header actions ===== */
-$('hAv').addEventListener('click', () => { if (S.otherUid) goProfile(S.otherUid); });
-$('hBody').addEventListener('click', () => { if (S.otherUid) goProfile(S.otherUid); });
-$('backBtn').addEventListener('click', closeRoom);
-$('topAv').addEventListener('click', () => { if (S.me) goProfile(S.me); });
-
-/* ===== List interactions ===== */
-$('chatList').addEventListener('click', (e) => {
-  const av = e.target.closest('[data-profile]');
-  if (av) { goProfile(av.dataset.profile); return; }
-  const row = e.target.closest('[data-chat]');
-  if (row) location.hash = '#/c/' + encodeURIComponent(row.dataset.chat);
-});
-$('listSearch').addEventListener('input', (e) => {
-  S.listSearch = e.target.value.trim().toLowerCase();
-  scheduleList();
-});
-
-/* ===== New chat: search & open ===== */
-function openNewChat() {
-  $('userSearch').value = '';
-  $('searchResults').innerHTML = `<div class="hint">ابحث عن شخص لبدء المحادثة</div>`;
-  $('newModal').classList.add('open');
-  setTimeout(() => $('userSearch').focus(), 50);
+function copyText(text) {
+  if (!navigator.clipboard) { showToast('النسخ غير مدعوم'); return; }
+  navigator.clipboard.writeText(text)
+    .then(() => showToast('تم النسخ'))
+    .catch(() => showToast('تعذر النسخ'));
 }
-function closeNewChat() {
-  $('newModal').classList.remove('open');
-}
-$('newChatBtn').addEventListener('click', openNewChat);
-$('fab').addEventListener('click', openNewChat);
-$('emptyNewBtn').addEventListener('click', openNewChat);
-$('newClose').addEventListener('click', closeNewChat);
-$('newModal').addEventListener('click', (e) => { if (e.target.id === 'newModal') closeNewChat(); });
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { closeSheet(); closeNewChat(); }
-});
 
-let searchTimer = 0;
-let searchSeq = 0;
-$('userSearch').addEventListener('input', (e) => {
-  clearTimeout(searchTimer);
-  const term = e.target.value.trim();
-  if (term.length < 2) {
-    $('searchResults').innerHTML = `<div class="hint">اكتب حرفين على الأقل أو رقم الهاتف كاملاً</div>`;
-    return;
+/* ================= لوحة الخيارات ================= */
+function openSheet(id) {
+  const e = S.map.get(id);
+  if (!e) return;
+  const d = e.data;
+  const mine = d.senderUid === S.me;
+  S.sheetId = id;
+
+  const emo = $('shEmojis');
+  emo.replaceChildren();
+  if (!d.deleted) {
+    for (const x of EMOJIS) {
+      const b = el('button', d.reactions?.[S.me] === x ? 'on' : null, x);
+      b.onclick = () => { closeSheet(); toggleReaction(id, x); };
+      emo.appendChild(b);
+    }
   }
-  searchTimer = setTimeout(() => runUserSearch(term), 300);
-});
 
-async function runUserSearch(term) {
-  const seq = ++searchSeq;
-  $('searchResults').innerHTML = `<div class="hint">جاري البحث...</div>`;
-  const usersCol = collection(db, 'users');
-  const lower = term.toLowerCase();
-  const digits = term.replace(/\D/g, '');
-  const reqs = [
-    getDocs(query(usersCol, where('username', 'in', [...new Set([term, lower])]), limit(10))),
-    getDocs(query(usersCol, where('name', '>=', term), where('name', '<=', term + '\uf8ff'), limit(10)))
-  ];
-  if (digits.length >= 6) {
-    reqs.push(getDocs(query(usersCol, where('phone', 'in', [...new Set([term, digits])]), limit(10))));
-  }
-  try {
-    const snaps = await Promise.all(reqs);
-    if (seq !== searchSeq) return;
-    const hits = new Map();
-    snaps.forEach(s => s.docs.forEach(d => {
-      if (d.id !== S.me && !hits.has(d.id)) hits.set(d.id, d.data());
-    }));
-    hits.forEach((data, uid) => { if (!userCache.has(uid)) userCache.set(uid, data); });
-    renderHits([...hits.entries()]);
-  } catch (e) {
-    console.error(e);
-    if (seq === searchSeq) $('searchResults').innerHTML = `<div class="hint">تعذر البحث، حاول مرة أخرى</div>`;
-  }
+  const acts = $('shActions');
+  acts.replaceChildren();
+  const add = (icon, label, fn, danger) => {
+    const b = el('button', danger ? 'danger' : null);
+    b.append(el('i', 'fa-solid ' + icon), document.createTextNode(label));
+    b.onclick = () => { closeSheet(); fn(); };
+    acts.appendChild(b);
+  };
+  if (!d.deleted) add('fa-reply', 'رد', () => startReply(id));
+  if (!d.deleted && d.text) add('fa-copy', 'نسخ', () => copyText(d.text));
+  if (mine && !d.deleted && d.text && !d.attachment) add('fa-pen', 'تعديل', () => startEdit(id));
+  if (mine && !d.deleted) add('fa-trash', 'حذف', () => deleteMsg(id), true);
+
+  $('sheetBg').classList.add('open');
+  $('sheet').classList.add('open');
 }
 
-function renderHits(list) {
-  const el = $('searchResults');
-  if (!list.length) { el.innerHTML = `<div class="hint">لا توجد نتائج</div>`; return; }
-  el.innerHTML = list.map(([uid, u]) => `
-    <div class="user-row" data-uid="${esc(uid)}">
-      <div class="av" data-profile="${esc(uid)}">${avatarInner(u, 80)}</div>
-      <div class="uinfo">
-        <div class="uname">${esc(displayName(u))}</div>
-        <div class="usub">${u.username ? '@' + esc(u.username) : ''}</div>
-      </div>
-    </div>`).join('');
+function closeSheet() {
+  $('sheetBg').classList.remove('open');
+  $('sheet').classList.remove('open');
+  S.sheetId = null;
 }
-$('searchResults').addEventListener('click', (e) => {
-  const av = e.target.closest('[data-profile]');
-  if (av) { goProfile(av.dataset.profile); return; }
-  const row = e.target.closest('[data-uid]');
-  if (!row) return;
-  closeNewChat();
-  location.hash = '#/c/' + encodeURIComponent(chatIdFor(S.me, row.dataset.uid));
-});
+
+/* ================= الأحداث ================= */
+function bindEvents() {
+  const input = $('input');
+
+  // القائمة
+  $('chatList').addEventListener('click', (e) => {
+    const row = e.target.closest('.item');
+    if (!row) return;
+    if (e.target.closest('[data-profile]')) { goProfile(row.dataset.uid); return; }
+    openRoomFor(row.dataset.id, row.dataset.uid);
+  });
+
+  $('results').addEventListener('click', (e) => {
+    const row = e.target.closest('.item');
+    if (!row) return;
+    if (e.target.closest('[data-profile]')) { goProfile(row.dataset.uid); return; }
+    openWith(row.dataset.uid);
+  });
+
+  $('tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('.tab');
+    if (!b) return;
+    S.tab = b.dataset.tab;
+    document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('on', t === b));
+    renderList();
+  });
+
+  $('search').addEventListener('input', () => {
+    S.listQuery = $('search').value.trim();
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => runSearch(S.listQuery), 250);
+    scheduleList();
+  });
+
+  // الغرفة
+  $('backBtn').addEventListener('click', closeRoom);
+  $('rav').addEventListener('click', () => goProfile(S.otherUid));
+  $('rinfo').addEventListener('click', () => goProfile(S.otherUid));
+
+  const thread = S.thread;
+  thread.addEventListener('click', (e) => {
+    if (e.target.closest('[data-profile]')) { goProfile(S.otherUid); return; }
+    const q = e.target.closest('.quote');
+    if (q) { e.stopPropagation(); scrollToMsg(q.dataset.jump); return; }
+    if (e.target.closest('.att-img, .att-file')) { e.stopPropagation(); return; }
+    const row = e.target.closest('.row');
+    if (row && row.dataset.id) openSheet(row.dataset.id);
+  });
+
+  thread.addEventListener('scroll', () => {
+    if (nearBottom() && S.newBelow) S.newBelow = 0;
+    if (thread.scrollTop < 120) loadOlder();
+    maybeMarkRead();
+    updateJump();
+  }, { passive: true });
+
+  $('jump').addEventListener('click', () => {
+    thread.scrollTop = thread.scrollHeight;
+    S.newBelow = 0;
+    updateJump();
+    maybeMarkRead();
+  });
+
+  // الطلب
+  $('acceptBtn').addEventListener('click', acceptRequest);
+  $('blockBtn').addEventListener('click', blockRequest);
+
+  // الكتابة
+  $('send').addEventListener('click', onSend);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      onSend();
+    }
+  });
+  input.addEventListener('input', () => { autoSize(); updateSendBtn(); });
+
+  $('ctxClose').addEventListener('click', clearCtx);
+
+  $('attach').addEventListener('click', () => {
+    if (!canSend()) return;
+    if (S.editingId) { showToast('لا يمكن إرفاق ملف أثناء التعديل'); return; }
+    $('fileInput').click();
+  });
+
+  $('fileInput').addEventListener('change', () => {
+    const f = $('fileInput').files[0];
+    $('fileInput').value = '';
+    if (!f) return;
+    if (f.size > MAX_FILE) { showToast('الحد الأقصى لحجم الملف 10 ميغابايت'); return; }
+    if (S.editingId || !canSend()) return;
+    S.pendingFile = f;
+    showChip(f);
+    updateSendBtn();
+  });
+
+  $('fchipX').addEventListener('click', clearChip);
+
+  // لوحة الخيارات
+  $('sheetBg').addEventListener('click', closeSheet);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if ($('sheet').classList.contains('open')) closeSheet();
+    else if (S.editingId || S.reply) clearCtx();
+  });
+}
+
+/* ================= التشغيل ================= */
+function init() {
+  S.thread = $('thread');
+  S.intro = makeIntro();
+  S.thread.appendChild(S.intro.root);
+  bindEvents();
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) { location.href = LOGIN_PAGE; return; }
+    if (S.me) return;
+    S.me = user.uid;
+    startList();
+    renderList();
+    const target = new URLSearchParams(location.search).get('uid');
+    if (target && target !== S.me) openWith(target);
+  });
+}
+
+init();
 </script>
 </body>
 </html>
