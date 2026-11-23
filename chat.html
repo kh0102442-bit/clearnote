@@ -19,7 +19,6 @@ body{font-family:Cairo,system-ui,sans-serif;background:var(--bg);color:var(--tex
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none;padding:0}
 a{color:inherit}
-
 /* ===== Layout ===== */
 .app{position:relative;height:100vh;height:100dvh;display:flex;overflow:hidden}
 .list-col{position:relative;width:100%;height:100%;background:#fff;display:flex;flex-direction:column;min-width:0}
@@ -27,8 +26,7 @@ a{color:inherit}
 body.room-open .main{transform:none}
 .empty-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);text-align:center;padding:20px;font-size:15px}
 .empty-main i{font-size:46px;opacity:.5}
-.room{flex:1;min-height:0;display:flex;flex-direction:column}
-
+.room{flex:1;min-height:0;min-width:0;display:flex;flex-direction:column}
 /* ===== List header / search / tabs ===== */
 .lhdr{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--navy);color:#fff;flex-shrink:0}
 .lhdr h1{font-size:18px;margin:0;flex:1}
@@ -49,7 +47,6 @@ body.room-open .main{transform:none}
 .hint{font-size:12.5px;color:var(--muted);padding:10px 14px}
 .grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .grow small{color:var(--muted);font-size:12px}
-
 /* ===== Rows ===== */
 .item{display:flex;gap:11px;padding:11px 14px;cursor:pointer;border-bottom:1px solid #f1f3f6;content-visibility:auto;contain-intrinsic-size:auto 70px}
 .item:hover{background:#f7f9fb}
@@ -66,7 +63,6 @@ body.room-open .main{transform:none}
 .res{display:flex;align-items:center;gap:11px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f1f3f6}
 .res:hover{background:#f7f9fb}
 .res .btn{height:34px;padding:0 12px;font-size:13px}
-
 /* ===== Avatars ===== */
 .av{position:relative;width:46px;height:46px;border-radius:50%;background:var(--navy);color:#fff;display:inline-grid;place-items:center;font-weight:800;flex-shrink:0;overflow:hidden;font-size:17px}
 .av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -76,25 +72,24 @@ body.room-open .main{transform:none}
 .av.k-channel{background:var(--accent)}
 .av.k-community{background:var(--green)}
 .rhdr .av{width:40px;height:40px;font-size:15px}
-
 /* ===== Bottom nav ===== */
 .bottom-nav{display:flex;justify-content:space-around;border-top:1px solid var(--line);background:#fff;padding:6px 0 calc(6px + env(safe-area-inset-bottom));flex-shrink:0}
 .bottom-nav a{flex:1;text-align:center;color:var(--muted);font-size:11.5px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px}
 .bottom-nav a i{font-size:18px}
 .bottom-nav a.on{color:var(--navy);font-weight:800}
-
 /* ===== Room header ===== */
 .rhdr{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--navy);color:#fff;flex-shrink:0}
 .rhdr .icon-btn{color:#fff}
 .rinfo{flex:1;min-width:0;cursor:pointer}
 #rname{font-weight:800;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #rsub{font-size:12px;opacity:.8}
-
 /* ===== Thread ===== */
 .thread-wrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
 #threadWrap{flex:1;overflow-y:auto;padding:12px 10px 8px;overscroll-behavior:contain;min-height:0}
 #thread{max-width:860px;margin:0 auto;display:flex;flex-direction:column}
 #rows{display:flex;flex-direction:column}
+.mrow{display:flex;flex-direction:column}
+.day{align-self:center;background:rgba(0,0,0,.14);color:#fff;font-size:12px;padding:3px 10px;border-radius:8px;margin:12px 0 4px}
 .intro-card{background:#fff;border-radius:16px;padding:18px 14px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.06);margin-bottom:12px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .i-av-btn{border-radius:50%}
 .i-name{font-size:18px;font-weight:800;display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap}
@@ -104,7 +99,6 @@ body.room-open .main{transform:none}
 .i-stats b{font-size:15px;color:var(--text)}
 .i-desc{font-size:13px;color:var(--soft);max-width:520px;white-space:pre-wrap}
 .i-hint{font-size:12.5px;color:var(--muted);margin-top:6px;background:#f5f7fa;padding:8px 12px;border-radius:10px;max-width:520px}
-
 .row{display:flex;margin-top:8px}
 .row.grouped{margin-top:2px}
 .row.mine{justify-content:flex-end}
@@ -127,7 +121,6 @@ body.room-open .main{transform:none}
 .reacts{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .rc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1px 7px;font-size:12.5px}
 .rc.mine{border-color:var(--navy);background:#eaf2fb}
-
 /* ===== Attachments in bubbles ===== */
 .att{border-radius:8px;overflow:hidden;margin-bottom:4px;cursor:pointer;position:relative;background:#e9edf2}
 .att-img img{display:block;width:100%;max-width:300px;height:auto;max-height:360px;min-height:110px;object-fit:cover;background:#e4e8ee}
@@ -141,15 +134,13 @@ body.room-open .main{transform:none}
 .fmeta{display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .fmeta b{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fmeta small{font-size:11.5px;color:var(--muted)}
-
 /* ===== Jump button ===== */
 .jump{position:absolute;bottom:14px;inset-inline-end:14px;width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18);display:grid;place-items:center;color:var(--navy);font-size:15px;z-index:2}
 .jump[hidden]{display:none}
 #jumpN{position:absolute;top:-4px;left:-4px;background:var(--green);color:#fff;border-radius:10px;font-size:11px;padding:1px 6px;min-width:18px;text-align:center}
-
 /* ===== Composer ===== */
 .composer{background:#f0f2f5;padding:8px 10px calc(8px + env(safe-area-inset-bottom));flex-shrink:0;border-top:1px solid var(--line)}
-.ctx{display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:6px 8px;margin-bottom:6px;border-inline-start:4px solid var(--accent)}
+.ctx{display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:6px 8px;margin-bottom:6px;border-inline-start:4px solid var(--accent);cursor:pointer}
 .ctx>i{color:var(--accent)}
 .ctx>div{flex:1;min-width:0;display:flex;flex-direction:column;font-size:12.5px}
 .ctx b{color:var(--accent)}
@@ -177,7 +168,6 @@ body.room-open .main{transform:none}
 #input{flex:1;min-width:0;resize:none;border:0;outline:none;background:#fff;border-radius:20px;padding:10px 14px;max-height:130px;line-height:1.5;font-size:15px}
 .send{width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;flex-shrink:0}
 .send:disabled{opacity:.5}
-
 /* ===== Panel (create room) ===== */
 .panel{position:absolute;inset:0;background:#fff;z-index:20;display:flex;flex-direction:column}
 .panel .form{padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
@@ -185,7 +175,6 @@ body.room-open .main{transform:none}
 .panel label.check{flex-direction:row;align-items:center;gap:8px}
 .panel input[type=text],.panel input:not([type]),.panel select,.panel textarea{border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;font-size:15px;background:#fff}
 .panel .hint{padding:0;color:var(--red)}
-
 /* ===== Bottom sheet ===== */
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40}
 .sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;z-index:41;padding:12px 14px calc(14px + env(safe-area-inset-bottom));max-height:80vh;overflow-y:auto;box-shadow:0 -8px 30px rgba(0,0,0,.2)}
@@ -197,7 +186,6 @@ body.room-open .main{transform:none}
 .sh-act:hover{background:#f5f7fa}
 .sh-act i{width:20px;text-align:center;color:var(--soft)}
 .sh-act.danger,.sh-act.danger i{color:var(--red)}
-
 /* ===== Viewer ===== */
 .viewer{position:fixed;inset:0;z-index:60;background:#0b0f16;color:#fff;display:flex;flex-direction:column}
 .vhdr{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,.06);flex-shrink:0}
@@ -224,11 +212,9 @@ body.room-open .main{transform:none}
 .file-card .btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .file-card .btn.ok{background:#fff;color:var(--navy)}
 .file-card .btn.ghost{color:#fff;border-color:rgba(255,255,255,.3);background:transparent}
-
 /* ===== Toast ===== */
 #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:#1b2433;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:100;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
-
 /* ===== Desktop ===== */
 @media (min-width:900px){
   .app{display:grid;grid-template-columns:clamp(320px,30vw,400px) 1fr}
@@ -241,21 +227,17 @@ body.room-open .main{transform:none}
 </style>
 </head>
 <body>
-
 <div class="app" id="app">
-
   <aside class="list-col" id="listCol">
     <header class="lhdr">
       <a class="icon-btn" href="app.html" aria-label="الرئيسية" title="الرئيسية"><i class="fa-solid fa-house"></i></a>
       <h1>الدردشات</h1>
       <button class="icon-btn" id="newRoomBtn" aria-label="إنشاء مساحة" title="إنشاء"><i class="fa-solid fa-plus"></i></button>
     </header>
-
     <div class="search">
       <i class="fa-solid fa-magnifying-glass"></i>
       <input id="search" type="search" placeholder="بحث بالاسم أو اسم المستخدم أو الهاتف" autocomplete="off">
     </div>
-
     <nav class="tabs" id="tabs">
       <button class="tab on" data-tab="all">الكل</button>
       <button class="tab" data-tab="unread">غير المقروءة</button>
@@ -265,22 +247,19 @@ body.room-open .main{transform:none}
       <button class="tab" data-tab="communities">المجتمعات</button>
       <button class="tab" data-tab="study">غرف المذاكرة</button>
     </nav>
-
     <div class="list-scroll" id="listScroll">
-      <div class="lnote" id="roomNotice" hidden>الجروبات والقنوات والمجتمعات تحتاج تحديث قواعد Firestore (مجموعة rooms). لن تظهر حتى يُنشر ملف القواعد.</div>
+      <div class="lnote" id="roomNotice" hidden>تعذر تحميل الجروبات والقنوات والمجتمعات. تحقق من نشر قواعد Firestore الخاصة بالمساحات (rooms).</div>
       <div id="resultsWrap" hidden><div class="sec">المستخدمون</div><div id="results"></div></div>
       <div id="chatList"></div>
       <div class="empty" id="listEmpty" hidden></div>
       <div class="empty" id="tabPlaceholder" hidden></div>
       <div id="discover" hidden></div>
     </div>
-
     <nav class="bottom-nav">
       <a href="app.html"><i class="fa-solid fa-house"></i>الرئيسية</a>
       <a class="on" href="chat.html"><i class="fa-solid fa-comments"></i>الدردشات</a>
       <a href="profile.html"><i class="fa-solid fa-user"></i>حسابي</a>
     </nav>
-
     <section class="panel" id="createPanel" hidden>
       <header class="lhdr">
         <button class="icon-btn" id="cBack" aria-label="رجوع"><i class="fa-solid fa-arrow-right"></i></button>
@@ -302,13 +281,11 @@ body.room-open .main{transform:none}
       </div>
     </section>
   </aside>
-
   <main class="main" id="main">
     <div class="empty-main" id="placeholder">
       <i class="fa-regular fa-comments"></i>
       <p>اختر محادثة أو مساحة للبدء</p>
     </div>
-
     <section class="room" id="room" hidden>
       <header class="rhdr">
         <button class="icon-btn back-btn" id="backBtn" aria-label="رجوع"><i class="fa-solid fa-arrow-right"></i></button>
@@ -318,7 +295,6 @@ body.room-open .main{transform:none}
           <div id="rsub"></div>
         </div>
       </header>
-
       <div class="thread-wrap">
         <div id="threadWrap">
           <div id="thread">
@@ -331,7 +307,6 @@ body.room-open .main{transform:none}
           <span id="jumpN" hidden>0</span>
         </button>
       </div>
-
       <footer class="composer" id="composer" hidden>
         <div class="ctx" id="ctx" hidden></div>
         <div class="filechip" id="filechip" hidden></div>
@@ -350,15 +325,12 @@ body.room-open .main{transform:none}
     </section>
   </main>
 </div>
-
 <input type="file" id="fileInput" hidden>
-
 <div class="sheet-bg" id="sheetBg" hidden></div>
 <div class="sheet" id="sheet" hidden>
   <div class="sh-em" id="shEmojis"></div>
   <div id="shActions"></div>
 </div>
-
 <div class="viewer" id="viewer" hidden>
   <div class="vhdr">
     <button class="icon-btn" id="vclose" aria-label="إغلاق"><i class="fa-solid fa-xmark"></i></button>
@@ -379,9 +351,7 @@ body.room-open .main{transform:none}
     <a id="vdown"><i class="fa-solid fa-download"></i> تنزيل</a>
   </div>
 </div>
-
 <div id="toast"></div>
-
 <script type="module">
 import { auth, db } from "./shared.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -404,11 +374,13 @@ const CLOUD_PRESET = "clearnote_unsigned";
 const CLOUD_PREFIX = "https://res.cloudinary.com/nopxs3zt/";
 const EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+const OPTS = { serverTimestamps: "estimate" };
 const ROLE_LABEL = { admin: "مشرف", moderator: "مشرف", founder: "المؤسس", member: "عضو", user: "عضو" };
 const KIND_LABEL = { group: "جروب", channel: "قناة", community: "مجتمع" };
 const KIND_ICON = { group: "fa-user-group", channel: "fa-bullhorn", community: "fa-people-roof" };
 const PLACEHOLDER_TABS = { study: "غرف المذاكرة قريباً" };
 const ROOM_TABS = { groups: "group", channels: "channel", communities: "community" };
+const TYPE_LABEL = { image: "صورة", video: "فيديو", audio: "صوت", pdf: "PDF", office: "مستند", text: "نص", other: "ملف" };
 
 /* ================= State ================= */
 const S = {
@@ -427,10 +399,10 @@ const S = {
   roomsUnsub: null,
   rowCache: new Map(),
   // active thread
-  kind: null,          // "chat" | "room"
+  kind: null,            // "chat" | "room"
   id: null,
   otherUid: null,
-  data: null,          // thread doc data
+  data: null,
   exists: false,
   loaded: false,
   otherReadMs: 0,
@@ -445,9 +417,9 @@ const S = {
   followBottom: true,
   newBelow: 0,
   marking: false,
-  map: new Map(),      // messageId -> data
-  order: [],           // [{id,t}] sorted
-  els: new Map(),      // messageId -> row element
+  map: new Map(),        // messageId -> { d, t }
+  order: [],             // [{ id, t }] sorted by t
+  els: new Map(),        // messageId -> wrapper element
   reply: null,
   editingId: null,
   sheetId: null,
@@ -459,10 +431,12 @@ const S = {
   viewerIdx: -1,
   viewToken: 0,
   speedIdx: 2,
-  zoom: null,
+  zoom: 1,
+  rot: 0,
+  px: 0,
+  py: 0,
   started: false,
 };
-
 const userCache = new Map();
 const userPending = new Map();
 
@@ -505,14 +479,12 @@ function toast(msg, ms = 2600) {
   clearTimeout(toast._t);
   toast._t = setTimeout(() => t.classList.remove("show"), ms);
 }
-
 function goProfile(uid) {
   if (!uid) return;
   location.href = uid === S.me ? PROFILE_PAGE : PROFILE_PAGE + "?uid=" + encodeURIComponent(uid);
 }
-
 function avatar(u, extra = "") {
-  const name = (u && u.name) || "?";
+  const name = String((u && u.name) || "?");
   const init = esc(name.trim().charAt(0) || "?");
   const img = u && u.avatarUrl
     ? `<img src="${esc(tx(u.avatarUrl, "w_120,h_120,c_fill,q_auto,f_auto"))}" alt="" loading="lazy" onerror="this.remove()">`
@@ -537,7 +509,6 @@ function getUser(uid) {
   userPending.set(uid, p);
   return p;
 }
-
 function onUserLoaded(uid, d) {
   document.querySelectorAll(`[data-sn="${uid}"]`).forEach((el) => (el.textContent = d.name || "مستخدم"));
   if (S.kind === "chat" && uid === S.otherUid) {
@@ -546,12 +517,6 @@ function onUserLoaded(uid, d) {
   }
   scheduleList();
 }
-
-function nameOf(uid) {
-  if (uid === S.me) return "أنت";
-  return (userCache.get(uid) && userCache.get(uid).name) || "...";
-}
-
 function realName(uid) {
   return (userCache.get(uid) && userCache.get(uid).name) || "مستخدم";
 }
@@ -569,7 +534,6 @@ function fileType(a) {
   if (mime.startsWith("text/") || ["txt", "md", "csv", "json", "log", "js", "css", "html", "xml", "py", "java", "c", "cpp", "sql"].includes(ext)) return "text";
   return "other";
 }
-
 function ficonClass(a) {
   const ft = fileType(a), ext = extOf(a.name);
   if (ft === "pdf") return "fa-file-pdf";
@@ -581,7 +545,6 @@ function ficonClass(a) {
   if (["ppt", "pptx", "odp"].includes(ext)) return "fa-file-powerpoint";
   return "fa-file";
 }
-
 function vthumb(url) {
   if (!isCloud(url) || !url.includes("/video/upload/")) return "";
   return url
@@ -598,7 +561,6 @@ function needsRead(d) {
   if (!r) return false;
   return millis(r) < millis(d.lastMessageAt);
 }
-
 function buildItems() {
   const items = [];
   for (const [id, d] of S.chats) {
@@ -612,7 +574,6 @@ function buildItems() {
   items.sort((a, b) => b.t - a.t);
   return items;
 }
-
 function passTab(it) {
   const d = it.d;
   switch (S.tab) {
@@ -625,7 +586,6 @@ function passTab(it) {
     default: return false;
   }
 }
-
 function matchQuery(it, q) {
   if (!q) return true;
   if (it.kind === "room") return String(it.d.name || "").toLowerCase().includes(q);
@@ -633,7 +593,6 @@ function matchQuery(it, q) {
   if (!u) return false;
   return String(u.name || "").toLowerCase().includes(q) || String(u.username || "").toLowerCase().includes(q);
 }
-
 function rowInfo(it) {
   const d = it.d;
   let av, name, tag = "";
@@ -656,7 +615,6 @@ function rowInfo(it) {
   const html = `${av}<div class="ib"><div class="ir1"><span class="title">${esc(name)}</span><span class="time">${time}</span></div><div class="ir2"><span class="prev">${esc(prevRaw)}</span>${tag}${dot}</div></div>`;
   return { html };
 }
-
 function emptyText() {
   if (S.listQuery.trim()) return "لا توجد نتائج مطابقة في المحادثات";
   const map = {
@@ -669,13 +627,11 @@ function emptyText() {
   };
   return map[S.tab] || "";
 }
-
 function scheduleList() {
   if (S.listScheduled) return;
   S.listScheduled = true;
   requestAnimationFrame(renderList);
 }
-
 function renderList() {
   S.listScheduled = false;
   const q = S.listQuery.trim().toLowerCase();
@@ -711,12 +667,11 @@ function renderList() {
     rec.el.dataset.id = it.id;
     frag.appendChild(rec.el);
   }
-  for (const key of S.rowCache.keys()) if (!seen.has(key)) S.rowCache.delete(key);
+  for (const key of [...S.rowCache.keys()]) if (!seen.has(key)) S.rowCache.delete(key);
   $("#chatList").replaceChildren(frag);
   $("#listEmpty").hidden = items.length > 0;
   $("#listEmpty").textContent = emptyText();
 }
-
 function renderDiscover() {
   const kind = ROOM_TABS[S.tab];
   const list = kind ? S.publicRooms.filter((r) => r.kind === kind && !(r.members || []).includes(S.me)) : [];
@@ -733,7 +688,6 @@ function renderDiscover() {
   $("#discover").innerHTML = html;
   $("#discover").hidden = !html;
 }
-
 async function loadDiscover() {
   try {
     const snap = await getDocs(query(collection(db, "rooms"), where("isPublic", "==", true), limit(60)));
@@ -745,14 +699,13 @@ async function loadDiscover() {
   S.discoverHtml = "";
   renderDiscover();
 }
-
 function startLists() {
   S.chatsUnsub = onSnapshot(
     query(collection(db, "chats"), where("participants", "array-contains", S.me), limit(CHAT_LIST_LIMIT)),
     (snap) => {
       snap.docChanges().forEach((c) => {
         if (c.type === "removed") S.chats.delete(c.doc.id);
-        else S.chats.set(c.doc.id, c.doc.data());
+        else S.chats.set(c.doc.id, c.doc.data(OPTS));
       });
       scheduleList();
     },
@@ -761,14 +714,13 @@ function startLists() {
       toast("تعذر تحميل المحادثات");
     }
   );
-
   S.roomsUnsub = onSnapshot(
     query(collection(db, "rooms"), where("members", "array-contains", S.me), limit(ROOM_LIST_LIMIT)),
     (snap) => {
       S.roomsError = false;
       snap.docChanges().forEach((c) => {
         if (c.type === "removed") S.rooms.delete(c.doc.id);
-        else S.rooms.set(c.doc.id, c.doc.data());
+        else S.rooms.set(c.doc.id, c.doc.data(OPTS));
       });
       scheduleList();
     },
@@ -793,7 +745,6 @@ async function runUserSearch(raw) {
   }
   box.hidden = false;
   res.innerHTML = `<div class="hint">جارٍ البحث…</div>`;
-
   const usersCol = collection(db, "users");
   const digits = q.replace(/\D/g, "");
   const tasks = [
@@ -802,10 +753,8 @@ async function runUserSearch(raw) {
     getDocs(query(usersCol, where("lower", "==", q.toLowerCase()), limit(10))),
   ];
   if (digits.length >= 6) tasks.push(getDocs(query(usersCol, where("digits", "==", digits), limit(10))));
-
   const results = await Promise.allSettled(tasks);
   if (token !== S.searchToken) return;
-
   const found = new Map();
   results.forEach((r) => {
     if (r.status !== "fulfilled") return;
@@ -813,7 +762,6 @@ async function runUserSearch(raw) {
       if (d.id !== S.me) found.set(d.id, { uid: d.id, ...d.data() });
     });
   });
-
   if (!found.size) {
     res.innerHTML = `<div class="hint">لا توجد نتائج</div>`;
     return;
@@ -828,7 +776,6 @@ async function runUserSearch(raw) {
       </div>
     </div>`).join("");
 }
-
 function openFromSearch(uid) {
   S.searchToken++;
   $("#search").value = "";
@@ -839,7 +786,7 @@ function openFromSearch(uid) {
   openChat(uid);
 }
 
-/* ================= Thread: refs & state ================= */
+/* ================= Thread refs & state ================= */
 function threadRef() {
   return S.kind === "room" ? doc(db, "rooms", S.id) : doc(db, "chats", S.id);
 }
@@ -849,7 +796,10 @@ function msgsCol() {
 function msgRef(id) {
   return doc(msgsCol(), id);
 }
-
+function isRoomAdminNow() {
+  const r = S.data || {};
+  return S.kind === "room" && (r.ownerUid === S.me || (r.admins || []).includes(S.me));
+}
 function computeState() {
   if (!S.id) return "none";
   if (!S.loaded) return "loading";
@@ -857,8 +807,7 @@ function computeState() {
     if (!S.exists) return "gone";
     const r = S.data || {};
     if (!(r.members || []).includes(S.me)) return r.isPublic ? "join" : "closed";
-    const isAdmin = r.ownerUid === S.me || (r.admins || []).includes(S.me);
-    if (r.kind === "channel" && !isAdmin) return "readonly";
+    if (r.kind === "channel" && !isRoomAdminNow()) return "readonly";
     return "active";
   }
   if (!S.exists) return "new";
@@ -867,17 +816,14 @@ function computeState() {
   if (st === "pending") return S.data.requesterUid === S.me ? "wait" : "decide";
   return "active";
 }
-
 function closeSubs() {
   if (S.docUnsub) { S.docUnsub(); S.docUnsub = null; }
   if (S.msgUnsub) { S.msgUnsub(); S.msgUnsub = null; }
 }
-
 function openChat(uid) {
   if (!uid || uid === S.me) return;
   openThread("chat", chatIdFor(S.me, uid), uid);
 }
-
 function openThread(kind, id, otherUid = null) {
   closeSubs();
   S.token++;
@@ -907,23 +853,23 @@ function openThread(kind, id, otherUid = null) {
   $("#placeholder").hidden = true;
   $("#room").hidden = false;
   document.body.classList.add("room-open");
-
   if (kind === "chat" && otherUid) {
     getUser(otherUid);
     history.replaceState(null, "", "chat.html?uid=" + encodeURIComponent(otherUid));
   } else {
     history.replaceState(null, "", "chat.html");
   }
-
   const token = S.token;
   S.docUnsub = onSnapshot(
     threadRef(),
     (snap) => {
       if (token !== S.token) return;
       S.loaded = true;
-      S.data = snap.exists() ? snap.data() : null;
       S.exists = snap.exists();
-      if (S.kind === "chat") S.otherReadMs = millis(S.data && S.data.readAt ? S.data.readAt[S.otherUid] : 0);
+      S.data = snap.exists() ? snap.data(OPTS) : null;
+      if (S.kind === "chat") {
+        S.otherReadMs = millis(S.data && S.data.readAt ? S.data.readAt[S.otherUid] : 0);
+      }
       refreshState();
     },
     (err) => {
@@ -934,7 +880,6 @@ function openThread(kind, id, otherUid = null) {
   scheduleList();
   refreshState();
 }
-
 function closeThread() {
   closeSubs();
   S.token++;
@@ -956,13 +901,15 @@ function closeThread() {
   history.replaceState(null, "", "chat.html");
   scheduleList();
 }
-
 function refreshState() {
   if (!S.id) return;
   const st = computeState();
   const needMsgs = ["wait", "decide", "active", "readonly", "blocked"].includes(st);
   if (needMsgs && !S.msgUnsub) subscribeMessages();
-  else if (!needMsgs && S.msgUnsub) { S.msgUnsub(); S.msgUnsub = null; }
+  else if (!needMsgs && S.msgUnsub) {
+    S.msgUnsub();
+    S.msgUnsub = null;
+  }
   paintHeader();
   renderIntro();
   renderComposer();
@@ -970,7 +917,6 @@ function refreshState() {
   scheduleList();
   maybeMarkRead();
 }
-
 function paintHeader() {
   if (!S.id) return;
   const rav = $("#rav"), rname = $("#rname"), rsub = $("#rsub");
@@ -987,7 +933,6 @@ function paintHeader() {
     rsub.textContent = u.username ? "@" + u.username : (ROLE_LABEL[u.role] || "عضو");
   }
 }
-
 function renderIntro() {
   const el = $("#intro");
   const st = computeState();
@@ -1039,14 +984,12 @@ function canSend() {
   const st = computeState();
   return st === "new" || st === "active";
 }
-
 function renderComposer() {
   const st = computeState();
   const show = !!S.id && st !== "loading" && st !== "gone";
   $("#composer").hidden = !show;
   if (!show) return;
   const typing = st === "new" || st === "active";
-
   const ctx = $("#ctx");
   if (typing && (S.editingId || S.reply)) {
     ctx.hidden = false;
@@ -1057,11 +1000,11 @@ function renderComposer() {
     ctx.hidden = true;
     ctx.innerHTML = "";
   }
-
   const fc = $("#filechip");
   const f = S.pendingFile;
-  fc.hidden = !(typing && f && !S.editingId);
-  if (!fc.hidden) {
+  const showChip = typing && !!f && !S.editingId;
+  fc.hidden = !showChip;
+  if (showChip) {
     fc.innerHTML = `
       <div class="fthumb">${S.previewUrl ? `<img src="${S.previewUrl}" alt="">` : `<i class="fa-solid fa-file"></i>`}</div>
       <div class="fname"><span>${esc(f.name)}</span><small>${fmtSize(f.size)}</small></div>
@@ -1069,7 +1012,6 @@ function renderComposer() {
   } else {
     fc.innerHTML = "";
   }
-
   let mode = "type", msg = "", dec = "";
   if (st === "wait") {
     mode = "notice";
@@ -1100,7 +1042,6 @@ function renderComposer() {
   $("#attach").disabled = S.busy;
   $("#input").disabled = S.busy;
 }
-
 function clearPendingFile() {
   if (S.previewUrl) URL.revokeObjectURL(S.previewUrl);
   S.previewUrl = "";
@@ -1108,24 +1049,20 @@ function clearPendingFile() {
   $("#fileInput").value = "";
   renderComposer();
 }
-
 function autosize() {
   const el = $("#input");
   el.style.height = "auto";
   el.style.height = el.scrollHeight + "px";
 }
-
 function setFbar(pct, label) {
   $("#fbar").hidden = false;
   $("#fbarIn").style.width = pct + "%";
   $("#fbarTxt").textContent = label;
 }
-
 function hideFbar() {
   $("#fbar").hidden = true;
   $("#fbarIn").style.width = "0";
 }
-
 function cancelCtx() {
   S.reply = null;
   if (S.editingId) {
@@ -1135,7 +1072,6 @@ function cancelCtx() {
   }
   renderComposer();
 }
-
 function setReply(id) {
   const rec = S.map.get(id);
   if (!rec) return;
@@ -1148,7 +1084,6 @@ function setReply(id) {
   renderComposer();
   $("#input").focus();
 }
-
 function startEdit(id) {
   const rec = S.map.get(id);
   if (!rec) return;
@@ -1159,7 +1094,6 @@ function startEdit(id) {
   renderComposer();
   $("#input").focus();
 }
-
 function copyText(t) {
   if (!t) return;
   (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject(new Error("no clipboard")))
@@ -1182,12 +1116,10 @@ async function markRead() {
     S.marking = false;
   }
 }
-
 function maybeMarkRead() {
   if (S.kind !== "chat" || !S.loaded || !S.followBottom || document.hidden) return;
   markRead();
 }
-
 function applyTicks() {
   if (S.kind !== "chat") return;
   for (const [id, el] of S.els) {
@@ -1211,7 +1143,6 @@ function lowerBound(t) {
   }
   return lo;
 }
-
 function indexOfId(id, t) {
   let i = lowerBound(t);
   while (i < S.order.length && S.order[i].t === t) {
@@ -1220,17 +1151,12 @@ function indexOfId(id, t) {
   }
   return -1;
 }
-
 function insertOrder(id, t) {
   S.order.splice(lowerBound(t), 0, { id, t });
 }
-
-const DAY_STYLE = "align-self:center;background:rgba(0,0,0,.14);color:#fff;font-size:12px;padding:3px 10px;border-radius:8px;margin:12px 0 4px";
-
 function dayStr(t) {
   return new Date(t).toDateString();
 }
-
 function dayLabel(t) {
   const d = new Date(t), now = new Date();
   const y = new Date(now);
@@ -1239,23 +1165,20 @@ function dayLabel(t) {
   if (d.toDateString() === y.toDateString()) return "أمس";
   return pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear();
 }
-
 function nl2br(s) {
   return s.replace(/\n/g, "<br>");
 }
-
 function attachHTML(id, a) {
   const ft = fileType(a);
   if (ft === "image") {
-    return `<div class="att att-img" data-open="${id}"><img src="${esc(tx(a.url, "w_520,h_360,c_limit,q_auto,f_auto"))}" alt="" loading="lazy"></div>`;
+    return `<div class="att att-img" data-open="${esc(id)}"><img src="${esc(tx(a.url, "w_520,h_360,c_limit,q_auto,f_auto"))}" alt="" loading="lazy"></div>`;
   }
   if (ft === "video") {
     const th = vthumb(a.url);
-    return `<div class="att att-vid" data-open="${id}">${th ? `<img src="${esc(th)}" alt="" loading="lazy">` : ""}<div class="play"><i class="fa-solid fa-play"></i></div></div>`;
+    return `<div class="att att-vid" data-open="${esc(id)}">${th ? `<img src="${esc(th)}" alt="" loading="lazy">` : ""}<div class="play"><i class="fa-solid fa-play"></i></div></div>`;
   }
-  return `<div class="att att-file" data-open="${id}"><span class="ficon"><i class="fa-solid ${ficonClass(a)}"></i></span><div class="fmeta"><b>${esc(a.name || "ملف")}</b><small>${fmtSize(a.size || 0)}</small></div></div>`;
+  return `<div class="att att-file" data-open="${esc(id)}"><span class="ficon"><i class="fa-solid ${ficonClass(a)}"></i></span><div class="fmeta"><b>${esc(a.name || "ملف")}</b><small>${fmtSize(a.size || 0)}</small></div></div>`;
 }
-
 function reactHTML(r) {
   if (!r) return "";
   const groups = new Map();
@@ -1269,7 +1192,6 @@ function reactHTML(r) {
   if (!groups.size) return "";
   return `<div class="reacts">${[...groups].map(([em, g]) => `<span class="rc${g.mine ? " mine" : ""}">${esc(em)} ${g.n}</span>`).join("")}</div>`;
 }
-
 function rowHTML(id, d, t, grouped) {
   const mine = d.senderUid === S.me;
   if (!mine) getUser(d.senderUid);
@@ -1288,8 +1210,7 @@ function rowHTML(id, d, t, grouped) {
   const meta = `<div class="meta">${d.isEdited && !d.deleted ? "<span>معدّلة</span>" : ""}<span>${fmtTime(t)}</span>${ticks}</div>`;
   return `<div class="row ${mine ? "mine" : "theirs"}${grouped ? " grouped" : ""}"><div class="bwrap"><div class="bubble">${sname}${quote}${att}${txt}${reacts}${meta}</div></div></div>`;
 }
-
-function paintEntry(el, id, i, rec) {
+function paintEntry(el, i, rec) {
   const prev = i > 0 ? S.map.get(S.order[i - 1].id) : null;
   const newDay = !prev || dayStr(prev.t) !== dayStr(rec.t);
   const grouped = !newDay && prev.d.senderUid === rec.d.senderUid && rec.t - prev.t < GROUP_GAP_MS;
@@ -1298,10 +1219,10 @@ function paintEntry(el, id, i, rec) {
   ]);
   if (el.dataset.sig === sig) return;
   el.dataset.sig = sig;
-  el.innerHTML = (newDay ? `<div class="day" style="${DAY_STYLE}">${dayLabel(rec.t)}</div>` : "")
+  const id = el.dataset.id;
+  el.innerHTML = (newDay ? `<div class="day">${dayLabel(rec.t)}</div>` : "")
     + rowHTML(id, rec.d, rec.t, grouped);
 }
-
 function placeAndPaint(id) {
   const rec = S.map.get(id);
   if (!rec) return;
@@ -1321,16 +1242,15 @@ function placeAndPaint(id) {
     if (e) { next = e; break; }
   }
   if (el.parentNode !== rows || el.nextSibling !== next) rows.insertBefore(el, next);
-  paintEntry(el, id, i, rec);
+  paintEntry(el, i, rec);
 }
-
 function applyMessageChanges(snap) {
   const touched = new Set();
   let incoming = 0;
   for (const c of snap.docChanges()) {
     const id = c.doc.id;
+    const prev = S.map.get(id);
     if (c.type === "removed") {
-      const prev = S.map.get(id);
       if (!prev) continue;
       const i = indexOfId(id, prev.t);
       if (i > 0) touched.add(S.order[i - 1].id);
@@ -1341,9 +1261,8 @@ function applyMessageChanges(snap) {
       S.els.delete(id);
       continue;
     }
-    const d = c.doc.data();
+    const d = c.doc.data(OPTS);
     const t = millis(d.createdAt) || Date.now();
-    const prev = S.map.get(id);
     if (!prev) {
       insertOrder(id, t);
       if (d.senderUid !== S.me) incoming++;
@@ -1355,17 +1274,16 @@ function applyMessageChanges(snap) {
     S.map.set(id, { d, t });
     touched.add(id);
   }
-
   const repaint = new Set();
   for (const id of touched) {
-    if (!S.map.has(id)) continue;
-    const i = indexOfId(id, S.map.get(id).t);
+    const rec = S.map.get(id);
+    if (!rec) continue;
+    const i = indexOfId(id, rec.t);
     if (i < 0) continue;
     repaint.add(id);
     if (i + 1 < S.order.length) repaint.add(S.order[i + 1].id);
   }
   for (const id of repaint) placeAndPaint(id);
-
   const wrap = $("#threadWrap");
   S.hasMore = snap.size >= S.windowSize;
   if (S.loadingOlder) {
@@ -1383,7 +1301,6 @@ function applyMessageChanges(snap) {
   applyTicks();
   maybeMarkRead();
 }
-
 function subscribeMessages() {
   if (S.msgUnsub) return;
   const token = S.token;
@@ -1396,11 +1313,11 @@ function subscribeMessages() {
     },
     (err) => {
       console.error("messages:", err);
+      S.msgUnsub = null;
       toast("تعذر تحميل الرسائل");
     }
   );
 }
-
 function restartMessages() {
   if (S.msgUnsub) {
     S.msgUnsub();
@@ -1408,7 +1325,6 @@ function restartMessages() {
   }
   subscribeMessages();
 }
-
 function loadOlder() {
   if (!S.hasMore || S.loadingOlder || !S.msgUnsub) return;
   S.loadingOlder = true;
@@ -1416,7 +1332,6 @@ function loadOlder() {
   S.windowSize += PAGE_SIZE;
   restartMessages();
 }
-
 function updateJump() {
   const j = $("#jump");
   j.hidden = S.followBottom || S.kind == null;
@@ -1424,7 +1339,6 @@ function updateJump() {
   n.hidden = !S.newBelow;
   n.textContent = S.newBelow > 99 ? "99+" : String(S.newBelow);
 }
-
 function scrollToBottom() {
   const wrap = $("#threadWrap");
   wrap.scrollTop = wrap.scrollHeight;
@@ -1433,7 +1347,6 @@ function scrollToBottom() {
   updateJump();
   maybeMarkRead();
 }
-
 function scrollToMsg(id) {
   const el = S.els.get(id);
   if (!el) {
@@ -1448,7 +1361,6 @@ function scrollToMsg(id) {
   row.classList.add("flash");
   setTimeout(() => row.classList.remove("flash"), 1300);
 }
-
 function onThreadScroll() {
   const wrap = $("#threadWrap");
   const dist = wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight;
@@ -1458,7 +1370,11 @@ function onThreadScroll() {
   if (S.followBottom) maybeMarkRead();
   if (wrap.scrollTop < 150) loadOlder();
 }
-
+function onMediaLoad(e) {
+  if (e.target.tagName !== "IMG" || !S.followBottom) return;
+  const wrap = $("#threadWrap");
+  wrap.scrollTop = wrap.scrollHeight;
+}
 function onRowsClick(e) {
   const open = e.target.closest("[data-open]");
   if (open) return openViewerFor(open.dataset.open);
@@ -1477,32 +1393,31 @@ function onRowsClick(e) {
 function actBtn(a, icon, label, cls = "") {
   return `<button class="sh-act ${cls}" data-act="${a}"><i class="fa-solid ${icon}"></i>${label}</button>`;
 }
-
 function openSheet(id) {
   const rec = S.map.get(id);
   if (!rec || rec.d.deleted) return;
-  S.sheetId = id;
+  if (computeState() === "blocked") return;
   const mine = rec.d.senderUid === S.me;
   const can = canSend();
-  $("#shEmojis").innerHTML = can
-    ? EMOJIS.map((e) => `<button data-em="${e}" aria-label="تفاعل">${e}</button>`).join("")
-    : "";
+  const canMod = isRoomAdminNow();
+  const emojis = can ? EMOJIS.map((e) => `<button data-em="${e}" aria-label="تفاعل">${e}</button>`).join("") : "";
   const acts = [];
   if (can) acts.push(actBtn("reply", "fa-reply", "رد"));
   if (rec.d.text) acts.push(actBtn("copy", "fa-copy", "نسخ"));
-  if (mine && !rec.d.attachment) acts.push(actBtn("edit", "fa-pen", "تعديل"));
-  if (mine) acts.push(actBtn("delete", "fa-trash", "حذف", "danger"));
+  if (mine && can && !rec.d.attachment) acts.push(actBtn("edit", "fa-pen", "تعديل"));
+  if (mine || canMod) acts.push(actBtn("delete", "fa-trash", "حذف", "danger"));
+  if (!emojis && !acts.length) return;
+  S.sheetId = id;
+  $("#shEmojis").innerHTML = emojis;
   $("#shActions").innerHTML = acts.join("");
   $("#sheet").hidden = false;
   $("#sheetBg").hidden = false;
 }
-
 function closeSheet() {
   $("#sheet").hidden = true;
   $("#sheetBg").hidden = true;
   S.sheetId = null;
 }
-
 function runAct(id, a) {
   if (!id) return;
   if (a === "reply") setReply(id);
@@ -1510,7 +1425,6 @@ function runAct(id, a) {
   else if (a === "edit") startEdit(id);
   else if (a === "delete") deleteMsg(id);
 }
-
 async function toggleReaction(id, em) {
   const rec = S.map.get(id);
   if (!rec) return;
@@ -1523,34 +1437,36 @@ async function toggleReaction(id, em) {
     toast("تعذر التفاعل");
   }
 }
-
 async function saveEdit(text) {
   const id = S.editingId;
-  if (!id) return;
+  if (!id || S.busy) return;
   if (!text) {
     toast("لا يمكن أن تكون الرسالة فارغة");
     return;
   }
+  S.busy = true;
+  renderComposer();
   try {
     await updateDoc(msgRef(id), { text, isEdited: true, editedAt: serverTimestamp() });
-    if (S.data && S.data.lastMessageId === id) {
+    if (S.kind === "chat" && S.data && S.data.lastMessageId === id) {
       await updateDoc(threadRef(), { lastMessage: text.slice(0, 120) });
     }
     S.editingId = null;
     $("#input").value = "";
     autosize();
-    renderComposer();
   } catch (e) {
     console.error("edit:", e);
     toast("تعذر حفظ التعديل");
+  } finally {
+    S.busy = false;
+    renderComposer();
   }
 }
-
 async function deleteMsg(id) {
   if (!confirm("حذف هذه الرسالة؟")) return;
   try {
     await updateDoc(msgRef(id), { text: "", deleted: true, deletedAt: serverTimestamp(), attachment: null });
-    if (S.data && S.data.lastMessageId === id) {
+    if (S.kind === "chat" && S.data && S.data.lastMessageId === id) {
       await updateDoc(threadRef(), { lastMessage: "تم حذف الرسالة" });
     }
   } catch (e) {
@@ -1598,11 +1514,9 @@ function uploadAttachment(file) {
     xhr.send(fd);
   });
 }
-
 async function sendMessage(text, attachment, reply) {
   const tref = threadRef();
   const mid = doc(msgsCol()).id;
-
   if (S.kind === "chat" && !S.exists) {
     await setDoc(tref, {
       participants: [S.me, S.otherUid].sort(),
@@ -1612,7 +1526,6 @@ async function sendMessage(text, attachment, reply) {
       readAt: { [S.me]: serverTimestamp() },
     });
   }
-
   const msg = {
     senderUid: S.me,
     text,
@@ -1623,38 +1536,35 @@ async function sendMessage(text, attachment, reply) {
     reactions: {},
     attachment,
   };
-  const preview = (text || (attachment ? "📎 " + attachment.name : "")).slice(0, 120);
-
   const batch = writeBatch(db);
   batch.set(doc(msgsCol(), mid), msg);
-  batch.update(tref, {
-    lastMessage: preview,
-    lastMessageAt: serverTimestamp(),
-    lastSenderUid: S.me,
-    lastMessageId: mid,
-  });
+  if (S.kind === "chat") {
+    // معاينة آخر رسالة للمحادثات الخاصة فقط (قواعد المساحات لا تسمح بها)
+    batch.update(tref, {
+      lastMessage: (text || (attachment ? "📎 " + attachment.name : "")).slice(0, 120),
+      lastMessageAt: serverTimestamp(),
+      lastSenderUid: S.me,
+      lastMessageId: mid,
+    });
+  }
   await batch.commit();
 }
-
 async function onSend() {
   if (S.busy || !S.id) return;
   const st = computeState();
   if (st !== "new" && st !== "active") return;
   const input = $("#input");
   const text = input.value.trim();
-
   if (S.editingId) {
     await saveEdit(text);
     return;
   }
-
   const file = S.pendingFile;
   if (!text && !file) return;
   if (text.length > MAX_TEXT) {
     toast("الرسالة أطول من 2000 حرف");
     return;
   }
-
   const reply = S.reply;
   S.busy = true;
   renderComposer();
@@ -1679,7 +1589,6 @@ async function onSend() {
     renderComposer();
   }
 }
-
 function onFilePicked() {
   const input = $("#fileInput");
   const f = input.files && input.files[0];
@@ -1709,7 +1618,6 @@ async function acceptRequest() {
     toast("تعذر قبول الطلب");
   }
 }
-
 async function blockRequest() {
   if (!confirm("حظر هذا المستخدم؟ لن تصلك رسائله بعد الآن.")) return;
   try {
@@ -1719,7 +1627,6 @@ async function blockRequest() {
     toast("تعذر الحظر");
   }
 }
-
 async function joinRoom(id) {
   if (!id) return;
   try {
@@ -1732,7 +1639,6 @@ async function joinRoom(id) {
     toast("تعذر الانضمام");
   }
 }
-
 async function createRoom() {
   const name = $("#cName").value.trim();
   const hint = $("#cHint");
@@ -1766,7 +1672,6 @@ async function createRoom() {
     btn.disabled = false;
   }
 }
-
 function onComposerClick(e) {
   const t = e.target.closest("button");
   if (!t) return;
@@ -1777,32 +1682,26 @@ function onComposerClick(e) {
 }
 
 /* ================= Viewer ================= */
-const TYPE_LABEL = { image: "صورة", video: "فيديو", audio: "صوت", pdf: "PDF", office: "مستند", text: "نص", other: "ملف" };
-
 function setDisabled(id, v) {
   const el = $("#" + id);
   el.disabled = v;
   el.style.opacity = v ? ".35" : "";
 }
-
 function applyXf() {
   const img = $("#vstage img");
   if (img) img.style.transform = `translate(${S.px}px,${S.py}px) rotate(${S.rot}deg) scale(${S.zoom})`;
 }
-
 function setZoom(z) {
   S.zoom = Math.max(0.5, Math.min(5, Math.round(z * 100) / 100));
   if (S.zoom <= 1) { S.px = 0; S.py = 0; }
   applyXf();
 }
-
 function applyRate() {
   const rate = SPEEDS[S.speedIdx];
   $("#vspeedTxt").textContent = rate + "×";
   const m = document.querySelector("#vstage video, #vstage audio");
   if (m) m.playbackRate = rate;
 }
-
 function openViewerFor(id) {
   const gallery = [];
   for (const o of S.order) {
@@ -1815,7 +1714,6 @@ function openViewerFor(id) {
   $("#viewer").hidden = false;
   showViewer(idx);
 }
-
 function showViewer(idx) {
   const n = S.gallery.length;
   if (!n) return;
@@ -1824,7 +1722,6 @@ function showViewer(idx) {
   const ft = fileType(a);
   const token = ++S.viewToken;
   S.zoom = 1; S.rot = 0; S.px = 0; S.py = 0;
-
   const stage = $("#vstage");
   stage.replaceChildren();
   $("#vtTitle").textContent = a.name || "ملف";
@@ -1840,7 +1737,6 @@ function showViewer(idx) {
   setDisabled("vreset", ft !== "image");
   setDisabled("vspeed", ft !== "video" && ft !== "audio");
   $("#vspeedTxt").textContent = SPEEDS[S.speedIdx] + "×";
-
   if (ft === "image") {
     const img = document.createElement("img");
     img.alt = a.name || "";
@@ -1898,7 +1794,6 @@ function showViewer(idx) {
       </div>`;
   }
 }
-
 function closeViewer() {
   S.viewToken++;
   $("#vstage").replaceChildren();
@@ -1907,38 +1802,7 @@ function closeViewer() {
   S.viewerIdx = -1;
 }
 
-/* ================= Thread lifecycle ================= */
-function threadRef() {
-  return S.kind === "room" ? doc(db, "rooms", S.id) : doc(db, "chats", S.id);
-}
-
-function msgsCol() {
-  return collection(threadRef(), "messages");
-}
-
-function msgRef(id) {
-  return doc(msgsCol(), id);
-}
-
-async function deleteUnusedGuard() {}
-
-function refreshState() {
-  if (!S.id) return;
-  const st = computeState();
-  const needMsgs = ["wait", "decide", "active", "readonly", "blocked"].includes(st);
-  if (needMsgs && !S.msgUnsub) subscribeMessages();
-  else if (!needMsgs && S.msgUnsub) {
-    S.msgUnsub();
-    S.msgUnsub = null;
-  }
-  paintHeader();
-  renderIntro();
-  renderComposer();
-  applyTicks();
-  scheduleList();
-  maybeMarkRead();
-}
-
+/* ================= Bindings & init ================= */
 function bind() {
   $("#search").addEventListener("input", (e) => {
     const v = e.target.value;
@@ -1947,7 +1811,6 @@ function bind() {
     S.searchTimer = setTimeout(() => runUserSearch(v), 250);
     scheduleList();
   });
-
   $("#tabs").addEventListener("click", (e) => {
     const b = e.target.closest(".tab");
     if (!b) return;
@@ -1955,7 +1818,6 @@ function bind() {
     document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("on", t === b));
     scheduleList();
   });
-
   $("#chatList").addEventListener("click", (e) => {
     const it = e.target.closest(".item");
     if (!it) return;
@@ -1968,17 +1830,14 @@ function bind() {
     const other = d && (d.participants || []).find((x) => x !== S.me);
     if (other && (S.id !== id || S.kind !== "chat")) openChat(other);
   });
-
   $("#discover").addEventListener("click", (e) => {
     const b = e.target.closest("[data-join]");
     if (b) joinRoom(b.dataset.join);
   });
-
   $("#results").addEventListener("click", (e) => {
     const r = e.target.closest("[data-uid]");
     if (r) openFromSearch(r.dataset.uid);
   });
-
   $("#newRoomBtn").addEventListener("click", () => {
     $("#createPanel").hidden = false;
     $("#cHint").textContent = "";
@@ -1986,12 +1845,12 @@ function bind() {
   });
   $("#cBack").addEventListener("click", () => { $("#createPanel").hidden = true; });
   $("#cSave").addEventListener("click", createRoom);
-
   $("#backBtn").addEventListener("click", closeThread);
   $("#rinfo").addEventListener("click", () => {
     if (S.kind === "chat" && S.otherUid) goProfile(S.otherUid);
   });
   $("#rows").addEventListener("click", onRowsClick);
+  $("#rows").addEventListener("load", onMediaLoad, true);
   $("#threadWrap").addEventListener("scroll", onThreadScroll, { passive: true });
   $("#jump").addEventListener("click", scrollToBottom);
   $("#composer").addEventListener("click", onComposerClick);
@@ -2006,7 +1865,6 @@ function bind() {
     }
   });
   $("#input").addEventListener("input", autosize);
-
   $("#sheetBg").addEventListener("click", closeSheet);
   $("#sheet").addEventListener("click", (e) => {
     const id = S.sheetId;
@@ -2022,7 +1880,6 @@ function bind() {
       runAct(id, a.dataset.act);
     }
   });
-
   $("#vclose").addEventListener("click", closeViewer);
   $("#vprev").addEventListener("click", () => showViewer(S.viewerIdx - 1));
   $("#vnext").addEventListener("click", () => showViewer(S.viewerIdx + 1));
@@ -2040,11 +1897,10 @@ function bind() {
     S.speedIdx = (S.speedIdx + 1) % SPEEDS.length;
     applyRate();
   });
-
   const stage = $("#vstage");
   let drag = null;
   stage.addEventListener("pointerdown", (e) => {
-    if (e.target.closest("video,audio,iframe")) return;
+    if (e.target.closest("video,audio,iframe,a,button")) return;
     drag = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY };
     if (stage.setPointerCapture) stage.setPointerCapture(e.pointerId);
   });
@@ -2072,7 +1928,6 @@ function bind() {
     if (!$("#vstage img")) return;
     setZoom(S.zoom > 1 ? 1 : 2.5);
   });
-
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       if (!$("#viewer").hidden) closeViewer();
@@ -2085,12 +1940,10 @@ function bind() {
       else if (e.key === "ArrowRight") showViewer(S.viewerIdx - 1);
     }
   });
-
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) maybeMarkRead();
   });
 }
-
 function init() {
   bind();
   onAuthStateChanged(auth, (user) => {
@@ -2108,7 +1961,6 @@ function init() {
     if (uid && uid !== S.me) openChat(uid);
   });
 }
-
 init();
 </script>
 </body>
