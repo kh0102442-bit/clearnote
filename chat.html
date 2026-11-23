@@ -12,6 +12,7 @@
   --navy:#152741; --navy-dark:#0f1e33; --accent:#a8741a;
   --bg:#f4f6f8; --chat-bg:#efeae2; --mine:#d9fdd3; --red:#b91c1c;
   --line:#e6e9ee; --muted:#6b7480; --text:#1b2433;
+  --shadow:0 2px 10px rgba(15,30,51,.08);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 [hidden]{display:none !important}
@@ -22,23 +23,40 @@ button{cursor:pointer;background:none;border:none}
 
 .app{height:100vh;height:100dvh;display:flex;overflow:hidden}
 
-/* ================= القائمة ================= */
+/* ================= قائمة الدردشات ================= */
 .list-col{width:100%;height:100%;display:flex;flex-direction:column;background:#fff;min-width:0}
-.lhdr{height:56px;flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--navy);color:#fff}
+.lhdr{height:58px;flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--navy);color:#fff;box-shadow:var(--shadow)}
 .lhdr h1{font-size:18px;font-weight:800;flex:1}
-.hbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.hbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;transition:.15s}
 .hbtn:hover{background:rgba(255,255,255,.12)}
 .search{margin:10px 12px 6px;position:relative;flex:0 0 auto}
 .search i{position:absolute;inset-inline-start:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
-.search input{width:100%;height:40px;border:1px solid var(--line);border-radius:20px;padding:0 38px 0 14px;background:#f5f7f9;outline:none}
-.tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 12px 8px;scrollbar-width:none;flex:0 0 auto;border-bottom:1px solid var(--line)}
+.search input{width:100%;height:42px;border:1px solid var(--line);border-radius:21px;padding:0 38px 0 14px;background:#f5f7f9;outline:none;transition:.15s}
+.search input:focus{border-color:var(--navy);background:#fff;box-shadow:0 0 0 3px rgba(21,39,65,.08)}
+
+/* التبويبات - محسّنة للهواتف */
+.tabs{
+  display:flex;gap:6px;overflow-x:auto;padding:4px 12px 10px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  scroll-snap-type:x proximity;
+  flex:0 0 auto;border-bottom:1px solid var(--line);
+  position:relative;
+}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;padding:6px 12px;border-radius:16px;background:#eef1f5;color:#334;font-size:13px;font-weight:600;white-space:nowrap}
-.tab.on{background:var(--navy);color:#fff}
+.tab{
+  flex:0 0 auto;scroll-snap-align:start;
+  padding:8px 14px;border-radius:18px;background:#eef1f5;color:#334;
+  font-size:13px;font-weight:700;white-space:nowrap;transition:.15s;
+  display:flex;align-items:center;gap:5px;
+}
+.tab:hover{background:#e3e8ee}
+.tab.on{background:var(--navy);color:#fff;box-shadow:0 2px 6px rgba(21,39,65,.25)}
+.tab i{font-size:12px}
+
 .list-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
 .sec-title{padding:10px 14px 4px;font-size:12px;color:var(--muted);font-weight:700}
 .res-hint{padding:6px 14px;font-size:12px;color:var(--muted)}
-.item{display:flex;align-items:center;gap:12px;padding:10px 12px;cursor:pointer;border-bottom:1px solid #f1f3f6;content-visibility:auto;contain-intrinsic-size:auto 68px}
+.item{display:flex;align-items:center;gap:12px;padding:10px 12px;cursor:pointer;border-bottom:1px solid #f1f3f6;content-visibility:auto;contain-intrinsic-size:auto 68px;transition:.1s}
 .item:hover{background:#f7f9fb}
 .item.sel{background:#eef3f9}
 .item .av{width:50px;height:50px;border-radius:50%;flex:0 0 50px;overflow:hidden;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}
@@ -54,12 +72,34 @@ button{cursor:pointer;background:none;border:none}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:0 0 auto}
 .tag{flex:0 0 auto;font-size:11px;padding:2px 8px;border-radius:10px;background:#eef1f5;color:#334;font-weight:700;white-space:nowrap}
 .tag.gold{background:#fbf1de;color:#7a4f0c}
-.tag.red{background:#fde8e8;color:var(--red)}
 .vbadge{color:var(--accent);font-size:14px;flex:0 0 auto}
+
+/* حالات فارغة احترافية */
 .empty{padding:40px 24px;text-align:center;color:var(--muted);font-size:14px;line-height:1.9}
-.empty i{font-size:34px;color:#c6ccd4;display:block;margin-bottom:10px}
+.empty .empty-ill{font-size:72px;color:#d1d8e0;margin-bottom:14px;line-height:1}
+.empty h3{font-size:17px;color:var(--navy);margin-bottom:8px;font-weight:800}
+.empty p{max-width:340px;margin:0 auto}
+
+/* placeholder للتبويبات القادمة */
+.soon-card{
+  margin:20px 16px;padding:28px 20px;background:#fff;border-radius:16px;
+  text-align:center;box-shadow:var(--shadow);border:1px solid var(--line);
+}
+.soon-card .soon-icon{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,#e7eef6,#d4dfe9);
+  display:grid;place-items:center;margin:0 auto 16px;
+  font-size:34px;color:var(--navy);
+}
+.soon-card h3{color:var(--navy);font-size:18px;margin-bottom:8px;font-weight:800}
+.soon-card p{color:var(--muted);font-size:13.5px;line-height:1.7;margin-bottom:18px}
+.soon-card .soon-badge{
+  display:inline-block;padding:6px 14px;background:#fff8e6;color:#7a4f0c;
+  border-radius:20px;font-size:12px;font-weight:700;
+}
+
 .bottom-nav{display:flex;border-top:1px solid var(--line);background:#fff;flex:0 0 auto;padding-bottom:env(safe-area-inset-bottom)}
-.bottom-nav a{flex:1;text-align:center;padding:8px 0 10px;font-size:12px;color:var(--muted);text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bottom-nav a{flex:1;text-align:center;padding:8px 0 10px;font-size:11px;color:var(--muted);text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.15s}
 .bottom-nav a i{font-size:18px}
 .bottom-nav a.on{color:var(--navy);font-weight:800}
 
@@ -69,8 +109,9 @@ body.room-open .main{transform:none}
 .empty-main{display:none;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#5b6472;text-align:center;padding:20px}
 .empty-main i{font-size:48px;color:#b8c0ca}
 .room{flex:1;display:flex;flex-direction:column;min-height:0}
-.rhdr{height:60px;flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:0 10px;background:var(--navy);color:#fff}
-.back-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;flex:0 0 auto}
+.rhdr{height:60px;flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:0 10px;background:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.back-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;flex:0 0 auto;transition:.15s}
+.back-btn:hover{background:rgba(255,255,255,.12)}
 .rav{width:42px;height:42px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.18);display:grid;place-items:center;font-weight:800;cursor:pointer;flex:0 0 42px}
 .rav img{width:100%;height:100%;object-fit:cover}
 .rinfo{flex:1;min-width:0;cursor:pointer}
@@ -116,18 +157,32 @@ body.room-open .main{transform:none}
 .rx{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1px 7px;font-size:13px}
 .rx.on{border-color:var(--accent);background:#fff8ea}
 .rx small{font-size:11px;color:var(--muted)}
-.att-img{display:block;margin-bottom:4px;border-radius:8px;overflow:hidden;max-width:100%}
+
+/* ================= المرفقات (محسّنة) ================= */
+.att-img{display:block;margin-bottom:4px;border-radius:8px;overflow:hidden;max-width:100%;position:relative;cursor:zoom-in}
 .att-img img{display:block;max-width:100%;max-height:340px;border-radius:8px;object-fit:cover}
-.att-file{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.05);border-radius:8px;padding:8px 10px;margin-bottom:4px;text-decoration:none;color:inherit;min-width:0}
-.att-file i{font-size:24px;color:var(--navy)}
-.att-file span{display:flex;flex-direction:column;min-width:0}
+.att-video{display:block;margin-bottom:4px;border-radius:8px;overflow:hidden;max-width:100%;position:relative;cursor:pointer;background:#000;aspect-ratio:16/9;width:280px}
+.att-video video{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.att-video .play-badge{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:60px;height:60px;border-radius:50%;background:rgba(0,0,0,.7);
+  display:grid;place-items:center;color:#fff;font-size:24px;
+  backdrop-filter:blur(4px);pointer-events:none;
+  transition:.2s;
+}
+.att-video:hover .play-badge{background:rgba(168,116,26,.9);transform:translate(-50%,-50%) scale(1.1)}
+.att-file{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.05);border-radius:8px;padding:8px 10px;margin-bottom:4px;text-decoration:none;color:inherit;min-width:0;cursor:pointer;width:100%;text-align:start;font:inherit}
+.att-file i{font-size:24px;color:var(--navy);flex:0 0 auto}
+.att-file span{display:flex;flex-direction:column;min-width:0;flex:1}
 .att-file b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
 .att-file small{font-size:12px;color:var(--muted)}
+.att-pdf{background:rgba(185,28,28,.06)}
+.att-pdf i{color:var(--red)}
 
 .jump{position:absolute;bottom:12px;inset-inline-end:14px;width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);display:grid;place-items:center;color:var(--navy);z-index:5}
 .jump b{position:absolute;top:-6px;inset-inline-start:-4px;background:var(--accent);color:#fff;border-radius:10px;font-size:11px;padding:1px 6px;min-width:20px;text-align:center}
 
-.composer-wrap{flex:0 0 auto;background:#f0f2f5;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
+.composer-wrap{flex:0 0 auto;background:#f0f2f5;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px;box-shadow:0 -2px 10px rgba(0,0,0,.04)}
 .ctx{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:8px 10px;border-inline-start:4px solid var(--accent)}
 .ctx > div{flex:1;min-width:0;display:flex;flex-direction:column}
 .ctx b{font-size:13px;color:var(--accent)}
@@ -148,10 +203,13 @@ body.room-open .main{transform:none}
 .btn.ok{background:var(--navy);color:#fff}
 .btn.no{background:#fde8e8;color:var(--red)}
 .inputrow{display:flex;align-items:flex-end;gap:6px}
-.attach{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#5a6470;flex:0 0 auto;font-size:18px}
-.inputrow textarea{flex:1;min-width:0;resize:none;border:none;outline:none;border-radius:20px;padding:11px 14px;background:#fff;max-height:140px;line-height:1.5;font-size:15px}
-.send{width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;flex:0 0 auto;font-size:16px}
-.send:disabled{opacity:.45;cursor:default}
+.attach{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#5a6470;flex:0 0 auto;font-size:18px;transition:.15s}
+.attach:hover{background:#e5e8ec}
+.inputrow textarea{flex:1;min-width:0;resize:none;border:none;outline:none;border-radius:20px;padding:11px 14px;background:#fff;max-height:140px;line-height:1.5;font-size:15px;transition:.15s}
+.inputrow textarea:focus{box-shadow:0 0 0 2px rgba(21,39,65,.1)}
+.send{width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;flex:0 0 auto;font-size:16px;transition:.15s}
+.send:hover{background:var(--navy-dark);transform:scale(1.05)}
+.send:disabled{opacity:.45;cursor:default;transform:none}
 
 /* ================= لوحة الخيارات ================= */
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
@@ -160,22 +218,104 @@ body.room-open .main{transform:none}
 .sheet.open{transform:translate(-50%,0)}
 .sh-grip{width:40px;height:4px;border-radius:2px;background:#d6dbe2;margin:0 auto 10px}
 .sh-emojis{display:flex;justify-content:space-between;gap:4px;margin-bottom:8px}
-.sh-emojis button{font-size:26px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center}
+.sh-emojis button{font-size:26px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;transition:.15s}
+.sh-emojis button:hover{background:#f4f6f8}
 .sh-emojis button.on{background:#fff3da;box-shadow:inset 0 0 0 2px var(--accent)}
 .sh-actions{display:flex;flex-direction:column}
-.sh-actions button{display:flex;align-items:center;gap:12px;padding:12px 8px;font-size:15px;border-radius:10px;text-align:start}
+.sh-actions button{display:flex;align-items:center;gap:12px;padding:12px 8px;font-size:15px;border-radius:10px;text-align:start;transition:.15s}
 .sh-actions button:hover{background:#f4f6f8}
 .sh-actions i{width:20px;text-align:center;color:var(--navy)}
 .sh-actions .danger,.sh-actions .danger i{color:var(--red)}
 
+/* ================= عارض الوسائط الاحترافي ================= */
+.media-viewer{
+  position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);
+  display:flex;flex-direction:column;color:#fff;
+}
+.mv-hdr{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;
+  background:rgba(0,0,0,.5);flex:0 0 auto;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.mv-btn{
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.1);color:#fff;
+  display:grid;place-items:center;font-size:16px;transition:.15s;
+}
+.mv-btn:hover{background:rgba(255,255,255,.22)}
+.mv-title{flex:1;font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mv-body{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+}
+.mv-body > img{
+  max-width:100%;max-height:100%;object-fit:contain;
+  transition:transform .25s ease;cursor:zoom-in;
+  user-select:none;-webkit-user-select:none;
+}
+.mv-body > img.zoomed{transform:scale(2.5);cursor:zoom-out}
+.mv-body iframe{width:100%;height:100%;border:none;background:#fff}
+
+/* مشغل الفيديو */
+.vp-wrap{
+  width:100%;height:100%;display:flex;flex-direction:column;
+  background:#000;
+}
+.vp-video{flex:1;width:100%;min-height:0;background:#000;object-fit:contain}
+.vp-ctrl{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;background:#111;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.vp-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.15);color:#fff;
+  display:grid;place-items:center;font-size:15px;transition:.15s;
+}
+.vp-btn:hover{background:rgba(168,116,26,.8)}
+.vp-seek{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:#333;outline:none;cursor:pointer}
+.vp-seek::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--accent);cursor:pointer;
+}
+.vp-time{font-size:12px;font-family:monospace;color:#ccc;min-width:88px;text-align:center}
+.vp-speed{
+  background:#222;color:#fff;border:none;
+  padding:6px 8px;border-radius:6px;font-size:12px;cursor:pointer;
+}
+
+/* نافذة ارفاق */
+.attach-sheet{
+  position:fixed;bottom:0;left:50%;width:min(440px,100%);
+  transform:translate(-50%,105%);background:#fff;
+  border-radius:18px 18px 0 0;z-index:51;
+  padding:12px 14px calc(16px + env(safe-area-inset-bottom));
+  transition:transform .22s ease;box-shadow:0 -6px 24px rgba(0,0,0,.15);
+}
+.attach-sheet.open{transform:translate(-50%,0)}
+.attach-sheet .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.attach-sheet .item{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:14px 8px;border-radius:12px;background:#f4f6f8;
+  font-size:12px;font-weight:700;color:var(--navy);cursor:pointer;transition:.15s;
+  border:none;width:100%;
+}
+.attach-sheet .item:hover{background:#e7eef6;transform:translateY(-2px)}
+.attach-sheet .item i{font-size:24px}
+.attach-sheet .item.photo i{color:#e74c3c}
+.attach-sheet .item.video i{color:#2980b9}
+.attach-sheet .item.file i{color:#8e44ad}
+.attach-sheet .item.camera i{color:#16a085}
+
 /* ================= الشاشات الواسعة ================= */
 @media (min-width:900px){
-  .list-col{width:360px;flex:0 0 360px;border-inline-end:1px solid var(--line)}
+  .list-col{width:380px;flex:0 0 380px;border-inline-end:1px solid var(--line)}
   .bottom-nav{display:none}
   .back-btn{display:none}
   .main{position:relative;inset:auto;transform:none;flex:1;transition:none;z-index:auto}
   body:not(.has-room) .empty-main{display:flex}
   body:not(.has-room) .room{display:none}
+  .bubble{max-width:min(70%,540px)}
 }
 </style>
 </head>
@@ -190,17 +330,17 @@ body.room-open .main{transform:none}
 
     <div class="search">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input id="search" type="search" placeholder="ابحث بالاسم أو اسم المستخدم أو الهاتف" autocomplete="off">
+      <input id="search" type="search" placeholder="ابحث بالاسم أو اسم المستخدم" autocomplete="off">
     </div>
 
     <nav class="tabs" id="tabs">
-      <button class="tab on" data-tab="all">الكل</button>
-      <button class="tab" data-tab="unread">غير المقروءة</button>
-      <button class="tab" data-tab="direct">الخاص</button>
-      <button class="tab" data-tab="groups">الجروبات</button>
-      <button class="tab" data-tab="channels">القنوات</button>
-      <button class="tab" data-tab="communities">المجتمعات</button>
-      <button class="tab" data-tab="study">غرف المذاكرة</button>
+      <button class="tab on" data-tab="all"><i class="fa-solid fa-list"></i> الكل</button>
+      <button class="tab" data-tab="unread"><i class="fa-solid fa-envelope"></i> غير مقروء</button>
+      <button class="tab" data-tab="direct"><i class="fa-solid fa-user"></i> خاص</button>
+      <button class="tab" data-tab="groups"><i class="fa-solid fa-users"></i> جروبات</button>
+      <button class="tab" data-tab="channels"><i class="fa-solid fa-bullhorn"></i> قنوات</button>
+      <button class="tab" data-tab="communities"><i class="fa-solid fa-globe"></i> مجتمعات</button>
+      <button class="tab" data-tab="study"><i class="fa-solid fa-book-open"></i> مذاكرة</button>
     </nav>
 
     <div class="list-scroll" id="listScroll">
@@ -211,8 +351,7 @@ body.room-open .main{transform:none}
         <div class="res-hint" id="resEmpty" hidden>لا يوجد مستخدم مطابق</div>
       </section>
       <div id="chatList"></div>
-      <div class="empty" id="listEmpty" hidden></div>
-      <div class="empty" id="placeholder" hidden></div>
+      <div id="listEmpty" hidden></div>
     </div>
 
     <nav class="bottom-nav">
@@ -278,11 +417,45 @@ body.room-open .main{transform:none}
 
 <input type="file" id="fileInput" hidden>
 
+<!-- لوحة الرد/التفاعل -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet" role="dialog">
   <div class="sh-grip"></div>
   <div class="sh-emojis" id="shEmojis"></div>
   <div class="sh-actions" id="shActions"></div>
+</div>
+
+<!-- لوحة الإرفاق -->
+<div class="sheet-bg" id="attachBg"></div>
+<div class="attach-sheet" id="attachSheet">
+  <div class="sh-grip"></div>
+  <div style="padding:6px 4px 4px;font-weight:800;color:var(--navy);font-size:15px;">
+    <i class="fa-solid fa-paperclip"></i> إرفاق
+  </div>
+  <div class="grid">
+    <button class="item photo" onclick="pickAttach('image/*')">
+      <i class="fa-solid fa-image"></i><span>صورة</span>
+    </button>
+    <button class="item video" onclick="pickAttach('video/*')">
+      <i class="fa-solid fa-video"></i><span>فيديو</span>
+    </button>
+    <button class="item file" onclick="pickAttach('*/*')">
+      <i class="fa-solid fa-file"></i><span>ملف</span>
+    </button>
+    <button class="item camera" onclick="pickAttach('image/*', 'camera')">
+      <i class="fa-solid fa-camera"></i><span>كاميرا</span>
+    </button>
+  </div>
+</div>
+
+<!-- عارض الوسائط الاحترافي -->
+<div class="media-viewer" id="mediaViewer" hidden>
+  <header class="mv-hdr">
+    <button class="mv-btn" onclick="closeMedia()"><i class="fa-solid fa-arrow-right"></i></button>
+    <div class="mv-title" id="mvTitle"></div>
+    <button class="mv-btn" id="mvDownload" onclick="downloadMedia()" title="تنزيل"><i class="fa-solid fa-download"></i></button>
+  </header>
+  <div class="mv-body" id="mvBody"></div>
 </div>
 
 <script type="module">
@@ -299,20 +472,22 @@ const PROFILE_PAGE = 'profile.html';
 const PAGE_SIZE = 30;
 const CHAT_LIST_LIMIT = 300;
 const MAX_TEXT = 2000;
-const MAX_FILE = 10 * 1024 * 1024;
+const MAX_FILE = 50 * 1024 * 1024; // 50MB للفيديو
 const GROUP_GAP_MS = 5 * 60 * 1000;
 const EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 const CLOUD_URL = 'https://api.cloudinary.com/v1_1/nopxs3zt/auto/upload';
 const CLOUD_PRESET = 'clearnote_unsigned';
 const FOLLOWERS_KEY = 'followersCount';
 const POSTS_KEY = 'postsCount';
-const PLACEHOLDER_TABS = {
-  groups: 'الجروبات قريباً',
-  channels: 'القنوات قريباً',
-  communities: 'المجتمعات قريباً',
-  study: 'غرف المذاكرة قريباً'
-};
 const ROLE_LABEL = { admin: 'مشرف', moderator: 'مشرف', founder: 'المؤسس', member: 'عضو', user: 'عضو' };
+
+// تبويبات قادمة (UI محسّن)
+const COMING_TABS = {
+  groups: { icon: 'fa-users', title: 'الجروبات', desc: 'أنشئ جروباً للتواصل مع زملائك، وشاركوا الرسائل والملفات في مساحة خاصة بكم.', eta: 'قريباً' },
+  channels: { icon: 'fa-bullhorn', title: 'القنوات', desc: 'تابع القنوات التعليمية وأرقى المحتوى من المدرسين والمبدعين.', eta: 'قريباً' },
+  communities: { icon: 'fa-globe', title: 'المجتمعات', desc: 'مجتمعات كبيرة تجمع طلاباً من كل مكان، بنقاشات ومنشورات.', eta: 'قريباً' },
+  study: { icon: 'fa-book-open', title: 'غرف المذاكرة', desc: 'ادرس مع أصدقائك في نفس الوقت، بمؤقت بومودورو مشترك.', eta: 'قريباً' }
+};
 
 /* ================= الحالة ================= */
 const S = {
@@ -348,7 +523,10 @@ const S = {
   uploading: false,
 
   thread: null,
-  intro: null
+  intro: null,
+
+  // عارض الوسائط
+  mv: { url: null, name: null, videoEl: null, isZoomed: false }
 };
 
 /* ================= أدوات ================= */
@@ -428,6 +606,24 @@ function fillAv(node, u, size) {
 function goProfile(uid) {
   if (!uid) return;
   location.href = uid === S.me ? PROFILE_PAGE : `${PROFILE_PAGE}?uid=${encodeURIComponent(uid)}`;
+}
+
+// تحديد نوع الملف
+function fileKind(file) {
+  const m = (file.type || '').toLowerCase();
+  if (m.startsWith('image/')) return 'image';
+  if (m.startsWith('video/')) return 'video';
+  if (m.startsWith('audio/')) return 'audio';
+  if (m === 'application/pdf') return 'pdf';
+  return 'file';
+}
+
+function fileIcon(a) {
+  const m = a.mime || '';
+  if (m.includes('pdf')) return 'fa-file-pdf';
+  if (m.startsWith('video/')) return 'fa-file-video';
+  if (m.startsWith('audio/')) return 'fa-file-audio';
+  return 'fa-file';
 }
 
 /* ================= المستخدمون (كاش) ================= */
@@ -581,16 +777,27 @@ function paintListRow(row, id, d) {
 
 function renderList() {
   if (!S.me) return;
-  const list = $('chatList'), empty = $('listEmpty'), ph = $('placeholder');
-  const phText = PLACEHOLDER_TABS[S.tab];
-  list.hidden = !!phText;
-  ph.hidden = !phText;
-  empty.hidden = true;
-  if (phText) {
-    ph.textContent = '';
-    ph.append(el('i', 'fa-solid fa-hourglass-half'), phText);
+  const list = $('chatList'), empty = $('listEmpty');
+
+  // عرض placeholder للتبويبات القادمة
+  const coming = COMING_TABS[S.tab];
+  if (coming) {
+    list.replaceChildren();
+    empty.hidden = true;
+    list.innerHTML = `
+      <div class="soon-card">
+        <div class="soon-icon"><i class="fa-solid ${coming.icon}"></i></div>
+        <h3>${coming.title}</h3>
+        <p>${coming.desc}</p>
+        <span class="soon-badge">${coming.eta}</span>
+      </div>
+    `;
     return;
   }
+
+  list.hidden = false;
+  empty.hidden = true;
+
   const items = visibleChats();
   const frag = document.createDocumentFragment();
   const seen = new Set();
@@ -607,9 +814,11 @@ function renderList() {
   list.replaceChildren(frag);
   if (!items.length) {
     empty.hidden = false;
-    empty.textContent = S.tab === 'unread'
-      ? 'لا توجد رسائل غير مقروءة'
-      : 'لا توجد محادثات بعد. ابحث باسم شخص أو اسم مستخدمه لبدء المراسلة.';
+    empty.innerHTML = `
+      <div class="empty-ill"><i class="fa-solid fa-comment-dots"></i></div>
+      <h3>${S.tab === 'unread' ? 'لا رسائل غير مقروءة' : 'لا توجد محادثات'}</h3>
+      <p>${S.tab === 'unread' ? 'أنت على اطلاع بكل شيء 👌' : 'ابحث عن شخص بالاسم أو اسم المستخدم لبدء المراسلة'}</p>
+    `;
   }
 }
 
@@ -701,7 +910,7 @@ function openWith(uid) {
   openRoomFor(chatIdFor(S.me, uid), uid);
 }
 
-/* ================= الغرفة: فتح وإغلاق ================= */
+/* ================= الغرفة ================= */
 function makeIntro() {
   const root = el('div', 'intro');
   const av = el('div', 'intro-av');
@@ -804,7 +1013,6 @@ function onRoomChat(snap) {
   maybeMarkRead();
 }
 
-/* ================= الغرفة: العرض ================= */
 function renderHeader() {
   if (!S.otherUid) return;
   const u = userCache.get(S.otherUid) || placeholder(S.otherUid);
@@ -848,15 +1056,13 @@ function renderComposer() {
   notice.hidden = !(st === 'wait' || st === 'blocked');
   notice.classList.toggle('red', st === 'blocked');
   if (st === 'wait') {
-    notice.textContent = 'بانتظار موافقة الطرف الآخر على طلب المراسلة. لا يمكنك إرسال رسالة أخرى قبل أن يرد.';
+    notice.textContent = 'بانتظار موافقة الطرف الآخر على طلب المراسلة.';
   } else if (st === 'blocked') {
-    notice.textContent = S.chatData?.blockedBy === S.me
-      ? 'حظرت هذا المستخدم. لا يمكن إرسال الرسائل في هذه المحادثة.'
-      : 'لا يمكن إرسال الرسائل في هذه المحادثة.';
+    notice.textContent = 'لا يمكن إرسال رسائل في هذه المحادثة.';
   }
   if (st === 'decide') {
     const name = userCache.get(S.otherUid)?.name || 'هذا المستخدم';
-    $('decideText').textContent = `أرسل إليك ${name} طلب مراسلة. وافق لتبدأ المحادثة أو احظر.`;
+    $('decideText').textContent = `أرسل إليك ${name} طلب مراسلة.`;
   }
   updateSendBtn();
 }
@@ -874,49 +1080,71 @@ const nearBottom = () => {
   return t.scrollHeight - t.scrollTop - t.clientHeight < 140;
 };
 
-/* ================= الرسائل: الترتيب والإدراج ================= */
+/* ================= الرسائل ================= */
 const sigOf = (d) => [
   d.text || '',
   d.deleted ? 1 : 0,
   d.isEdited ? 1 : 0,
   d.attachment?.url || '',
   d.replyTo?.id || '',
-  d.replyTo?.text || '',
   JSON.stringify(d.reactions || {})
 ].join('\u0001');
 
-function fileIcon(a) {
-  const m = a.mime || '';
-  if (m.includes('pdf')) return 'fa-file-pdf';
-  if (m.startsWith('video/')) return 'fa-file-video';
-  if (m.startsWith('audio/')) return 'fa-file-audio';
-  return 'fa-file';
-}
-
+/* ===== بناء المرفقات (محسّن) ===== */
 function buildAttachment(a) {
+  const btn = el('button', '');
+  btn.type = 'button';
+
   if (a.kind === 'image') {
-    const link = el('a', 'att-img');
-    link.href = a.url;
-    link.target = '_blank';
-    link.rel = 'noopener';
+    btn.className = 'att-img';
+    btn.onclick = () => openMedia(a.url, a.name, 'image');
     const img = new Image();
     img.alt = a.name || '';
-    img.decoding = 'async';
     img.loading = 'lazy';
+    img.decoding = 'async';
     if (a.w && a.h) img.style.aspectRatio = `${a.w} / ${a.h}`;
     img.src = thumbSrc(a.url);
-    link.appendChild(img);
-    return link;
+    btn.appendChild(img);
+    return btn;
   }
-  const f = el('a', 'att-file');
-  f.href = a.url;
-  f.target = '_blank';
-  f.rel = 'noopener';
-  f.download = a.name || '';
+
+  if (a.kind === 'video') {
+    btn.className = 'att-video';
+    btn.onclick = () => openMedia(a.url, a.name, 'video');
+    const vid = document.createElement('video');
+    vid.src = a.url;
+    vid.preload = 'metadata';
+    vid.muted = true;
+    vid.playsInline = true;
+    btn.appendChild(vid);
+    btn.appendChild(el('div', 'play-badge', '▶'));
+    return btn;
+  }
+
+  if (a.kind === 'pdf') {
+    btn.className = 'att-file att-pdf';
+    btn.onclick = () => openMedia(a.url, a.name, 'pdf');
+    const info = el('span');
+    info.append(el('b', null, a.name || 'ملف PDF'), el('small', null, fmtSize(a.size)));
+    btn.append(el('i', 'fa-solid fa-file-pdf'), info);
+    return btn;
+  }
+
+  // ملف عادي - تنزيل
+  btn.className = 'att-file';
+  btn.onclick = () => {
+    const link = document.createElement('a');
+    link.href = a.url;
+    link.download = a.name || 'file';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
   const info = el('span');
   info.append(el('b', null, a.name || 'ملف'), el('small', null, fmtSize(a.size)));
-  f.append(el('i', 'fa-solid ' + fileIcon(a)), info);
-  return f;
+  btn.append(el('i', 'fa-solid ' + fileIcon(a)), info);
+  return btn;
 }
 
 function buildReactions(reacts) {
@@ -1059,7 +1287,6 @@ function upsertMessage(id, d) {
   attach(e);
 }
 
-/* ================= الرسائل: الاشتراك والتحميل ================= */
 function subscribeMessages() {
   if (S.msgUnsub) { S.msgUnsub(); S.msgUnsub = null; }
   const chatId = S.activeId;
@@ -1119,7 +1346,7 @@ function loadOlder() {
 
 function scrollToMsg(id) {
   const e = S.map.get(id);
-  if (!e) { showToast('الرسالة أقدم من المحمّل. مرّر للأعلى لتحميل المزيد'); return; }
+  if (!e) { showToast('الرسالة أقدم من المحمّل'); return; }
   e.row.scrollIntoView({ block: 'center', behavior: 'smooth' });
   e.bubble.classList.add('flash');
   setTimeout(() => e.bubble.classList.remove('flash'), 1200);
@@ -1138,11 +1365,8 @@ async function markRead() {
   const chatId = S.activeId;
   try {
     await updateDoc(doc(db, 'chats', chatId), { [`readAt.${S.me}`]: serverTimestamp() });
-  } catch (err) {
-    console.warn('markRead', err);
-  } finally {
-    marking = false;
-  }
+  } catch (err) { console.warn('markRead', err); }
+  finally { marking = false; }
 }
 
 /* ================= طلب المراسلة ================= */
@@ -1150,23 +1374,17 @@ async function acceptRequest() {
   if (!S.activeId) return;
   try {
     await updateDoc(doc(db, 'chats', S.activeId), { status: 'active', acceptedAt: serverTimestamp() });
-  } catch (err) {
-    console.error(err);
-    showToast('تعذر قبول الطلب');
-  }
+  } catch (err) { showToast('تعذر قبول الطلب'); }
 }
 
 async function blockRequest() {
   if (!S.activeId) return;
-  if (!confirm('حظر هذا المستخدم؟ لن تصلك رسائله بعد الآن.')) return;
+  if (!confirm('حظر هذا المستخدم؟')) return;
   try {
     await updateDoc(doc(db, 'chats', S.activeId), {
       status: 'blocked', blockedBy: S.me, blockedAt: serverTimestamp()
     });
-  } catch (err) {
-    console.error(err);
-    showToast('تعذر تنفيذ الحظر');
-  }
+  } catch (err) { showToast('تعذر تنفيذ الحظر'); }
 }
 
 /* ================= الرفع ================= */
@@ -1185,7 +1403,7 @@ function uploadAttachment(file) {
       try { j = JSON.parse(xhr.responseText); } catch (_) { j = null; }
       if (xhr.status >= 200 && xhr.status < 300 && j && j.secure_url) {
         resolve({
-          kind: (file.type || '').startsWith('image/') ? 'image' : 'file',
+          kind: fileKind(file),
           url: j.secure_url,
           name: file.name,
           size: file.size,
@@ -1204,7 +1422,8 @@ function uploadAttachment(file) {
 
 function showChip(f) {
   const isImg = (f.type || '').startsWith('image/');
-  $('fchipIcon').className = 'fa-solid fi ' + (isImg ? 'fa-image' : 'fa-file');
+  const isVid = (f.type || '').startsWith('video/');
+  $('fchipIcon').className = 'fa-solid fi ' + (isImg ? 'fa-image' : isVid ? 'fa-video' : 'fa-file');
   $('fchipName').textContent = f.name;
   $('fchipSize').textContent = fmtSize(f.size);
   $('fbar').style.width = '0';
@@ -1240,7 +1459,7 @@ async function onSend() {
 
   const file = S.pendingFile;
   if (!text && !file) return;
-  if (text.length > MAX_TEXT) { showToast('الرسالة طويلة جداً (الحد 2000 حرف)'); return; }
+  if (text.length > MAX_TEXT) { showToast('الرسالة طويلة جداً'); return; }
   if (!canSend()) return;
 
   const chatId = S.activeId, other = S.otherUid, me = S.me;
@@ -1249,11 +1468,9 @@ async function onSend() {
   if (file) {
     S.uploading = true;
     updateSendBtn();
-    try {
-      attachment = await uploadAttachment(file);
-    } catch (err) {
-      console.error(err);
-      showToast('تعذر رفع الملف، حاول مرة أخرى');
+    try { attachment = await uploadAttachment(file); }
+    catch (err) {
+      showToast('تعذر رفع الملف');
       S.uploading = false;
       updateSendBtn();
       return;
@@ -1280,7 +1497,7 @@ async function onSend() {
     attachment
   };
   const preview = (text || (attachment
-    ? (attachment.kind === 'image' ? '📷 صورة' : '📎 ' + attachment.name)
+    ? (attachment.kind === 'image' ? '📷 صورة' : attachment.kind === 'video' ? '🎥 فيديو' : '📎 ' + attachment.name)
     : '')).slice(0, 120);
   const meta = {
     lastMessage: preview,
@@ -1330,7 +1547,6 @@ async function onSend() {
     await batch.commit();
     if (!S.msgUnsub && S.activeId === chatId) subscribeMessages();
   } catch (err) {
-    console.error(err);
     showToast('تعذر الإرسال');
     if (creating && S.activeId === chatId) {
       S.chatExists = false;
@@ -1369,7 +1585,7 @@ function startReply(id) {
   const d = e.data;
   const name = d.senderUid === S.me ? 'أنت' : (userCache.get(S.otherUid)?.name || 'الطرف الآخر');
   const text = d.text || (d.attachment
-    ? (d.attachment.kind === 'image' ? '📷 صورة' : '📎 ' + (d.attachment.name || 'ملف'))
+    ? (d.attachment.kind === 'image' ? '📷 صورة' : d.attachment.kind === 'video' ? '🎥 فيديو' : '📎 ' + (d.attachment.name || 'ملف'))
     : '');
   S.reply = { id, senderUid: d.senderUid, name, text: text.slice(0, 140) };
   S.editingId = null;
@@ -1408,12 +1624,8 @@ async function saveEdit(text) {
   S.editingId = null;
   $('input').value = '';
   clearCtx();
-  try {
-    await batch.commit();
-  } catch (err) {
-    console.error(err);
-    showToast('تعذر حفظ التعديل');
-  }
+  try { await batch.commit(); }
+  catch (err) { showToast('تعذر حفظ التعديل'); }
 }
 
 async function deleteMsg(id) {
@@ -1427,12 +1639,8 @@ async function deleteMsg(id) {
   if (S.chatData?.lastMessageId === id) {
     batch.update(doc(db, 'chats', chatId), { lastMessage: 'تم حذف الرسالة' });
   }
-  try {
-    await batch.commit();
-  } catch (err) {
-    console.error(err);
-    showToast('تعذر الحذف');
-  }
+  try { await batch.commit(); }
+  catch (err) { showToast('تعذر الحذف'); }
 }
 
 async function toggleReaction(id, emo) {
@@ -1442,10 +1650,7 @@ async function toggleReaction(id, emo) {
   const cur = e.data.reactions?.[S.me];
   try {
     await updateDoc(ref, { [`reactions.${S.me}`]: cur === emo ? deleteField() : emo });
-  } catch (err) {
-    console.error(err);
-    showToast('تعذر إضافة التفاعل');
-  }
+  } catch (err) { showToast('تعذر إضافة التفاعل'); }
 }
 
 function copyText(text) {
@@ -1496,11 +1701,160 @@ function closeSheet() {
   S.sheetId = null;
 }
 
+/* ================= لوحة الإرفاق ================= */
+function openAttachSheet() {
+  if (!canSend()) return;
+  if (S.editingId) { showToast('لا يمكن إرفاق ملف أثناء التعديل'); return; }
+  $('attachBg').classList.add('open');
+  $('attachSheet').classList.add('open');
+}
+
+function closeAttachSheet() {
+  $('attachBg').classList.remove('open');
+  $('attachSheet').classList.remove('open');
+}
+
+window.pickAttach = (accept) => {
+  closeAttachSheet();
+  $('fileInput').accept = accept;
+  $('fileInput').click();
+};
+
+/* ================= عارض الوسائط الاحترافي ================= */
+function openMedia(url, name, kind) {
+  const MV = S.mv;
+  MV.url = url;
+  MV.name = name;
+  MV.videoEl = null;
+  MV.isZoomed = false;
+
+  $('mvTitle').textContent = name || 'معاينة';
+  const body = $('mvBody');
+  body.innerHTML = '';
+
+  if (kind === 'image') {
+    const img = new Image();
+    img.src = url;
+    img.alt = name || '';
+    img.onclick = () => {
+      MV.isZoomed = !MV.isZoomed;
+      img.classList.toggle('zoomed', MV.isZoomed);
+    };
+    body.appendChild(img);
+  } else if (kind === 'video') {
+    body.innerHTML = `
+      <div class="vp-wrap">
+        <video class="vp-video" id="mvVideo" src="${url}" playsinline preload="metadata"></video>
+        <div class="vp-ctrl">
+          <button class="vp-btn" id="mvPlay" onclick="mvTogglePlay()"><i class="fa-solid fa-play"></i></button>
+          <input class="vp-seek" type="range" id="mvSeek" min="0" max="100" step="0.1" value="0" oninput="mvSeekTo(this.value)">
+          <span class="vp-time" id="mvTime">0:00 / 0:00</span>
+          <select class="vp-speed" id="mvSpeed" onchange="mvSetSpeed(this.value)">
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="1.75">1.75x</option>
+            <option value="2">2x</option>
+          </select>
+          <button class="vp-btn" onclick="mvFullscreen()" title="ملء الشاشة"><i class="fa-solid fa-expand"></i></button>
+        </div>
+      </div>
+    `;
+    MV.videoEl = $('mvVideo');
+    MV.videoEl.addEventListener('timeupdate', mvUpdateTime);
+    MV.videoEl.addEventListener('loadedmetadata', mvUpdateTime);
+    MV.videoEl.addEventListener('play', () => {
+      $('mvPlay').innerHTML = '<i class="fa-solid fa-pause"></i>';
+    });
+    MV.videoEl.addEventListener('pause', () => {
+      $('mvPlay').innerHTML = '<i class="fa-solid fa-play"></i>';
+    });
+  } else if (kind === 'pdf') {
+    body.innerHTML = `<iframe src="${url}#toolbar=1&navpanes=0&view=FitH" title="${name}"></iframe>`;
+  } else {
+    body.innerHTML = `
+      <div style="text-align:center;color:#fff;padding:40px;">
+        <i class="fa-solid fa-file" style="font-size:72px;opacity:.5;margin-bottom:20px;display:block;"></i>
+        <p style="font-size:16px;margin-bottom:20px;">لا يمكن معاينة هذا النوع داخل التطبيق</p>
+        <a href="${url}" download="${name}" style="display:inline-block;padding:12px 24px;background:var(--accent);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;">
+          <i class="fa-solid fa-download"></i> تنزيل الملف
+        </a>
+      </div>
+    `;
+    $('mvDownload').hidden = true;
+  }
+
+  $('mediaViewer').hidden = false;
+}
+
+function closeMedia() {
+  const MV = S.mv;
+  if (MV.videoEl) {
+    MV.videoEl.pause();
+    MV.videoEl.src = '';
+  }
+  $('mvBody').innerHTML = '';
+  $('mediaViewer').hidden = true;
+  $('mvDownload').hidden = false;
+  MV.url = null;
+  MV.name = null;
+  MV.videoEl = null;
+}
+
+function downloadMedia() {
+  if (!S.mv.url) return;
+  const a = document.createElement('a');
+  a.href = S.mv.url;
+  a.download = S.mv.name || 'download';
+  a.target = '_blank';
+  a.click();
+}
+
+function mvTogglePlay() {
+  if (!S.mv.videoEl) return;
+  if (S.mv.videoEl.paused) S.mv.videoEl.play();
+  else S.mv.videoEl.pause();
+}
+
+function mvSeekTo(val) {
+  if (!S.mv.videoEl || !S.mv.videoEl.duration) return;
+  S.mv.videoEl.currentTime = (val / 100) * S.mv.videoEl.duration;
+}
+
+function mvSetSpeed(val) {
+  if (S.mv.videoEl) S.mv.videoEl.playbackRate = parseFloat(val);
+}
+
+function mvUpdateTime() {
+  if (!S.mv.videoEl) return;
+  const cur = S.mv.videoEl.currentTime;
+  const dur = S.mv.videoEl.duration || 0;
+  $('mvSeek').value = dur ? (cur / dur) * 100 : 0;
+  const fmt = (s) => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+  $('mvTime').textContent = `${fmt(cur)} / ${fmt(dur)}`;
+}
+
+function mvFullscreen() {
+  const wrap = S.mv.videoEl?.closest('.vp-wrap');
+  if (!wrap) return;
+  if (document.fullscreenElement) document.exitFullscreen();
+  else wrap.requestFullscreen?.();
+}
+
+// تصدير للاستخدام العالمي
+window.closeMedia = closeMedia;
+window.downloadMedia = downloadMedia;
+window.mvTogglePlay = mvTogglePlay;
+window.mvSeekTo = mvSeekTo;
+window.mvSetSpeed = mvSetSpeed;
+window.mvFullscreen = mvFullscreen;
+
 /* ================= الأحداث ================= */
 function bindEvents() {
   const input = $('input');
 
-  // القائمة
   $('chatList').addEventListener('click', (e) => {
     const row = e.target.closest('.item');
     if (!row) return;
@@ -1530,7 +1884,6 @@ function bindEvents() {
     scheduleList();
   });
 
-  // الغرفة
   $('backBtn').addEventListener('click', closeRoom);
   $('rav').addEventListener('click', () => goProfile(S.otherUid));
   $('rinfo').addEventListener('click', () => goProfile(S.otherUid));
@@ -1540,7 +1893,8 @@ function bindEvents() {
     if (e.target.closest('[data-profile]')) { goProfile(S.otherUid); return; }
     const q = e.target.closest('.quote');
     if (q) { e.stopPropagation(); scrollToMsg(q.dataset.jump); return; }
-    if (e.target.closest('.att-img, .att-file')) { e.stopPropagation(); return; }
+    const attBtn = e.target.closest('.att-img, .att-video, .att-file');
+    if (attBtn) { e.stopPropagation(); return; }
     const row = e.target.closest('.row');
     if (row && row.dataset.id) openSheet(row.dataset.id);
   });
@@ -1559,11 +1913,9 @@ function bindEvents() {
     maybeMarkRead();
   });
 
-  // الطلب
   $('acceptBtn').addEventListener('click', acceptRequest);
   $('blockBtn').addEventListener('click', blockRequest);
 
-  // الكتابة
   $('send').addEventListener('click', onSend);
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
@@ -1575,32 +1927,31 @@ function bindEvents() {
 
   $('ctxClose').addEventListener('click', clearCtx);
 
-  $('attach').addEventListener('click', () => {
-    if (!canSend()) return;
-    if (S.editingId) { showToast('لا يمكن إرفاق ملف أثناء التعديل'); return; }
-    $('fileInput').click();
-  });
+  $('attach').addEventListener('click', openAttachSheet);
+  $('attachBg').addEventListener('click', closeAttachSheet);
 
   $('fileInput').addEventListener('change', () => {
     const f = $('fileInput').files[0];
     $('fileInput').value = '';
     if (!f) return;
-    if (f.size > MAX_FILE) { showToast('الحد الأقصى لحجم الملف 10 ميغابايت'); return; }
+    if (f.size > MAX_FILE) { showToast('الحد الأقصى 50 ميغابايت'); return; }
     if (S.editingId || !canSend()) return;
     S.pendingFile = f;
     showChip(f);
     updateSendBtn();
+    closeAttachSheet();
   });
 
   $('fchipX').addEventListener('click', clearChip);
 
-  // لوحة الخيارات
   $('sheetBg').addEventListener('click', closeSheet);
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if ($('sheet').classList.contains('open')) closeSheet();
-    else if (S.editingId || S.reply) clearCtx();
+    if (!$('mediaViewer').hidden) { closeMedia(); return; }
+    if ($('attachSheet').classList.contains('open')) { closeAttachSheet(); return; }
+    if ($('sheet').classList.contains('open')) { closeSheet(); return; }
+    if (S.editingId || S.reply) clearCtx();
   });
 }
 
