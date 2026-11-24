@@ -29,18 +29,17 @@ button{cursor:pointer;background:none;border:none}
 .lhdr h1{font-size:18px;font-weight:800;flex:1}
 .hbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;transition:.15s}
 .hbtn:hover{background:rgba(255,255,255,.12)}
+
 .search{margin:10px 12px 6px;position:relative;flex:0 0 auto}
 .search i{position:absolute;inset-inline-start:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
 .search input{width:100%;height:42px;border:1px solid var(--line);border-radius:21px;padding:0 38px 0 14px;background:#f5f7f9;outline:none;transition:.15s}
 .search input:focus{border-color:var(--navy);background:#fff;box-shadow:0 0 0 3px rgba(21,39,65,.08)}
 
-/* التبويبات - محسّنة للهواتف */
 .tabs{
   display:flex;gap:6px;overflow-x:auto;padding:4px 12px 10px;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
   scroll-snap-type:x proximity;
   flex:0 0 auto;border-bottom:1px solid var(--line);
-  position:relative;
 }
 .tabs::-webkit-scrollbar{display:none}
 .tab{
@@ -134,66 +133,98 @@ body.room-open .main{transform:none}
 .intro-stats span{font-size:12px;color:var(--muted)}
 .intro-hint{font-size:12px;color:#5b6472;background:rgba(255,255,255,.75);border-radius:10px;padding:6px 12px;margin-top:8px;max-width:360px;line-height:1.7}
 
+/* ===== تصميم الرسائل المحسن ===== */
 .row{content-visibility:auto;contain-intrinsic-size:auto 60px}
-.day{display:flex;justify-content:center;margin:12px 0 6px}
-.day span{background:rgba(255,255,255,.9);padding:3px 12px;border-radius:9px;font-size:12px;color:#4d5663;box-shadow:0 1px 1px rgba(0,0,0,.05)}
-.mrow{display:flex;margin:1px 0}
-.mrow.head{margin-top:8px}
+.day{display:flex;justify-content:center;margin:14px 0 8px}
+.day span{background:rgba(255,255,255,.9);padding:4px 14px;border-radius:12px;font-size:12px;color:#4d5663;box-shadow:0 1px 2px rgba(0,0,0,.06);font-weight:600}
+.mrow{display:flex;margin:2px 0;padding:0 4px}
+.mrow.head{margin-top:12px}
 .mrow.mine{justify-content:flex-end}
-.bubble{max-width:min(80%,540px);min-width:0;background:#fff;border-radius:12px;padding:6px 9px 4px;box-shadow:0 1px 1px rgba(0,0,0,.08);cursor:pointer;transition:box-shadow .2s}
-.theirs.tail .bubble{border-top-right-radius:3px}
-.mine .bubble{background:var(--mine)}
-.mine.tail .bubble{border-top-left-radius:3px}
-.bubble.flash{box-shadow:0 0 0 3px rgba(168,116,26,.55)}
-.txt{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.6}
-.deleted{font-style:italic;color:#7a808a;font-size:14px}
-.quote{display:flex;flex-direction:column;gap:2px;border-inline-start:3px solid var(--accent);background:rgba(0,0,0,.05);border-radius:6px;padding:4px 8px;margin-bottom:4px;cursor:pointer;min-width:0}
-.quote b{font-size:12px;color:var(--accent)}
-.quote span{font-size:13px;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.meta{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:11px;color:#7a808a;margin-top:2px}
-.ticks{font-size:12px;color:#8a929c}
-.ticks.seen{color:#34b7f1}
-.rxs{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
-.rx{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1px 7px;font-size:13px}
-.rx.on{border-color:var(--accent);background:#fff8ea}
-.rx small{font-size:11px;color:var(--muted)}
 
-/* ================= المرفقات (محسّنة) ================= */
-.att-img{display:block;margin-bottom:4px;border-radius:8px;overflow:hidden;max-width:100%;position:relative;cursor:zoom-in}
-.att-img img{display:block;max-width:100%;max-height:340px;border-radius:8px;object-fit:cover}
-.att-video{display:block;margin-bottom:4px;border-radius:8px;overflow:hidden;max-width:100%;position:relative;cursor:pointer;background:#000;aspect-ratio:16/9;width:280px}
+.bubble{
+  max-width:min(85%,540px);min-width:0;background:#fff;
+  border-radius:16px;padding:8px 12px 6px;
+  box-shadow:0 1px 3px rgba(0,0,0,.08);
+  cursor:pointer;transition:box-shadow .2s;
+  position:relative;
+}
+.theirs.tail .bubble{border-top-right-radius:4px}
+.mine .bubble{background:var(--mine)}
+.mine.tail .bubble{border-top-left-radius:4px}
+
+/* ذيل الفقاعة */
+.bubble::before{
+  content:'';position:absolute;top:0;width:12px;height:12px;
+}
+.theirs.tail .bubble::before{
+  right:-8px;
+  background:radial-gradient(circle at 100% 0, transparent 12px, #fff 12px);
+}
+.mine.tail .bubble::before{
+  left:-8px;
+  background:radial-gradient(circle at 0 0, transparent 12px, var(--mine) 12px);
+}
+
+.bubble.flash{box-shadow:0 0 0 3px rgba(168,116,26,.55)}
+.txt{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.6;color:#1a1a1a}
+.deleted{font-style:italic;color:#7a808a;font-size:14px}
+
+/* الاقتباس */
+.quote{display:flex;flex-direction:column;gap:2px;border-inline-start:3px solid var(--accent);background:rgba(0,0,0,.04);border-radius:6px;padding:4px 8px;margin-bottom:4px;cursor:pointer;min-width:0}
+.quote b{font-size:12px;color:var(--accent);font-weight:700}
+.quote span{font-size:13px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* التوقيت */
+.meta{display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:11px;color:#7a808a;margin-top:4px;padding:0 2px}
+.ticks{font-size:13px;color:#8a929c}
+.ticks.seen{color:#34b7f1}
+
+/* التفاعلات */
+.rxs{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.rx{background:#fff;border:1px solid var(--line);border-radius:12px;padding:2px 8px;font-size:13px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.rx.on{border-color:var(--accent);background:#fff8ea}
+.rx small{font-size:11px;color:var(--muted);margin-inline-start:2px}
+
+/* ================= المرفقات ================= */
+.att-img{display:block;margin-bottom:4px;border-radius:10px;overflow:hidden;max-width:100%;position:relative;cursor:zoom-in;border:none;background:none;padding:0}
+.att-img img{display:block;max-width:100%;max-height:340px;border-radius:10px;object-fit:cover}
+.att-video{display:block;margin-bottom:4px;border-radius:10px;overflow:hidden;max-width:100%;position:relative;cursor:pointer;background:#000;aspect-ratio:16/9;width:280px;border:none;padding:0}
 .att-video video{width:100%;height:100%;object-fit:cover;pointer-events:none}
 .att-video .play-badge{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   width:60px;height:60px;border-radius:50%;background:rgba(0,0,0,.7);
   display:grid;place-items:center;color:#fff;font-size:24px;
-  backdrop-filter:blur(4px);pointer-events:none;
-  transition:.2s;
+  backdrop-filter:blur(4px);pointer-events:none;transition:.2s;
 }
 .att-video:hover .play-badge{background:rgba(168,116,26,.9);transform:translate(-50%,-50%) scale(1.1)}
-.att-file{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.05);border-radius:8px;padding:8px 10px;margin-bottom:4px;text-decoration:none;color:inherit;min-width:0;cursor:pointer;width:100%;text-align:start;font:inherit}
+.att-file{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.05);border-radius:10px;padding:10px 12px;margin-bottom:4px;text-decoration:none;color:inherit;min-width:0;cursor:pointer;width:100%;text-align:start;font:inherit;border:none;transition:.15s}
+.att-file:hover{background:rgba(0,0,0,.08)}
 .att-file i{font-size:24px;color:var(--navy);flex:0 0 auto}
 .att-file span{display:flex;flex-direction:column;min-width:0;flex:1}
-.att-file b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
+.att-file b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;font-weight:700}
 .att-file small{font-size:12px;color:var(--muted)}
-.att-pdf{background:rgba(185,28,28,.06)}
+.att-pdf{background:rgba(185,28,28,.08)}
 .att-pdf i{color:var(--red)}
 
 .jump{position:absolute;bottom:12px;inset-inline-end:14px;width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);display:grid;place-items:center;color:var(--navy);z-index:5}
 .jump b{position:absolute;top:-6px;inset-inline-start:-4px;background:var(--accent);color:#fff;border-radius:10px;font-size:11px;padding:1px 6px;min-width:20px;text-align:center}
 
+/* ===== صندوق الإرسال المحسن ===== */
 .composer-wrap{flex:0 0 auto;background:#f0f2f5;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px;box-shadow:0 -2px 10px rgba(0,0,0,.04)}
 .ctx{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:8px 10px;border-inline-start:4px solid var(--accent)}
 .ctx > div{flex:1;min-width:0;display:flex;flex-direction:column}
 .ctx b{font-size:13px;color:var(--accent)}
 .ctx span{font-size:13px;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.icon-x{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#667;flex:0 0 auto}
+.icon-x{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#667;flex:0 0 auto;transition:.15s}
+.icon-x:hover{background:rgba(0,0,0,.05)}
+
 .filechip{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:8px 10px;position:relative;overflow:hidden}
 .filechip .fi{font-size:22px;color:var(--navy)}
 .filechip .fn{flex:1;min-width:0;display:flex;flex-direction:column}
 .filechip .fn b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .filechip .fn small{font-size:12px;color:var(--muted)}
 .fbar{position:absolute;bottom:0;inset-inline-start:0;height:3px;background:var(--accent);width:0;transition:width .15s}
+
 .notice{background:#fff;border-radius:10px;padding:12px;text-align:center;font-size:14px;color:#44505e;line-height:1.7}
 .notice.red{color:var(--red)}
 .decide{background:#fff;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
@@ -202,11 +233,25 @@ body.room-open .main{transform:none}
 .btn{flex:1;height:40px;border-radius:10px;font-weight:700;font-size:14px}
 .btn.ok{background:var(--navy);color:#fff}
 .btn.no{background:#fde8e8;color:var(--red)}
-.inputrow{display:flex;align-items:flex-end;gap:6px}
+
+.inputrow{display:flex;align-items:flex-end;gap:8px}
 .attach{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#5a6470;flex:0 0 auto;font-size:18px;transition:.15s}
 .attach:hover{background:#e5e8ec}
-.inputrow textarea{flex:1;min-width:0;resize:none;border:none;outline:none;border-radius:20px;padding:11px 14px;background:#fff;max-height:140px;line-height:1.5;font-size:15px;transition:.15s}
+
+/* ===== textarea محسن ===== */
+.inputrow textarea{
+  flex:1;min-width:0;resize:none;border:none;outline:none;
+  border-radius:22px;padding:11px 16px;background:#fff;
+  min-height:44px;max-height:120px;
+  line-height:22px;font-size:15px;
+  transition:box-shadow .15s;
+  overflow-y:auto;
+  scrollbar-width:thin;
+}
 .inputrow textarea:focus{box-shadow:0 0 0 2px rgba(21,39,65,.1)}
+.inputrow textarea::-webkit-scrollbar{width:6px}
+.inputrow textarea::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+
 .send{width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;flex:0 0 auto;font-size:16px;transition:.15s}
 .send:hover{background:var(--navy-dark);transform:scale(1.05)}
 .send:disabled{opacity:.45;cursor:default;transform:none}
@@ -256,7 +301,6 @@ body.room-open .main{transform:none}
 .mv-body > img.zoomed{transform:scale(2.5);cursor:zoom-out}
 .mv-body iframe{width:100%;height:100%;border:none;background:#fff}
 
-/* مشغل الفيديو */
 .vp-wrap{
   width:100%;height:100%;display:flex;flex-direction:column;
   background:#000;
@@ -284,7 +328,6 @@ body.room-open .main{transform:none}
   padding:6px 8px;border-radius:6px;font-size:12px;cursor:pointer;
 }
 
-/* نافذة ارفاق */
 .attach-sheet{
   position:fixed;bottom:0;left:50%;width:min(440px,100%);
   transform:translate(-50%,105%);background:#fff;
@@ -306,6 +349,35 @@ body.room-open .main{transform:none}
 .attach-sheet .item.video i{color:#2980b9}
 .attach-sheet .item.file i{color:#8e44ad}
 .attach-sheet .item.camera i{color:#16a085}
+
+/* ================= الإعدادات ================= */
+.settings-modal{
+  position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.4);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.settings-modal.open{opacity:1;pointer-events:auto}
+.settings-box{
+  background:#fff;width:100%;max-width:440px;
+  border-radius:20px 20px 0 0;
+  padding:12px 16px calc(16px + env(safe-area-inset-bottom));
+  transform:translateY(100%);transition:transform .25s;
+  max-height:85vh;overflow-y:auto;
+}
+.settings-modal.open .settings-box{transform:translateY(0)}
+.settings-hdr{display:flex;align-items:center;gap:10px;padding:8px 0 14px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.settings-hdr h3{flex:1;font-size:17px;color:var(--navy);font-weight:800}
+.settings-close{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--muted);transition:.15s}
+.settings-close:hover{background:#f4f6f8}
+.settings-item{
+  display:flex;align-items:center;gap:12px;padding:14px 8px;
+  border-radius:10px;cursor:pointer;transition:.15s;font-size:15px;
+}
+.settings-item:hover{background:#f4f6f8}
+.settings-item i{width:24px;text-align:center;font-size:17px;color:var(--navy)}
+.settings-item span{flex:1}
+.settings-item .badge-on{font-size:11px;color:var(--green);font-weight:700}
+.settings-item.danger,.settings-item.danger i{color:var(--red)}
 
 /* ================= الشاشات الواسعة ================= */
 @media (min-width:900px){
@@ -375,6 +447,7 @@ body.room-open .main{transform:none}
           <div class="rname"><span id="rname"></span><i class="fa-solid fa-circle-check vbadge" id="rverified" hidden></i></div>
           <div class="rsub" id="rsub"></div>
         </div>
+        <button class="hbtn" id="roomSettingsBtn" title="إعدادات"><i class="fa-solid fa-ellipsis-vertical"></i></button>
       </header>
 
       <div class="thread-wrap">
@@ -458,12 +531,23 @@ body.room-open .main{transform:none}
   <div class="mv-body" id="mvBody"></div>
 </div>
 
+<!-- إعدادات المحادثة -->
+<div class="settings-modal" id="settingsModal">
+  <div class="settings-box">
+    <div class="settings-hdr">
+      <h3>إعدادات المحادثة</h3>
+      <button class="settings-close" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="settingsContent"></div>
+  </div>
+</div>
+
 <script type="module">
 import { auth, db, showToast } from './shared.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
   collection, doc, getDoc, getDocs, onSnapshot, query, where, orderBy, limit,
-  writeBatch, updateDoc, serverTimestamp, deleteField
+  writeBatch, updateDoc, serverTimestamp, deleteField, deleteDoc
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 /* ================= ثوابت ================= */
@@ -472,7 +556,7 @@ const PROFILE_PAGE = 'profile.html';
 const PAGE_SIZE = 30;
 const CHAT_LIST_LIMIT = 300;
 const MAX_TEXT = 2000;
-const MAX_FILE = 50 * 1024 * 1024; // 50MB للفيديو
+const MAX_FILE = 50 * 1024 * 1024; // 50MB
 const GROUP_GAP_MS = 5 * 60 * 1000;
 const EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 const CLOUD_URL = 'https://api.cloudinary.com/v1_1/nopxs3zt/auto/upload';
@@ -481,7 +565,6 @@ const FOLLOWERS_KEY = 'followersCount';
 const POSTS_KEY = 'postsCount';
 const ROLE_LABEL = { admin: 'مشرف', moderator: 'مشرف', founder: 'المؤسس', member: 'عضو', user: 'عضو' };
 
-// تبويبات قادمة (UI محسّن)
 const COMING_TABS = {
   groups: { icon: 'fa-users', title: 'الجروبات', desc: 'أنشئ جروباً للتواصل مع زملائك، وشاركوا الرسائل والملفات في مساحة خاصة بكم.', eta: 'قريباً' },
   channels: { icon: 'fa-bullhorn', title: 'القنوات', desc: 'تابع القنوات التعليمية وأرقى المحتوى من المدرسين والمبدعين.', eta: 'قريباً' },
@@ -496,7 +579,6 @@ const S = {
   listQuery: '',
   chats: new Map(),
   listUnsub: null,
-
   activeId: null,
   otherUid: null,
   chatExists: false,
@@ -504,7 +586,6 @@ const S = {
   otherReadMs: 0,
   roomUnsub: null,
   msgUnsub: null,
-
   windowSize: PAGE_SIZE,
   hasMore: true,
   loadingOlder: false,
@@ -512,20 +593,15 @@ const S = {
   ready: false,
   forceBottom: true,
   newBelow: 0,
-
   order: [],
   map: new Map(),
-
   reply: null,
   editingId: null,
   sheetId: null,
   pendingFile: null,
   uploading: false,
-
   thread: null,
   intro: null,
-
-  // عارض الوسائط
   mv: { url: null, name: null, videoEl: null, isZoomed: false }
 };
 
@@ -608,7 +684,6 @@ function goProfile(uid) {
   location.href = uid === S.me ? PROFILE_PAGE : `${PROFILE_PAGE}?uid=${encodeURIComponent(uid)}`;
 }
 
-// تحديد نوع الملف
 function fileKind(file) {
   const m = (file.type || '').toLowerCase();
   if (m.startsWith('image/')) return 'image';
@@ -626,7 +701,7 @@ function fileIcon(a) {
   return 'fa-file';
 }
 
-/* ================= المستخدمون (كاش) ================= */
+/* ================= المستخدمون ================= */
 const userCache = new Map();
 const userPending = new Map();
 
@@ -673,7 +748,7 @@ function onUserLoaded(uid) {
   if (S.otherUid === uid) { renderHeader(); renderIntro(); }
 }
 
-/* ================= الحالة والصلاحيات ================= */
+/* ================= الحالة ================= */
 function needsRead(d) {
   if (!d || !S.me) return false;
   if ((d.status || 'active') === 'blocked') return false;
@@ -712,7 +787,8 @@ function visibleChats() {
     if (!d.participants || !d.participants.includes(S.me)) continue;
     const st = d.status || 'active';
     if (st === 'blocked') continue;
-    if (S.tab === 'direct' && st !== 'active') continue;
+    if (st === 'archived') continue; // أخفِ المؤرشفة
+    if (S.tab === 'direct' && st !== 'active' && st !== 'archived') continue;
     if (S.tab === 'unread' && !needsRead(d)) continue;
     if (q) {
       const u = cachedUser(otherOf(d));
@@ -778,8 +854,6 @@ function paintListRow(row, id, d) {
 function renderList() {
   if (!S.me) return;
   const list = $('chatList'), empty = $('listEmpty');
-
-  // عرض placeholder للتبويبات القادمة
   const coming = COMING_TABS[S.tab];
   if (coming) {
     list.replaceChildren();
@@ -837,7 +911,7 @@ function startList() {
   );
 }
 
-/* ================= البحث عن مستخدمين ================= */
+/* ================= البحث ================= */
 let searchTimer = 0;
 let searchSeq = 0;
 
@@ -989,12 +1063,16 @@ function openRoomFor(chatId, uid) {
     (snap) => { if (S.activeId === chatId) onRoomChat(snap); },
     () => showToast('تعذر فتح المحادثة')
   );
+  // ✅ إضافة حالة الرجوع
+  history.pushState({ chatId, uid }, '', `?uid=${uid}`);
   scheduleList();
 }
 
 function closeRoom() {
+  if (!S.activeId) return;
   teardownRoom();
   document.body.classList.remove('room-open', 'has-room');
+  history.pushState({}, '', 'chat.html');
   scheduleList();
 }
 
@@ -1020,11 +1098,12 @@ function renderHeader() {
   $('rname').textContent = u.name;
   $('rverified').hidden = !u.verified;
   const st = roomState();
-  $('rsub').textContent =
-    st === 'wait' ? 'بانتظار الموافقة' :
-    st === 'decide' ? 'طلب مراسلة' :
-    st === 'blocked' ? 'محظورة' :
-    (u.username ? '@' + u.username : roleLabel(u.role));
+  let sub = u.username ? '@' + u.username : roleLabel(u.role);
+  if (st === 'wait') sub = 'بانتظار الموافقة';
+  if (st === 'decide') sub = 'طلب مراسلة';
+  if (st === 'blocked') sub = 'محظورة';
+  if (S.chatData?.muted?.[S.me]) sub += ' · مكتوم';
+  $('rsub').textContent = sub;
 }
 
 function renderIntro() {
@@ -1090,7 +1169,7 @@ const sigOf = (d) => [
   JSON.stringify(d.reactions || {})
 ].join('\u0001');
 
-/* ===== بناء المرفقات (محسّن) ===== */
+/* ===== بناء المرفقات ===== */
 function buildAttachment(a) {
   const btn = el('button', '');
   btn.type = 'button';
@@ -1130,7 +1209,6 @@ function buildAttachment(a) {
     return btn;
   }
 
-  // ملف عادي - تنزيل
   btn.className = 'att-file';
   btn.onclick = () => {
     const link = document.createElement('a');
@@ -1442,7 +1520,7 @@ function clearChip() {
 function autoSize() {
   const t = $('input');
   t.style.height = 'auto';
-  t.style.height = Math.min(t.scrollHeight, 140) + 'px';
+  t.style.height = Math.min(t.scrollHeight, 120) + 'px';
 }
 
 function updateSendBtn() {
@@ -1720,7 +1798,7 @@ window.pickAttach = (accept) => {
   $('fileInput').click();
 };
 
-/* ================= عارض الوسائط الاحترافي ================= */
+/* ================= عارض الوسائط ================= */
 function openMedia(url, name, kind) {
   const MV = S.mv;
   MV.url = url;
@@ -1843,13 +1921,102 @@ function mvFullscreen() {
   else wrap.requestFullscreen?.();
 }
 
-// تصدير للاستخدام العالمي
 window.closeMedia = closeMedia;
 window.downloadMedia = downloadMedia;
 window.mvTogglePlay = mvTogglePlay;
 window.mvSeekTo = mvSeekTo;
 window.mvSetSpeed = mvSetSpeed;
 window.mvFullscreen = mvFullscreen;
+
+/* ================= إعدادات المحادثة ================= */
+async function openSettings() {
+  if (!S.activeId) return;
+  const isMuted = S.chatData?.muted?.[S.me] === true;
+  const isArchived = S.chatData?.archived?.[S.me] === true;
+  const content = $('settingsContent');
+  content.innerHTML = `
+    <div class="settings-item" onclick="toggleMute()">
+      <i class="fa-solid fa-bell${isMuted ? '-slash' : ''}"></i>
+      <span>${isMuted ? 'إلغاء كتم' : 'كتم الإشعارات'}</span>
+      ${isMuted ? '<span class="badge-on">مكتوم</span>' : ''}
+    </div>
+    <div class="settings-item" onclick="toggleArchive()">
+      <i class="fa-solid fa-box-archive"></i>
+      <span>${isArchived ? 'إلغاء الأرشفة' : 'أرشفة المحادثة'}</span>
+      ${isArchived ? '<span class="badge-on">مؤرشف</span>' : ''}
+    </div>
+    <div class="settings-item danger" onclick="deleteChat()">
+      <i class="fa-solid fa-trash"></i>
+      <span>حذف المحادثة</span>
+    </div>
+    <div class="settings-item danger" onclick="blockUser()">
+      <i class="fa-solid fa-ban"></i>
+      <span>حظر المستخدم</span>
+    </div>
+  `;
+  $('settingsModal').classList.add('open');
+}
+
+function closeSettings() {
+  $('settingsModal').classList.remove('open');
+}
+
+async function toggleMute() {
+  if (!S.activeId) return;
+  const isMuted = S.chatData?.muted?.[S.me] === true;
+  try {
+    await updateDoc(doc(db, 'chats', S.activeId), {
+      [`muted.${S.me}`]: !isMuted
+    });
+    closeSettings();
+    showToast(isMuted ? 'تم إلغاء الكتم' : 'تم كتم الإشعارات');
+  } catch (e) { showToast('تعذر التحديث'); }
+}
+
+async function toggleArchive() {
+  if (!S.activeId) return;
+  const isArchived = S.chatData?.archived?.[S.me] === true;
+  try {
+    await updateDoc(doc(db, 'chats', S.activeId), {
+      [`archived.${S.me}`]: !isArchived
+    });
+    closeSettings();
+    showToast(isArchived ? 'تم إلغاء الأرشفة' : 'تم الأرشفة');
+    if (!isArchived) closeRoom(); // اخرج من الشات المؤرشف
+  } catch (e) { showToast('تعذر التحديث'); }
+}
+
+async function deleteChat() {
+  if (!S.activeId) return;
+  if (!confirm('حذف المحادثة بالكامل؟')) return;
+  try {
+    await deleteDoc(doc(db, 'chats', S.activeId));
+    closeSettings();
+    closeRoom();
+    showToast('تم الحذف');
+  } catch (e) { showToast('تعذر الحذف'); }
+}
+
+async function blockUser() {
+  if (!S.activeId) return;
+  if (!confirm('حظر هذا المستخدم؟')) return;
+  try {
+    await updateDoc(doc(db, 'chats', S.activeId), {
+      status: 'blocked',
+      blockedBy: S.me,
+      blockedAt: serverTimestamp()
+    });
+    closeSettings();
+    showToast('تم الحظر');
+  } catch (e) { showToast('تعذر الحظر'); }
+}
+
+window.toggleMute = toggleMute;
+window.toggleArchive = toggleArchive;
+window.deleteChat = deleteChat;
+window.blockUser = blockUser;
+window.openSettings = openSettings;
+window.closeSettings = closeSettings;
 
 /* ================= الأحداث ================= */
 function bindEvents() {
@@ -1887,6 +2054,7 @@ function bindEvents() {
   $('backBtn').addEventListener('click', closeRoom);
   $('rav').addEventListener('click', () => goProfile(S.otherUid));
   $('rinfo').addEventListener('click', () => goProfile(S.otherUid));
+  $('roomSettingsBtn').addEventListener('click', openSettings);
 
   const thread = S.thread;
   thread.addEventListener('click', (e) => {
@@ -1946,9 +2114,17 @@ function bindEvents() {
 
   $('sheetBg').addEventListener('click', closeSheet);
 
+  // ✅ زر الرجوع
+  window.addEventListener('popstate', () => {
+    if (document.body.classList.contains('room-open')) {
+      closeRoom();
+    }
+  });
+
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('mediaViewer').hidden) { closeMedia(); return; }
+    if ($('settingsModal').classList.contains('open')) { closeSettings(); return; }
     if ($('attachSheet').classList.contains('open')) { closeAttachSheet(); return; }
     if ($('sheet').classList.contains('open')) { closeSheet(); return; }
     if (S.editingId || S.reply) clearCtx();
