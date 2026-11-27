@@ -1,22 +1,27 @@
 /* ============================================================
- 
+   js/chat-core.js — الجزء 1/2 (النسخة المصححة)
+   يُدمج مع الجزء 2/2 بعده مباشرةً. الجزء 1/2 يحتوي على import.
+
    المسؤوليات:
    - الاتصال بـ Firestore والمستخدم الحالي (تهيئة من chat.html عبر init)
    - قائمة المحادثات، الطلبات، الحظر، التفضيلات الشخصية (userPrefs)
-   - المحادثة النشطة والرسائل وكتابة الرسائل والإرسال والحذف والتفاعل (الجزء 2)
+   - المحادثة النشطة والرسائل والإرسال والحذف والتفاعل (الجزء 2)
 
    عقد الأحداث (on(evt, fn)):
    - 'auth'        → user | null
    - 'ready'       → null                       (تم تحميل القائمة لأول مرة)
    - 'chats'       → Array<ChatView>            (القائمة كاملة مرتبة ومفلترة)
    - 'chat:active' → { chat, blockedByMe, otherUid } | null
-   - 'messages'    → { chatId, reason, messages[], hasOlder, loadingOlder }
+   - 'messages'    → { chatId, reason, messages[], hasOlder, loadingOlder, pinned[] }
                       reason: init | older | live | meta | failed
    - 'typing'      → { chatId, uids[], isTyping }
-   - 'incoming'    → { chatId, senderUid, otherUid, title, preview, at, isActive }
+   - 'incoming'    → { chatId, senderUid, otherUid, title, preview, at, isActive, muted }
    - 'send-failed' → { chatId, id, message }
    - 'toast'       → { type: 'success'|'danger'|'info', text }
    - 'error'       → ChatError
+
+   مدة الكتم (muteChat): تقبل false | 'forever' | true | Timestamp | مدة بالمللي ثانية
+   | طابع زمني مطلق بالمللي ثانية (أي قيمة >= 1e12 تُعامَل مطلقة).
 
    ملاحظة: الحقول المتوقعة في users: displayName|name|fullName|username
    و photoURL|avatarUrl|avatar و isVerified و lastSeen. تُقرأ بأمان ولا تُكتب.
@@ -32,6 +37,7 @@ import {
 /* ------------------------------------------------------------
    1) الثوابت
    ------------------------------------------------------------ */
+
 export const CHAT_LIMITS = Object.freeze({
   TEXT_MAX: 4000,
   PREVIEW_MAX: 140,
@@ -64,11 +70,15 @@ export const ATTACH_KINDS = Object.freeze(['image', 'video', 'audio', 'pdf', 'fi
 
 const PREF_KEYS = ['archived', 'pinned', 'muted', 'hiddenAt', 'clearedAt'];
 const CLOUD_PREFIX = 'https://res.cloudinary.com/nopxs3zt/';
-const DAY_MS = 86400000;
+/** أي قيمة مدة كتم أكبر من هذا الرقم تُعامَل كطابع زمني مطلق (ms منذ 1970). */
+const ABS_TIME_THRESHOLD_MS = 1e12;
+/** قراءة الطوابع المعلّقة محلياً كتقدير، حتى لا تتأخر الإجراءات المرئية. */
+const DATA_OPTS = Object.freeze({ serverTimestamps: 'estimate' });
 
 /* ------------------------------------------------------------
    2) الأخطاء
    ------------------------------------------------------------ */
+
 export class ChatError extends Error {
   constructor(code, message) {
     super(message);
@@ -102,6 +112,7 @@ const run = async (fn, fallback) => {
 /* ------------------------------------------------------------
    3) ناقل الأحداث
    ------------------------------------------------------------ */
+
 const bus = new Map();
 
 function on(evt, fn) {
@@ -125,6 +136,7 @@ function emit(evt, payload) {
 /* ------------------------------------------------------------
    4) أدوات مساعدة
    ------------------------------------------------------------ */
+
 const toMs = (v) => {
   if (!v) return null;
   if (typeof v === 'number') return v;
@@ -140,17 +152,7 @@ const clip = (s, n) => {
 
 const chatIdFor = (a, b) => [a, b].sort().join('_');
 
-const dayStart = (ms) => {
-  const d = new Date(ms);
-  d.setHours(0, 0, 0, 0);
-  return d.getTime();
-};
-
-const chunks = (arr, size) => {
-  const out = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
-};
+const otherOf = (d, uid) => (d?.participants || []).find((p) => p !== uid) || null;
 
 function requireUid() {
   if (!S.uid) throw new ChatError('unauthenticated', ERROR_MESSAGES.unauthenticated);
@@ -160,18 +162,26 @@ function requireUid() {
 const chatRef = (id) => doc(S.db, 'chats', id);
 const msgsCol = (id) => collection(S.db, 'chats', id, 'messages');
 const msgRef = (chatId, id) => doc(S.db, 'chats', chatId, 'messages', id);
+const blockRef = (a, b) => doc(S.db, 'blocks', `${a}_${b}`);
 
 async function readChat(chatId) {
   const snap = await run(() => getDoc(chatRef(chatId)), 'تعذّر فتح المحادثة');
   if (!snap.exists()) throw new ChatError('not-found', ERROR_MESSAGES['not-found']);
-  const data = snap.data();
+  const data = snap.data(DATA_OPTS);
   S.chatDocs.set(chatId, data);
   return data;
+}
+
+/** تحديث متفائل لنسخة المحادثة المحلية قبل وصول اللقطة من الخادم. */
+function patchChatDoc(chatId, patch) {
+  const cur = S.chatDocs.get(chatId);
+  if (cur) S.chatDocs.set(chatId, { ...cur, ...patch });
 }
 
 /* ------------------------------------------------------------
    5) الحالة الداخلية
    ------------------------------------------------------------ */
+
 const S = {
   db: null,
   auth: null,
@@ -192,12 +202,14 @@ const S = {
   unreadTimer: null,
   readSent: new Map(),      // chatId → آخر وقت أُرسل فيه readAt
   failed: new Map(),        // `${chatId}|${id}` → رسائل فشل إرسالها
-  active: null,             // حالة المحادثة النشطة
+  blockedByMe: new Map(),   // chatId → true إذا كنت أنا من حظر الطرف الآخر
+  active: null,             // { id, otherUid } للمحادثة النشطة
 };
 
 /* ------------------------------------------------------------
    6) الملفات الشخصية
    ------------------------------------------------------------ */
+
 function normalizeProfile(uid, d = {}) {
   return {
     uid,
@@ -213,7 +225,6 @@ function loadProfile(uid) {
   if (!uid) return Promise.resolve(null);
   if (S.profiles.has(uid)) return Promise.resolve(S.profiles.get(uid));
   if (S.profileLoads.has(uid)) return S.profileLoads.get(uid);
-
   const p = getDoc(doc(S.db, 'users', uid))
     .then((snap) => {
       const prof = normalizeProfile(uid, snap.exists() ? snap.data() : {});
@@ -226,7 +237,6 @@ function loadProfile(uid) {
       return fallback;
     })
     .finally(() => S.profileLoads.delete(uid));
-
   S.profileLoads.set(uid, p);
   return p;
 }
@@ -239,6 +249,7 @@ function nameOf(uid) {
 /* ------------------------------------------------------------
    7) عرض المحادثات: بناء الكائنات، الرؤية، غير المقروء
    ------------------------------------------------------------ */
+
 function muteState(raw) {
   if (raw === true || raw === 'forever') {
     return { muted: true, until: null, forever: raw === 'forever' };
@@ -250,14 +261,13 @@ function muteState(raw) {
 
 function buildChatView(id, d) {
   const uid = S.uid;
-  const otherUid = (d.participants || []).find((p) => p !== uid) || null;
+  const otherUid = otherOf(d, uid);
   const prefs = d.userPrefs?.[uid] || {};
   const lastAt = toMs(d.lastMessageAt);
   const hiddenAt = toMs(prefs.hiddenAt);
   const prof = otherUid ? S.profiles.get(otherUid) : null;
   const mute = muteState(prefs.muted);
   const status = d.status || CHAT_STATUS.ACTIVE; // المحادثات القديمة بلا حالة تُعامَل كنشطة
-
   return {
     id,
     otherUid,
@@ -303,7 +313,7 @@ function viewOf(id) {
   const d = S.chatDocs.get(id);
   if (!d || !S.uid) return null;
   const v = buildChatView(id, d);
-  v.blockedByMe = S.active?.id === id ? !!S.active.blockedByMe : false;
+  v.blockedByMe = v.blocked && S.blockedByMe.get(id) === true;
   v.unread = computeUnread(v);
   return v;
 }
@@ -326,13 +336,18 @@ function emitChatsNow() {
   if (views.some((v) => v.unread === -1)) queueUnreadCounts(views);
 }
 
-function emitActiveChat() {
-  const a = S.active;
-  if (!a) {
+/** يُصدر المحادثة النشطة للواجهة (حدث واحد موحّد). */
+function announceActive() {
+  if (!S.active) {
     emit('chat:active', null);
     return;
   }
-  emit('chat:active', { chat: viewOf(a.id), blockedByMe: !!a.blockedByMe, otherUid: a.otherUid });
+  const view = viewOf(S.active.id);
+  emit('chat:active', {
+    chat: view,
+    blockedByMe: !!(view && view.blockedByMe),
+    otherUid: S.active.otherUid,
+  });
 }
 
 function queueUnreadCounts(views) {
@@ -366,6 +381,7 @@ function queueUnreadCounts(views) {
 /* ------------------------------------------------------------
    8) الاتصال بالقائمة وتهيئة الجلسة
    ------------------------------------------------------------ */
+
 function subscribeChats() {
   const firstLoad = !S.chatsReady;
   const q = query(
@@ -373,13 +389,11 @@ function subscribeChats() {
     where('participants', 'array-contains', S.uid),
     limit(CHAT_LIMITS.CHATS_MAX)
   );
-
   S.chatsUnsub = onSnapshot(
     q,
     (snap) => {
       const incoming = [];
       let activeChanged = false;
-
       snap.docChanges().forEach((ch) => {
         const id = ch.doc.id;
         if (ch.type === 'removed') {
@@ -387,10 +401,9 @@ function subscribeChats() {
           S.seenLastIds.delete(id);
           return;
         }
-        const d = ch.doc.data();
+        const d = ch.doc.data(DATA_OPTS);
         S.chatDocs.set(id, d);
         if (S.active?.id === id) activeChanged = true;
-
         const lastId = d.lastMessageId || null;
         const prevId = S.seenLastIds.get(id);
         if (S.chatsPrimed && lastId && lastId !== prevId && d.lastSenderUid && d.lastSenderUid !== S.uid) {
@@ -401,27 +414,24 @@ function subscribeChats() {
             preview: d.lastMessage || '',
             at: toMs(d.lastMessageAt),
             isActive: S.active?.id === id,
+            muted: muteState(d.userPrefs?.[S.uid]?.muted).muted,
           });
         }
         S.seenLastIds.set(id, lastId);
       });
-
       S.chatDocs.forEach((d) => {
-        const other = (d.participants || []).find((p) => p !== S.uid);
+        const other = otherOf(d, S.uid);
         if (other && !S.profiles.has(other) && !S.profileLoads.has(other)) {
           loadProfile(other).then(() => emitChatsNow());
         }
       });
-
-      if (activeChanged) emitActiveChat();
+      if (activeChanged) announceActive();
       emitChatsNow();
-
       S.chatsPrimed = true;
       if (firstLoad) {
         S.chatsReady = true;
         emit('ready', null);
       }
-
       incoming.forEach((i) => {
         i.title = nameOf(i.senderUid);
         emit('incoming', i);
@@ -443,6 +453,7 @@ function resetSession() {
   S.unread.clear();
   S.readSent.clear();
   S.failed.clear();
+  S.blockedByMe.clear();
   S.chatViews = [];
   S.chatsReady = false;
   S.chatsPrimed = false;
@@ -455,11 +466,9 @@ function resetSession() {
 export function init({ db, auth }) {
   if (S.started) return S.ready;
   if (!db || !auth) throw new ChatError('invalid', 'تهيئة الشات ناقصة: db و auth مطلوبان');
-
   S.db = db;
   S.auth = auth;
   S.started = true;
-
   S.ready = new Promise((resolve) => {
     let settled = false;
     S.authUnsub = onAuthStateChanged(auth, (user) => {
@@ -484,7 +493,6 @@ export function init({ db, auth }) {
       }
     });
   });
-
   return S.ready;
 }
 
@@ -501,10 +509,8 @@ export async function ensureChat(otherUid) {
   if (!otherUid || typeof otherUid !== 'string' || otherUid === uid) {
     throw new ChatError('invalid', 'لا يمكن بدء محادثة مع هذا الحساب');
   }
-
   const id = chatIdFor(uid, otherUid);
   const ref = chatRef(id);
-
   let snap = null;
   try {
     snap = await getDoc(ref);
@@ -512,10 +518,9 @@ export async function ensureChat(otherUid) {
     if (err?.code !== 'permission-denied') throw toChatError(err, 'تعذّر فتح المحادثة');
   }
   if (snap?.exists()) {
-    S.chatDocs.set(id, snap.data());
+    S.chatDocs.set(id, snap.data(DATA_OPTS));
     return { id, created: false };
   }
-
   const [p0, p1] = [uid, otherUid].sort();
   try {
     await setDoc(ref, {
@@ -530,7 +535,7 @@ export async function ensureChat(otherUid) {
     // ربما أنشأها الطرف الآخر في نفس اللحظة
     const again = await getDoc(ref).catch(() => null);
     if (again?.exists()) {
-      S.chatDocs.set(id, again.data());
+      S.chatDocs.set(id, again.data(DATA_OPTS));
       return { id, created: false };
     }
     throw toChatError(err, 'تعذّر إنشاء المحادثة');
@@ -541,10 +546,12 @@ export async function ensureChat(otherUid) {
 export async function acceptRequest(chatId) {
   const uid = requireUid();
   const d = S.chatDocs.get(chatId) ?? (await readChat(chatId));
-  if (!(d.status === CHAT_STATUS.PENDING && d.requesterUid !== uid)) {
+  if (!(d.status === CHAT_STATUS.PENDING && d.requesterUid && d.requesterUid !== uid)) {
     throw new ChatError('invalid', 'لا يوجد طلب محادثة للقبول');
   }
   await run(() => updateDoc(chatRef(chatId), { status: CHAT_STATUS.ACTIVE }), 'تعذّر قبول الطلب');
+  patchChatDoc(chatId, { status: CHAT_STATUS.ACTIVE });
+  emitChatsNow();
   emit('toast', { type: 'success', text: 'تم قبول المحادثة' });
 }
 
@@ -556,12 +563,21 @@ export function declineRequest(chatId) {
 export async function blockUser(chatId) {
   const uid = requireUid();
   const d = S.chatDocs.get(chatId) ?? (await readChat(chatId));
-  const otherUid = (d.participants || []).find((p) => p !== uid);
-  if (d.status === CHAT_STATUS.BLOCKED) return;
+  const otherUid = otherOf(d, uid);
+  if (!otherUid) throw new ChatError('invalid', 'لا يمكن حظر هذا الحساب');
 
+  if (d.status === CHAT_STATUS.BLOCKED) {
+    if (S.blockedByMe.get(chatId) === true) {
+      emit('toast', { type: 'info', text: 'هذا المستخدم محظور بالفعل' });
+      return;
+    }
+    throw new ChatError('permission-denied', 'لا يمكن تنفيذ هذا الإجراء في هذه المحادثة');
+  }
+
+  const prevStatus = d.status || CHAT_STATUS.ACTIVE;
   await run(async () => {
     // أولاً سجل الحظر ثم حالة المحادثة (قواعد الحظر تعتمد على وجود السجل)
-    const bRef = doc(S.db, 'blocks', `${uid}_${otherUid}`);
+    const bRef = blockRef(uid, otherUid);
     const existing = await getDoc(bRef).catch(() => null);
     if (!existing?.exists()) {
       await setDoc(bRef, {
@@ -572,39 +588,52 @@ export async function blockUser(chatId) {
     }
     await updateDoc(chatRef(chatId), {
       status: CHAT_STATUS.BLOCKED,
-      prevStatus: d.status || CHAT_STATUS.ACTIVE,
+      prevStatus,
     });
   }, 'تعذّر حظر المستخدم');
 
-  if (S.active?.id === chatId) {
-    S.active.blockedByMe = true;
-    emitActiveChat();
-  }
+  S.blockedByMe.set(chatId, true);
+  patchChatDoc(chatId, { status: CHAT_STATUS.BLOCKED, prevStatus });
+  emitChatsNow(); // يُحدّث المحادثة النشطة عبر onChatsChanged
   emit('toast', { type: 'success', text: 'تم حظر المستخدم' });
 }
 
 export async function unblockUser(chatId) {
   const uid = requireUid();
   const d = S.chatDocs.get(chatId) ?? (await readChat(chatId));
-  const otherUid = (d.participants || []).find((p) => p !== uid);
-  const restore = d.prevStatus && d.prevStatus !== CHAT_STATUS.BLOCKED ? d.prevStatus : CHAT_STATUS.ACTIVE;
+  const otherUid = otherOf(d, uid);
+
+  if (d.status !== CHAT_STATUS.BLOCKED) {
+    S.blockedByMe.delete(chatId);
+    return;
+  }
+
+  // لا يُفك الحظر إلا إذا كنت أنا الحاظر (يوجد سجل حظر باسمي)
+  const bSnap = await getDoc(blockRef(uid, otherUid)).catch(() => null);
+  if (!bSnap?.exists()) {
+    throw new ChatError('permission-denied', 'لا يمكنك فك حظر هذا المستخدم، الحظر من الطرف الآخر');
+  }
+
+  const restore = d.prevStatus && d.prevStatus !== CHAT_STATUS.BLOCKED
+    ? d.prevStatus
+    : CHAT_STATUS.ACTIVE;
 
   await run(async () => {
     // أولاً تحديث المحادثة ثم حذف السجل
     await updateDoc(chatRef(chatId), { status: restore });
-    await deleteDoc(doc(S.db, 'blocks', `${uid}_${otherUid}`)).catch(() => {});
+    await deleteDoc(blockRef(uid, otherUid)).catch(() => {});
   }, 'تعذّر فك الحظر');
 
-  if (S.active?.id === chatId) {
-    S.active.blockedByMe = false;
-    emitActiveChat();
-  }
+  S.blockedByMe.delete(chatId);
+  patchChatDoc(chatId, { status: restore });
+  emitChatsNow();
   emit('toast', { type: 'success', text: 'تم فك الحظر' });
 }
 
 /* ------------------------------------------------------------
    10) التفضيلات الشخصية (userPrefs) — لكل مستخدم مفتاحه
    ------------------------------------------------------------ */
+
 export async function setPrefs(chatId, patch) {
   const uid = requireUid();
   const data = {};
@@ -617,15 +646,27 @@ export async function setPrefs(chatId, patch) {
 
 export const archiveChat = (chatId, on = true) => setPrefs(chatId, { archived: on });
 
+/** إلغاء الأرشفة صراحةً (restoreChat مخصص لإظهار محادثة مخفية فقط). */
+export const unarchiveChat = (chatId) => setPrefs(chatId, { archived: false });
+
 export const pinChat = (chatId, on = true) => setPrefs(chatId, { pinned: on });
 
-/** mode: false | 'forever' | مدة بالمللي ثانية */
-export function muteChat(chatId, mode) {
-  let value;
-  if (mode === false || mode == null) value = false;
-  else if (mode === 'forever') value = 'forever';
-  else value = Timestamp.fromMillis(Date.now() + Number(mode));
-  return setPrefs(chatId, { muted: value });
+/** تحويل قيمة الكتم إلى الصيغة المخزنة في userPrefs.muted. */
+function muteValue(mode) {
+  if (mode === false || mode == null) return false;
+  if (mode === 'forever' || mode === true) return 'forever';
+  if (mode instanceof Timestamp) return mode.toMillis() > Date.now() ? mode : false;
+  const n = Number(mode);
+  if (!Number.isFinite(n) || n <= 0) throw new ChatError('invalid', 'مدة الكتم غير صالحة');
+  const until = n >= ABS_TIME_THRESHOLD_MS ? n : Date.now() + n;
+  return until > Date.now() ? Timestamp.fromMillis(until) : false;
+}
+
+/**
+ * mode: false | 'forever' | مدة نسبية بالمللي ثانية | طابع زمني مطلق بالمللي ثانية | Timestamp
+ */
+export async function muteChat(chatId, mode) {
+  return setPrefs(chatId, { muted: muteValue(mode) });
 }
 
 /**
@@ -642,13 +683,19 @@ export function deleteChatForMe(chatId) {
 
 export const clearHistoryForMe = (chatId) => setPrefs(chatId, { clearedAt: serverTimestamp() });
 
+/** إظهار محادثة مخفية عندي (لا يلغي الأرشفة ولا مسح السجل). */
 export const restoreChat = (chatId) => setPrefs(chatId, { hiddenAt: deleteField() });
 /* ============================================================
-   js/chat-core.js — الجزء 2/2
+   js/chat-core.js — الجزء 2/2 (النسخة المصححة)
    يُلحق بعد نهاية الجزء 1/2 مباشرةً (لا يحتوي import).
+
+   يحتوي على: حالة الخيط، الرسائل، الكتابة، القراءة، الإرسال،
+   إعادة المحاولة، التعديل والحذف، التفاعلات، التثبيت، إعادة التوجيه،
+   فتح المحادثة وإغلاقها، والواجهة العامة ChatCore.
    ============================================================ */
 
 /* ---------- حالة الخيط (المحادثة النشطة) ---------- */
+
 const T = {
   chatId: null,
   token: 0,
@@ -669,6 +716,7 @@ const T = {
 };
 
 /* ---------- أدوات مساعدة ---------- */
+
 const msOf = (v) => (v ? toMs(v) || 0 : 0);
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
 const failKey = (chatId, id) => `${chatId}|${id}`;
@@ -677,6 +725,7 @@ const byCreated = (a, b) =>
   a.createdAt - b.createdAt || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 
 /* ---------- نصوص المعاينة والرد ---------- */
+
 function attachLabel(a) {
   if (!a) return '';
   switch (a.kind) {
@@ -704,6 +753,7 @@ function replyPayload(m) {
 }
 
 /* ---------- التحقق من المرفقات ---------- */
+
 function sanitizeAttachment(a) {
   if (!a || typeof a !== 'object') return { error: 'مرفق غير صالح.' };
   if (!ATTACH_KINDS.includes(a.kind)) return { error: 'نوع الملف غير مدعوم.' };
@@ -712,7 +762,6 @@ function sanitizeAttachment(a) {
   }
   const size = Number(a.size);
   if (!(size > 0)) return { error: 'حجم الملف غير صالح.' };
-
   const isVideo = a.kind === 'video';
   const max = isVideo ? CHAT_LIMITS.ATTACH_MAX_VIDEO : CHAT_LIMITS.ATTACH_MAX_OTHER;
   if (size > max) {
@@ -722,7 +771,6 @@ function sanitizeAttachment(a) {
         : 'الملف يتجاوز الحد الأقصى 50 ميجابايت.',
     };
   }
-
   const out = {
     url: a.url,
     name: clip(String(a.name || 'ملف'), 255) || 'ملف',
@@ -738,6 +786,7 @@ function sanitizeAttachment(a) {
 }
 
 /* ---------- بوابة الإرسال ---------- */
+
 function needsRequestFor(view) {
   return !!view && view.status === CHAT_STATUS.PENDING && !!view.isRequestOutgoing && !view.requestSent;
 }
@@ -757,6 +806,7 @@ function sendGate(view) {
 }
 
 /* ---------- تطبيع الرسائل ---------- */
+
 function buildReactionList(reactions, me) {
   const counts = new Map();
   Object.keys(reactions || {}).forEach((uid) => {
@@ -797,11 +847,16 @@ function normalizeMessage(chatId, id, d, pendingWrite = false) {
   });
 }
 
+/** الرسالة مرئية لي إذا لم أخفها ولم تسبق مسح السجل عندي. */
 function isVisibleMessage(m, clearedAt) {
   if (!S.uid) return false;
   if (m.hiddenFor.includes(S.uid)) return false;
   if (clearedAt && m.createdAt <= clearedAt) return false;
   return true;
+}
+
+function isMessageVisibleToMe(m, chatId) {
+  return isVisibleMessage(m, msOf(viewOf(chatId)?.clearedAt));
 }
 
 function currentMessage(chatId, id) {
@@ -810,12 +865,12 @@ function currentMessage(chatId, id) {
 }
 
 /* ---------- إصدار الرسائل ---------- */
+
 function emitMessages(reason) {
   const chatId = T.chatId;
   if (!chatId) return;
   const view = viewOf(chatId);
   const clearedAt = msOf(view && view.clearedAt);
-
   const messages = [];
   T.server.forEach((m) => {
     if (isVisibleMessage(m, clearedAt)) messages.push(m);
@@ -827,11 +882,9 @@ function emitMessages(reason) {
     if (m.chatId === chatId && isVisibleMessage(m, clearedAt)) messages.push(m);
   });
   messages.sort(byCreated);
-
   const pinned = messages
     .filter((m) => m.pinned)
     .sort((a, b) => b.pinnedAt - a.pinnedAt);
-
   emit('messages', {
     chatId,
     reason,
@@ -856,6 +909,7 @@ function restoreLocal(chatId, prev) {
 }
 
 /* ---------- الاستماع للرسائل ---------- */
+
 function stopMessages() {
   if (T.unsubMsgs) {
     try { T.unsubMsgs(); } catch (_) { /* تجاهل */ }
@@ -873,7 +927,7 @@ function subscribeMessages(chatId, token) {
       if (token !== T.token) return;
       const next = new Map();
       snap.forEach((d) => {
-        next.set(d.id, normalizeMessage(chatId, d.id, d.data(), d.metadata.hasPendingWrites));
+        next.set(d.id, normalizeMessage(chatId, d.id, d.data(DATA_OPTS), d.metadata.hasPendingWrites));
       });
       T.server = next;
       T.hasOlder = snap.size >= T.limit;
@@ -896,6 +950,7 @@ function subscribeMessages(chatId, token) {
 }
 
 /* ---------- تحميل الصفحات القديمة ---------- */
+
 function loadOlder() {
   if (!T.chatId || !T.hasOlder || T.loadingOlder) return false;
   T.loadingOlder = true;
@@ -907,6 +962,7 @@ function loadOlder() {
 }
 
 /* ---------- الكتابة ---------- */
+
 function stopTyping() {
   if (T.unsubTyping) {
     try { T.unsubTyping(); } catch (_) { /* تجاهل */ }
@@ -931,7 +987,6 @@ function publishTyping(chatId, force = false) {
   });
   const uids = [...T.typingAt.keys()];
   if (changed || force) emit('typing', { chatId, uids, isTyping: uids.length > 0 });
-
   if (uids.length && !T.typingTimer) {
     T.typingTimer = setInterval(() => publishTyping(chatId), 1000);
   } else if (!uids.length && T.typingTimer) {
@@ -950,7 +1005,7 @@ function subscribeTyping(chatId, token) {
       const next = new Map();
       snap.forEach((d) => {
         if (d.id === S.uid) return;
-        const at = msOf(d.data().at) || now;
+        const at = msOf(d.data(DATA_OPTS).at) || now;
         if (now - at < CHAT_LIMITS.TYPING_TTL_MS) next.set(d.id, at);
       });
       T.typingAt = next;
@@ -972,6 +1027,7 @@ function notifyTyping(chatId = T.chatId) {
 }
 
 /* ---------- القراءة ---------- */
+
 function latestFromOther() {
   let best = null;
   T.server.forEach((m) => {
@@ -1002,9 +1058,9 @@ function doRead(chatId) {
 }
 
 /* ---------- الكتابة الفعلية للرسالة ---------- */
+
 async function writeMessage(chatId, id, body, needsRequest) {
   const batch = writeBatch(S.db);
-
   const payload = {
     senderUid: S.uid,
     text: body.text || '',
@@ -1018,7 +1074,6 @@ async function writeMessage(chatId, id, body, needsRequest) {
   if (body.attachment) payload.attachment = body.attachment;
   if (body.forwardedFrom) payload.forwardedFrom = body.forwardedFrom;
   batch.set(msgRef(chatId, id), payload);
-
   const meta = {
     lastMessage: previewOf(body),
     lastMessageAt: serverTimestamp(),
@@ -1027,11 +1082,11 @@ async function writeMessage(chatId, id, body, needsRequest) {
   };
   if (needsRequest) meta.requestSent = true;
   batch.update(chatRef(chatId), meta);
-
   await batch.commit();
 }
 
 /* ---------- الإرسال مع الحالات وإعادة المحاولة ---------- */
+
 async function dispatch(chatId, id, body) {
   const needsRequest = needsRequestFor(viewOf(chatId));
   const local = {
@@ -1055,18 +1110,13 @@ async function dispatch(chatId, id, body) {
     state: MESSAGE_STATE.SENDING,
     _body: body,
   };
-
   if (chatId === T.chatId) {
+    // تبقى الرسالة في pending حتى تصل إلى اللقطة (وهي تحمل hasPendingWrites ثم تُستبدل بالنسخة الخادمية)
     T.pending.set(id, local);
     emitMessages('live');
   }
-
   try {
     await writeMessage(chatId, id, body, needsRequest);
-    if (chatId === T.chatId && T.pending.has(id)) {
-      T.pending.get(id).state = MESSAGE_STATE.SENT;
-      emitMessages('live');
-    }
     return true;
   } catch (err) {
     const e = toChatError(err, 'تعذر إرسال الرسالة.');
@@ -1145,16 +1195,15 @@ function discardFailed(chatId, id) {
 }
 
 /* ---------- التعديل والحذف ---------- */
+
 async function editMessage(chatId, id, rawText) {
   const m = currentMessage(chatId, id);
   if (!m || m.senderUid !== S.uid || m.state !== MESSAGE_STATE.SENT) return false;
-
   const view = viewOf(chatId);
   if (!view || view.blocked || view.status === CHAT_STATUS.BLOCKED) {
     pushToast('danger', 'لا يمكن تعديل الرسالة في هذه المحادثة.');
     return false;
   }
-
   const text = typeof rawText === 'string' ? rawText.trim() : '';
   if (!text && !m.attachment) {
     pushToast('danger', 'نص الرسالة فارغ.');
@@ -1165,7 +1214,6 @@ async function editMessage(chatId, id, rawText) {
     return false;
   }
   if (text === m.text) return true;
-
   const prev = { ...m };
   patchLocal(chatId, id, { text, isEdited: true, editedAt: Date.now() });
   try {
@@ -1186,11 +1234,12 @@ async function editMessage(chatId, id, rawText) {
   }
 }
 
+/** بعد حذف آخر رسالة: تُحدَّث معاينة المحادثة، وإن لم تبقَ رسائل تُزال بيانات الترتيب. */
 async function refreshPreviewAfterDelete(chatId, deletedId) {
   const snap = await getDocs(query(msgsCol(chatId), orderBy('createdAt', 'desc'), limit(2)));
   const remaining = [];
   snap.forEach((d) => {
-    if (d.id !== deletedId) remaining.push(normalizeMessage(chatId, d.id, d.data(), false));
+    if (d.id !== deletedId) remaining.push(normalizeMessage(chatId, d.id, d.data(DATA_OPTS), false));
   });
   const last = remaining[0];
   if (last) {
@@ -1201,27 +1250,28 @@ async function refreshPreviewAfterDelete(chatId, deletedId) {
       lastMessageId: last.id,
     });
   } else {
-    await updateDoc(chatRef(chatId), { lastMessage: '', lastMessageId: '' });
+    await updateDoc(chatRef(chatId), {
+      lastMessage: '',
+      lastMessageId: deleteField(),
+      lastMessageAt: deleteField(),
+      lastSenderUid: deleteField(),
+    });
   }
 }
 
 async function deleteForEveryone(chatId, id) {
   if (S.failed.has(failKey(chatId, id))) return discardFailed(chatId, id);
-
   const m = currentMessage(chatId, id);
   if (!m || m.senderUid !== S.uid) {
     pushToast('danger', 'يمكنك حذف رسائلك فقط للجميع.');
     return false;
   }
-
   const view = viewOf(chatId);
   const wasLast = !!view && view.lastMessageId === id;
   const prev = { ...m };
-
   T.server.delete(id);
   T.pending.delete(id);
   emitMessages('live');
-
   try {
     await deleteDoc(msgRef(chatId, id));
   } catch (err) {
@@ -1230,7 +1280,6 @@ async function deleteForEveryone(chatId, id) {
     emit('error', toChatError(err, 'تعذر حذف الرسالة.'));
     return false;
   }
-
   if (wasLast) refreshPreviewAfterDelete(chatId, id).catch(() => { /* معاينة غير حرجة */ });
   return true;
 }
@@ -1238,15 +1287,12 @@ async function deleteForEveryone(chatId, id) {
 async function deleteForMe(chatId, id) {
   if (!S.uid) return false;
   if (S.failed.has(failKey(chatId, id))) return discardFailed(chatId, id);
-
   const m = currentMessage(chatId, id);
   if (!m) return false;
   const prev = { ...m };
-
   T.server.delete(id);
   T.pending.delete(id);
   emitMessages('live');
-
   try {
     await updateDoc(msgRef(chatId, id), { hiddenFor: arrayUnion(S.uid) });
     return true;
@@ -1259,6 +1305,7 @@ async function deleteForMe(chatId, id) {
 }
 
 /* ---------- التفاعلات ---------- */
+
 function emojiOk(e) {
   const v = typeof e === 'string' ? e.trim() : '';
   return v && v.length <= CHAT_LIMITS.EMOJI_MAX_LEN ? v : '';
@@ -1268,28 +1315,23 @@ function applyReaction(chatId, id, emoji) {
   if (!S.uid) return false;
   const m = currentMessage(chatId, id);
   if (!m || m.state !== MESSAGE_STATE.SENT) return false;
-
   const view = viewOf(chatId);
   if (!view || view.status !== CHAT_STATUS.ACTIVE) {
     pushToast('info', 'التفاعل متاح في المحادثات النشطة فقط.');
     return false;
   }
-
   const current = m.reactions[S.uid] || null;
   if (emoji === null && !current) return true;
   if (emoji !== null && current === emoji) return true;
-
   const prev = { ...m };
   const reactions = { ...m.reactions };
   if (emoji === null) delete reactions[S.uid];
   else reactions[S.uid] = emoji;
   patchLocal(chatId, id, { reactions });
-
   const ref = msgRef(chatId, id);
   const write = emoji === null
     ? updateDoc(ref, { [`reactions.${S.uid}`]: deleteField() })
     : updateDoc(ref, { [`reactions.${S.uid}`]: emoji });
-
   write.catch((err) => {
     restoreLocal(chatId, prev);
     emit('error', toChatError(err, 'تعذر تحديث التفاعل.'));
@@ -1315,27 +1357,24 @@ function toggleReaction(chatId, id, emoji) {
 }
 
 /* ---------- التثبيت ---------- */
+
 function setPinned(chatId, id, on) {
   if (!S.uid) return false;
   const m = currentMessage(chatId, id);
   if (!m || m.state !== MESSAGE_STATE.SENT) return false;
-
   const view = viewOf(chatId);
   if (!view || view.status !== CHAT_STATUS.ACTIVE) {
     pushToast('info', 'التثبيت متاح في المحادثات النشطة فقط.');
     return false;
   }
   if (m.pinned === on) return true;
-
   const prev = { ...m };
   patchLocal(chatId, id, on
     ? { pinned: true, pinnedAt: Date.now(), pinnedBy: S.uid }
     : { pinned: false, pinnedAt: 0, pinnedBy: null });
-
   const data = on
     ? { pinned: true, pinnedAt: serverTimestamp(), pinnedBy: S.uid }
     : { pinned: false, pinnedAt: deleteField(), pinnedBy: deleteField() };
-
   updateDoc(msgRef(chatId, id), data).catch((err) => {
     restoreLocal(chatId, prev);
     emit('error', toChatError(err, 'تعذر تحديث التثبيت.'));
@@ -1344,47 +1383,55 @@ function setPinned(chatId, id, on) {
 }
 
 /* ---------- إعادة التوجيه ---------- */
+
 async function getSourceMessage(chatId, id) {
-  if (chatId === T.chatId && T.server.has(id)) return T.server.get(id);
-  const local = (chatId === T.chatId && T.pending.get(id)) || S.failed.get(failKey(chatId, id));
-  if (local) return local;
+  const cached =
+    (chatId === T.chatId && (T.server.get(id) || T.pending.get(id))) ||
+    S.failed.get(failKey(chatId, id)) ||
+    null;
+  if (cached) return cached;
   const snap = await getDoc(msgRef(chatId, id));
   if (!snap.exists()) return null;
-  return normalizeMessage(chatId, id, snap.data(), snap.metadata.hasPendingWrites);
+  return normalizeMessage(chatId, id, snap.data(DATA_OPTS), snap.metadata.hasPendingWrites);
 }
 
 async function forwardMessage(srcChatId, msgId, targetChatIds = []) {
   if (!S.uid) return 0;
-
   const targets = [...new Set(targetChatIds)]
     .filter((c) => typeof c === 'string' && c)
     .slice(0, CHAT_LIMITS.MAX_FORWARD_TARGETS);
   if (!targets.length) return 0;
 
-  let src;
+  let src = null;
   try {
     src = await getSourceMessage(srcChatId, msgId);
   } catch (err) {
     emit('error', toChatError(err, 'تعذر تحميل الرسالة.'));
     return 0;
   }
-  if (!src) {
+  // لا تُعاد توجيه رسالة أخفيتها عن نفسي أو مسحتُ سجلها
+  if (!src || !isMessageVisibleToMe(src, srcChatId)) {
     pushToast('danger', 'الرسالة لم تعد متاحة.');
     return 0;
   }
 
-  const originSender = src.forwardedFrom && src.forwardedFrom.senderUid
-    ? src.forwardedFrom.senderUid
-    : src.senderUid;
-  const originName = src.forwardedFrom && src.forwardedFrom.name
-    ? src.forwardedFrom.name
-    : nameOf(originSender);
+  let attachment = null;
+  if (src.attachment) {
+    const res = sanitizeAttachment(src.attachment);
+    if (res.error) {
+      pushToast('danger', res.error);
+      return 0;
+    }
+    attachment = res.value;
+  }
+
+  const originSender = src.forwardedFrom?.senderUid || src.senderUid;
+  const originName = src.forwardedFrom?.name || nameOf(originSender);
   const forwardedFrom = {
     name: clip(String(originName || 'مستخدم'), CHAT_LIMITS.FORWARD_NAME_MAX) || 'مستخدم',
     senderUid: String(originSender || '').slice(0, 128),
   };
 
-  const attach = src.attachment ? sanitizeAttachment(src.attachment) : { value: null };
   const ready = [];
   let skipped = 0;
   targets.forEach((cid) => {
@@ -1395,32 +1442,40 @@ async function forwardMessage(srcChatId, msgId, targetChatIds = []) {
     ready.push(cid);
   });
 
+  const body = { text: src.text || '', forwardedFrom };
+  if (attachment) body.attachment = attachment;
+  if (!body.text && !body.attachment) return 0;
+
   const results = await Promise.all(ready.map((cid) => {
-    const body = { text: src.text || '', forwardedFrom };
-    if (attach.value) body.attachment = attach.value;
     const id = doc(msgsCol(cid)).id;
     return dispatch(cid, id, body);
   }));
-
   const ok = results.filter(Boolean).length;
   if (ok) pushToast('success', `تمت إعادة التوجيه إلى ${ok} محادثة.`);
   if (skipped) pushToast('info', `تم تخطي ${skipped} محادثة لا تسمح بالإرسال حالياً.`);
   return ok;
 }
 
-/* ---------- فتح المحادثة وإغلاقها ---------- */
-function announceActive() {
-  if (!S.active) {
-    emit('chat:active', null);
+/* ---------- حالة الحظر من جهتي ---------- */
+
+/**
+ * عند فتح محادثة محظورة بعد إعادة التحميل، نتحقق من وجود سجل الحظر باسمي
+ * لنعرف هل أنا الحاظر أم الطرف الآخر.
+ */
+async function ensureBlockOwner(chatId, d) {
+  const uid = S.uid;
+  if (!uid || !d || d.status !== CHAT_STATUS.BLOCKED) {
+    S.blockedByMe.delete(chatId);
     return;
   }
-  const view = viewOf(S.active.id) || null;
-  emit('chat:active', {
-    chat: view,
-    blockedByMe: !!(view && view.blockedByMe),
-    otherUid: S.active.otherUid,
-  });
+  if (S.blockedByMe.get(chatId) === true) return;
+  const otherUid = otherOf(d, uid);
+  if (!otherUid) return;
+  const snap = await getDoc(blockRef(uid, otherUid)).catch(() => null);
+  if (snap?.exists()) S.blockedByMe.set(chatId, true);
 }
+
+/* ---------- فتح المحادثة وإغلاقها ---------- */
 
 function leaveChat(emitNull = true) {
   const prev = T.chatId;
@@ -1428,7 +1483,6 @@ function leaveChat(emitNull = true) {
   stopTyping();
   clearTimeout(T.readTimer);
   T.readTimer = null;
-
   T.token += 1;
   T.chatId = null;
   T.server = new Map();
@@ -1440,7 +1494,6 @@ function leaveChat(emitNull = true) {
   T.lastTypingSent = 0;
   T.viewKey = '';
   S.active = null;
-
   if (prev) {
     emit('typing', { chatId: prev, uids: [], isTyping: false });
     emit('messages', { chatId: prev, reason: 'meta', messages: [], hasOlder: false, loadingOlder: false, pinned: [] });
@@ -1475,6 +1528,14 @@ async function openChat(chatId) {
     return false;
   }
 
+  if (view.blocked && !S.blockedByMe.has(chatId)) {
+    try {
+      await ensureBlockOwner(chatId, S.chatDocs.get(chatId));
+    } catch (_) { /* نعرض الحالة الافتراضية */ }
+    if (seq !== T.openSeq) return false;
+    view = viewOf(chatId) || view;
+  }
+
   T.chatId = chatId;
   T.token += 1;
   const token = T.token;
@@ -1485,11 +1546,12 @@ async function openChat(chatId) {
   T.server = new Map();
   T.pending = new Map();
   T.viewKey = '';
-  S.active = { id: chatId, otherUid: view.otherUid, blockedByMe: !!view.blockedByMe };
+  S.active = { id: chatId, otherUid: view.otherUid };
 
   announceActive();
   subscribeMessages(chatId, token);
   subscribeTyping(chatId, token);
+  emitChatsNow(); // لتحديث الرؤية وغير المقروء للمحادثة المفتوحة
   return true;
 }
 
@@ -1515,6 +1577,7 @@ async function openDirect(otherUid) {
 
 function closeChat() {
   leaveChat(true);
+  emitChatsNow(); // المحادثة الفارغة المؤقتة تختفي من القائمة عند الإغلاق
 }
 
 /* إغلاق كامل (يُستدعى من resetSession عند تسجيل الخروج) */
@@ -1525,11 +1588,16 @@ function closeActive() {
 }
 
 /* ---------- مراقبة تغيّر المحادثة النشطة ---------- */
+
 function onChatsChanged() {
   if (!T.chatId || !S.active) return;
   const view = viewOf(T.chatId);
-  if (!view) return;
-
+  if (!view) {
+    // المحادثة المفتوحة اختفت من الخادم تماماً (حذف من الطرف الآخر أو إزالة)
+    leaveChat(true);
+    pushToast('info', 'لم تعد المحادثة متاحة.');
+    return;
+  }
   const key = [
     msOf(view.clearedAt),
     view.status,
@@ -1539,27 +1607,33 @@ function onChatsChanged() {
   ].join('|');
   if (key === T.viewKey) return;
   T.viewKey = key;
-
   S.active.otherUid = view.otherUid;
-  S.active.blockedByMe = !!view.blockedByMe;
   announceActive();
   emitMessages('meta');
 }
 
 on('chats', onChatsChanged);
 
+/* عند عودة التبويب للظهور تُرسل إيصالات القراءة المؤجلة */
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) markRead();
+  });
+}
+
 /* ---------- الإجراءات الإضافية للرسائل ---------- */
+
 function getMessage(chatId, id) {
   return currentMessage(chatId, id);
 }
 
 /* ---------- الواجهة العامة ---------- */
+
 export { on };
 
 export const ChatCore = Object.freeze({
   init,
   on,
-
   constants: Object.freeze({ CHAT_LIMITS, CHAT_STATUS, MESSAGE_STATE, ATTACH_KINDS }),
 
   // قائمة المحادثات والإجراءات (الجزء 1)
@@ -1570,6 +1644,7 @@ export const ChatCore = Object.freeze({
   unblockUser,
   setPrefs,
   archiveChat,
+  unarchiveChat,
   pinChat,
   muteChat,
   deleteChatForMe,
