@@ -104,14 +104,15 @@
        الإعدادات
        ========================================================== */
     const CONFIG = Object.freeze({
-      // انسخ القيم نفسها المستخدمة في shared.js (لا تُرفع مفاتيح سرية هنا، فإعدادات الويب عامة بطبيعتها)
+      // قيم مطابقة تماماً لـ firebaseConfig في js/shared.js.
+      // إعدادات Firebase للويب عامة بطبيعتها، والحماية الحقيقية تأتي من firestore.rules.
       firebase: {
-        apiKey: 'PASTE_API_KEY',
-        authDomain: 'PASTE_AUTH_DOMAIN',
-        projectId: 'PASTE_PROJECT_ID',
-        storageBucket: 'PASTE_STORAGE_BUCKET',
-        messagingSenderId: 'PASTE_SENDER_ID',
-        appId: 'PASTE_APP_ID'
+        apiKey: 'AIzaSyCHspBBXBG8DmLPOfKcqE8H8SmAjw5HGpQ',
+        authDomain: 'clearnote-aefcb.firebaseapp.com',
+        projectId: 'clearnote-aefcb',
+        storageBucket: 'clearnote-aefcb.firebasestorage.app',
+        messagingSenderId: '909239922660',
+        appId: '1:909239922660:web:1db0fbc92c419aa13a21f1'
       },
       // عدّل المسارات إن اختلفت أسماء الصفحات في المشروع
       routes: Object.freeze({
@@ -246,10 +247,6 @@
         'تعذّر تحميل الدردشات. تحقق من الاتصال بالإنترنت ثم أعد المحاولة.'
       );
     });
-  </script>
-
-  <script>
-    // تعبئة الأمان: إعلان الاستدعاء قبل تحميل الوحدات (لا تأثير وظيفي، للتوثيق فقط)
   </script>
 </body>
 </html>
