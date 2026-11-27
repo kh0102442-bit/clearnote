@@ -162,7 +162,7 @@ function cloudErrorText(status, body) {
   const detail = String(body?.error?.message || '');
   console.warn('[ChatMedia] Cloudinary error', status, detail);
   if (status === 413 || /file size|too large/i.test(detail)) return 'حجم الملف أكبر من المسموح به';
-  if (/preset/i.test(detail)) return 'إعداد الرفع غير صحيح، يُرجى إبلاغ الإدارة';
+  if (/invalid.*preset|preset.*not found/i.test(detail)) return 'إعداد الرفع غير صحيح، يُرجى إبلاغ الإدارة';
   if (/format|extension/i.test(detail)) return 'نوع الملف غير مدعوم من خدمة الرفع';
   if (status === 401 || status === 403) return 'الرفع غير مسموح حالياً';
   return 'فشل رفع الملف، حاول مرة أخرى';
@@ -183,8 +183,7 @@ function uploadToCloudinary(file, { resourceType, name, onProgress, signal } = {
     const form = new FormData();
     form.append('file', file, safeName(name || file.name));
     form.append('upload_preset', MEDIA_CFG.UPLOAD_PRESET);
-    form.append('use_filename', 'true');
-    form.append('unique_filename', 'true');
+  
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', `${MEDIA_CFG.API_BASE}/${resourceType}/upload`, true);
