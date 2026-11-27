@@ -1,16 +1,255 @@
-<script type="module">
-  import { ChatUI } from './js/chat-ui.js';
-  import { ChatCore } from './js/chat-core.js';
-  import { ChatMedia } from './js/chat-media.js';
-  import { ChatSound } from './js/chat-sound.js';
-  import { ChatSettings } from './js/chat-settings.js';
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="ClearNote — الدردشات">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="color-scheme" content="light dark">
+  <title>ClearNote — الدردشات</title>
 
-  ChatUI.init(document.querySelector('.cs-root'), {
-    media: ChatMedia,       // pick, recordVoice, renderAttachment
-    settings: ChatSettings, // open
-    profile: { open: (uid) => { /* فتح الملف الشخصي */ } },
-    startChat: () => { /* فتح نافذة بدء محادثة */ },
-  });
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+  <link rel="dns-prefetch" href="https://api.cloudinary.com">
 
-  ChatCore.init({ db, auth });
-</script>
+  <!-- تطبيق المظهر قبل تحميل التنسيقات لمنع الوميض عند فتح الصفحة -->
+  <script>
+    (function () {
+      try {
+        var KEY = 'clearnote.chat.theme.v1';
+        var saved = localStorage.getItem(KEY);
+        var mode = (saved === 'light' || saved === 'dark') ? saved
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', mode);
+        document.documentElement.style.colorScheme = mode;
+      } catch (e) { /* تجاهل: المظهر الافتراضي يكفي */ }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/chat-shared.css">
+
+  <style>
+    /* حالة التحميل والخطأ فقط، قبل بناء الواجهة */
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: #f5f6f8;
+      color: #111418;
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, "Noto Naskh Arabic", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    html[data-theme="dark"] body { background: #0f1115; color: #e8e9ec; }
+
+    .cs-boot {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 24px;
+      box-sizing: border-box;
+      text-align: center;
+      background: inherit;
+    }
+    .cs-boot.is-hidden { display: none; }
+    .cs-boot-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid currentColor;
+      border-inline-end-color: transparent;
+      border-radius: 50%;
+      opacity: .6;
+      animation: cs-boot-spin .8s linear infinite;
+    }
+    .cs-boot-text { margin: 0; font-size: 15px; line-height: 1.7; opacity: .85; max-width: 420px; }
+    .cs-boot-retry {
+      margin-top: 4px;
+      padding: 9px 18px;
+      border: 0;
+      border-radius: 10px;
+      background: #2f7cf6;
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .cs-boot.is-error .cs-boot-spinner { display: none; }
+    @keyframes cs-boot-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .cs-boot-spinner { animation-duration: 2.4s; }
+    }
+  </style>
+</head>
+<body>
+  <noscript>
+    <div class="cs-boot is-error">
+      <p class="cs-boot-text">يحتاج تطبيق الدردشات إلى تفعيل JavaScript في المتصفح.</p>
+    </div>
+  </noscript>
+
+  <!-- شاشة التحميل: تُخفى عند جهوزية ChatCore، وتعرض الخطأ عند الفشل -->
+  <div id="csBoot" class="cs-boot" role="status" aria-live="polite">
+    <div class="cs-boot-spinner" aria-hidden="true"></div>
+    <p id="csBootText" class="cs-boot-text">جارٍ تحميل الدردشات…</p>
+    <button id="csBootRetry" class="cs-boot-retry" type="button" hidden>إعادة المحاولة</button>
+  </div>
+
+  <!-- الحاوية: يبني ChatUI داخلها الهيكل (القائمة .cs-sidebar، واللوحة .cs-main) -->
+  <div class="cs-root" id="csRoot" dir="rtl"></div>
+
+  <script type="module">
+    /* ==========================================================
+       الإعدادات
+       ========================================================== */
+    const CONFIG = Object.freeze({
+      // انسخ القيم نفسها المستخدمة في shared.js (لا تُرفع مفاتيح سرية هنا، فإعدادات الويب عامة بطبيعتها)
+      firebase: {
+        apiKey: 'PASTE_API_KEY',
+        authDomain: 'PASTE_AUTH_DOMAIN',
+        projectId: 'PASTE_PROJECT_ID',
+        storageBucket: 'PASTE_STORAGE_BUCKET',
+        messagingSenderId: 'PASTE_SENDER_ID',
+        appId: 'PASTE_APP_ID'
+      },
+      // عدّل المسارات إن اختلفت أسماء الصفحات في المشروع
+      routes: Object.freeze({
+        login: 'login.html',
+        profile: (uid) => `profile.html?uid=${encodeURIComponent(uid)}`,
+        newChat: 'search.html?mode=chat'
+      })
+    });
+
+    const FIREBASE_CDN = 'https://www.gstatic.com/firebasejs/10.12.0';
+
+    const bootEl = document.getElementById('csBoot');
+    const bootText = document.getElementById('csBootText');
+    const bootRetry = document.getElementById('csBootRetry');
+    const rootEl = document.getElementById('csRoot');
+
+    /* ==========================================================
+       أدوات الشاشة الأولى
+       ========================================================== */
+    function hideBoot() {
+      bootEl.classList.add('is-hidden');
+    }
+
+    function showBootError(message) {
+      bootEl.classList.add('is-error');
+      bootEl.classList.remove('is-hidden');
+      bootText.textContent = message;
+      bootRetry.hidden = false;
+    }
+
+    function assertConfigured() {
+      const values = Object.values(CONFIG.firebase);
+      const incomplete = values.some((v) => !v || String(v).startsWith('PASTE_'));
+      if (incomplete) {
+        const err = new Error('إعدادات Firebase غير مكتملة في chat.html');
+        err.userMessage = 'إعدادات الاتصال غير مكتملة. أكمل بيانات Firebase في chat.html ثم أعد التحميل.';
+        throw err;
+      }
+    }
+
+    function openProfile(uid) {
+      if (!uid) return;
+      window.location.href = CONFIG.routes.profile(uid);
+    }
+
+    function openNewChat() {
+      window.location.href = CONFIG.routes.newChat;
+    }
+
+    /* ==========================================================
+       التهيئة
+       الترتيب مهم: الإعدادات، ثم الواجهة، ثم الصوت، ثم النواة أخيراً،
+       حتى لا تفوت الواجهة وحدات الصوت والوسائط حالة المصادقة الأولى.
+       ========================================================== */
+    async function main() {
+      assertConfigured();
+
+      // تحميل الوحدات بشكل ديناميكي حتى تظهر أخطاء المسارات بوضوح على الشاشة
+      const [appMod, authMod, fsMod, coreMod, uiMod, mediaMod, soundMod, settingsMod] = await Promise.all([
+        import(`${FIREBASE_CDN}/firebase-app.js`),
+        import(`${FIREBASE_CDN}/firebase-auth.js`),
+        import(`${FIREBASE_CDN}/firebase-firestore.js`),
+        import('./js/chat-core.js'),
+        import('./js/chat-ui.js'),
+        import('./js/chat-media.js'),
+        import('./js/chat-sound.js'),
+        import('./js/chat-settings.js')
+      ]);
+
+      const { ChatCore, on } = coreMod;
+      const { ChatUI } = uiMod;
+      const { ChatMedia } = mediaMod;
+      const { ChatSound } = soundMod;
+      const { ChatSettings } = settingsMod;
+
+      // تهيئة Firebase مرة واحدة فقط، حتى لو كان التطبيق مُهيأً في مكان آخر
+      const app = appMod.getApps().length ? appMod.getApp() : appMod.initializeApp(CONFIG.firebase);
+      const auth = authMod.getAuth(app);
+      const db = fsMod.getFirestore(app);
+
+      // حماية الصفحة: غير المسجل يُحوَّل إلى تسجيل الدخول
+      on('auth', (user) => {
+        if (!user) window.location.replace(CONFIG.routes.login);
+      });
+
+      // الجهوزية: إخفاء الشاشة الأولى، وفتح محادثة من الرابط إن وُجدت (?chat=...)
+      let deepLinkDone = false;
+      on('ready', () => {
+        hideBoot();
+        if (deepLinkDone) return;
+        deepLinkDone = true;
+        const chatId = new URLSearchParams(window.location.search).get('chat');
+        if (!chatId) return;
+        history.replaceState(null, '', window.location.pathname);
+        Promise.resolve(ChatCore.openChat(chatId)).catch((err) => {
+          console.error('[chat] deep link failed', err);
+        });
+      });
+
+      // 1) الإعدادات
+      await ChatSettings.init({
+        db,
+        auth,
+        onViewProfile: openProfile,
+        onAfterRemove: () => ChatCore.closeChat(),
+        onSearch: () => ChatUI.toggleRoomSearch(true)
+      });
+
+      // 2) الواجهة
+      await ChatUI.init(rootEl, {
+        media: ChatMedia,
+        settings: ChatSettings,
+        profile: { open: openProfile },
+        startChat: openNewChat
+      });
+
+      // 3) الأصوات والإشعارات
+      await ChatSound.init({
+        onOpen: (chatId) => ChatCore.openChat(chatId)
+      });
+
+      // 4) النواة (تبدأ الاتصال بـ Firestore وتطلق حدث ready)
+      await ChatCore.init({ db, auth });
+    }
+
+    bootRetry.addEventListener('click', () => window.location.reload());
+
+    main().catch((err) => {
+      console.error('[chat] init failed:', err);
+      showBootError(
+        (err && err.userMessage) ||
+        'تعذّر تحميل الدردشات. تحقق من الاتصال بالإنترنت ثم أعد المحاولة.'
+      );
+    });
+  </script>
+
+  <script>
+    // تعبئة الأمان: إعلان الاستدعاء قبل تحميل الوحدات (لا تأثير وظيفي، للتوثيق فقط)
+  </script>
+</body>
+</html>
