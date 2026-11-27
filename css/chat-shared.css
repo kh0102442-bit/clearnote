@@ -2358,3 +2358,49 @@ button.cs-att-video { cursor: zoom-in; }
     scroll-behavior: auto !important;
   }
 }
+/* ===== إضافات chat-ui.js (الجزء 3/3) ===== */
+.cs-findbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--cs-border, rgba(127, 127, 127, .2));
+  background: var(--cs-surface, #fff);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity .18s ease, transform .18s ease;
+}
+.cs-findbar.is-open { opacity: 1; transform: none; }
+.cs-findbar-input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  border: 0;
+  border-radius: 17px;
+  padding: 0 12px;
+  background: var(--cs-chip, rgba(127, 127, 127, .12));
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.cs-findbar-count { font-size: 12px; opacity: .7; white-space: nowrap; }
+.cs-findbar-btn {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.cs-findbar-btn:disabled { opacity: .35; cursor: default; }
+.cs-findbar-btn:focus-visible,
+.cs-findbar-input:focus-visible { box-shadow: 0 0 0 2px var(--cs-accent, #3b82f6); }
+.cs-attach-fallback {
+  color: var(--cs-accent, #3b82f6);
+  text-decoration: underline;
+  word-break: break-all;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-findbar { transition: none; }
+}
