@@ -2776,3 +2776,336 @@ button.cs-att-video { cursor: zoom-in; }
   .cs-voice-bar { transition: none; }
   .cs-voice-dot { animation: none; }
 }
+/* ===== chat-settings.js (الجزء 2/2) وأصناف cs-set-* ===== */
+
+/* --- الغلاف واللوحة الجانبية --- */
+.cs-set-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1250;
+  display: flex;
+  justify-content: flex-start;
+  background: rgba(0, 0, 0, .35);
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.cs-set-overlay.is-open { opacity: 1; }
+.cs-set-overlay.is-top {
+  z-index: 1350;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.cs-set-panel {
+  width: min(420px, 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--cs-surface, #fff);
+  color: inherit;
+  box-shadow: 8px 0 32px rgba(0, 0, 0, .2);
+  transform: translateX(24px);
+  opacity: 0;
+  transition: transform .22s ease, opacity .22s ease;
+}
+.cs-set-overlay.is-open .cs-set-panel { transform: none; opacity: 1; }
+.cs-set-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--cs-border, rgba(127, 127, 127, .2));
+}
+.cs-set-title { margin: 0; font-size: 17px; font-weight: 700; }
+.cs-set-icon {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+.cs-set-icon.sm {
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+  background: var(--cs-chip, rgba(127, 127, 127, .12));
+}
+.cs-set-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.cs-set-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--cs-chip, rgba(127, 127, 127, .08));
+}
+.cs-set-sec-title { margin: 0 0 2px; font-size: 13px; font-weight: 700; opacity: .85; }
+.cs-set-note { margin: 0; font-size: 13px; line-height: 1.6; opacity: .8; }
+
+/* --- الملف المختصر --- */
+.cs-set-profile { flex-direction: row; flex-wrap: wrap; align-items: center; }
+.cs-set-avatar-host { flex: 0 0 auto; }
+.cs-set-avatar {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--cs-chip, rgba(127, 127, 127, .15));
+}
+.cs-set-avatar.is-initial {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  background: hsl(var(--cs-hue, 210) 55% 48%);
+}
+.cs-set-profile-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cs-set-name-row { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.cs-set-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; }
+.cs-set-verified { color: var(--cs-accent, #3b82f6); font-size: 12px; }
+.cs-set-handle,
+.cs-set-status { font-size: 12px; opacity: .7; }
+
+/* --- الطلبات --- */
+.cs-set-request { box-shadow: inset 0 0 0 1px var(--cs-accent, #3b82f6); }
+.cs-set-row-btns { display: flex; gap: 8px; }
+.cs-set-row-btns .cs-set-btn { flex: 1; }
+
+/* --- الأزرار --- */
+.cs-set-btn {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--cs-chip, rgba(127, 127, 127, .14));
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cs-set-btn.sm { min-height: 30px; padding: 0 12px; border-radius: 15px; font-size: 12px; }
+.cs-set-btn.primary { background: var(--cs-accent, #3b82f6); color: #fff; }
+.cs-set-btn.danger { background: var(--cs-danger, #dc2626); color: #fff; }
+.cs-set-btn.ghost { background: var(--cs-chip, rgba(127, 127, 127, .14)); color: inherit; }
+.cs-set-btn.wide { width: 100%; }
+.cs-set-btn:disabled { opacity: .5; cursor: default; }
+.cs-set-btn:focus-visible,
+.cs-set-icon:focus-visible,
+.cs-set-action:focus-visible,
+.cs-set-option:focus-visible,
+.cs-set-switch:focus-visible,
+.cs-set-select:focus-visible,
+.cs-set-textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--cs-accent, #3b82f6);
+}
+
+/* --- الإجراءات السريعة --- */
+.cs-set-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.cs-set-action {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 4px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--cs-chip, rgba(127, 127, 127, .1));
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .15s ease, transform .1s ease;
+}
+.cs-set-action:active { transform: scale(.97); }
+.cs-set-action.is-on {
+  background: var(--cs-accent-soft, rgba(59, 130, 246, .18));
+  color: var(--cs-accent, #3b82f6);
+}
+.cs-set-action:disabled { opacity: .5; }
+.cs-set-action-ic { font-size: 18px; line-height: 1; }
+.cs-set-action-txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+
+/* --- خيارات الراديو --- */
+.cs-set-options { display: flex; flex-direction: column; gap: 4px; }
+.cs-set-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  text-align: start;
+  cursor: pointer;
+}
+.cs-set-option:hover { background: var(--cs-chip, rgba(127, 127, 127, .1)); }
+.cs-set-option.is-on { background: var(--cs-accent-soft, rgba(59, 130, 246, .12)); }
+.cs-set-option::after {
+  content: '';
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2px solid var(--cs-border, rgba(127, 127, 127, .5));
+}
+.cs-set-option.is-on::after {
+  border-color: var(--cs-accent, #3b82f6);
+  background: radial-gradient(circle, var(--cs-accent, #3b82f6) 45%, transparent 50%);
+}
+
+/* --- صفوف الإعدادات والمفاتيح --- */
+.cs-set-row { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.cs-set-row-col { flex-direction: column; align-items: stretch; }
+.cs-set-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
+.cs-set-row-text small { font-size: 12px; line-height: 1.5; opacity: .7; }
+.cs-set-switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  background: var(--cs-border, rgba(127, 127, 127, .35));
+  cursor: pointer;
+  transition: background .2s ease;
+}
+.cs-set-switch.is-on { background: var(--cs-accent, #3b82f6); }
+.cs-set-knob {
+  position: absolute;
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  transition: inset-inline-start .2s ease;
+}
+.cs-set-switch.is-on .cs-set-knob { inset-inline-start: 21px; }
+.cs-set-range-wrap { display: flex; align-items: center; gap: 10px; }
+.cs-set-range { flex: 1; accent-color: var(--cs-accent, #3b82f6); }
+.cs-set-range-out { min-width: 42px; text-align: center; font-size: 13px; font-variant-numeric: tabular-nums; }
+.cs-set-perm-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cs-set-perm { font-size: 12px; line-height: 1.5; opacity: .75; }
+.cs-set-quiet { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.cs-set-quiet .cs-set-perm { flex-basis: 100%; }
+.cs-set-field { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.cs-set-select {
+  min-height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--cs-border, rgba(127, 127, 127, .3));
+  border-radius: 8px;
+  background: var(--cs-surface, #fff);
+  color: inherit;
+  font: inherit;
+}
+
+/* --- نافذة التأكيد والإبلاغ --- */
+.cs-set-confirm {
+  box-sizing: border-box;
+  width: min(380px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--cs-surface, #fff);
+  color: inherit;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, .25);
+  opacity: 0;
+  transform: scale(.97);
+  transition: transform .18s ease, opacity .18s ease;
+}
+.cs-set-report { width: min(400px, 100%); }
+.cs-set-overlay.is-open .cs-set-confirm { opacity: 1; transform: none; }
+.cs-set-confirm-title { margin: 0; font-size: 17px; font-weight: 700; }
+.cs-set-confirm-body { margin: 0; font-size: 14px; line-height: 1.7; opacity: .85; }
+.cs-set-confirm-foot { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.cs-set-confirm-foot .cs-set-btn { min-width: 96px; }
+.cs-set-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--cs-border, rgba(127, 127, 127, .3));
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+
+/* --- التنبيهات الداخلية --- */
+.cs-set-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  z-index: 1400;
+  max-width: min(92vw, 380px);
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #1f2937;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 12px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+.cs-set-toast.is-in { opacity: 1; transform: translate(-50%, 0); }
+.cs-set-toast.is-success { background: #15803d; }
+.cs-set-toast.is-danger { background: #b91c1c; }
+
+/* --- الهاتف: اللوحة من الأسفل كورقة --- */
+@media (max-width: 640px) {
+  .cs-set-overlay { align-items: flex-end; justify-content: stretch; }
+  .cs-set-panel {
+    width: 100%;
+    height: auto;
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+    transform: translateY(100%);
+    opacity: 1;
+  }
+  .cs-set-overlay.is-open .cs-set-panel { transform: none; }
+  .cs-set-overlay.is-top { align-items: center; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-set-overlay,
+  .cs-set-panel,
+  .cs-set-confirm,
+  .cs-set-switch,
+  .cs-set-knob,
+  .cs-set-toast,
+  .cs-set-action { transition: none; }
+}
