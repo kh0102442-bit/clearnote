@@ -753,16 +753,19 @@ function replyPayload(m) {
 }
 
 /* ---------- التحقق من المرفقات ---------- */
-
 function sanitizeAttachment(a) {
   if (!a || typeof a !== 'object') return { error: 'مرفق غير صالح.' };
-  if (!ATTACH_KINDS.includes(a.kind)) return { error: 'نوع الملف غير مدعوم.' };
-  if (typeof a.url !== 'string' || !a.url.startsWith(CLOUD_PREFIX) || a.url.length > 500) {
+  // أي نوع غير معروف يُحفظ كملف عام بدل رفضه
+  const kind = ATTACH_KINDS.includes(a.kind) ? a.kind : 'file';
+  // Cloudinary يعيد رابط http و https: نحوّل إلى https دائماً
+  let url = typeof a.url === 'string' ? a.url.trim() : '';
+  if (url.startsWith('http://')) url = `https://${url.slice(7)}`;
+  if (!url.startsWith(CLOUD_PREFIX) || url.length > 500) {
     return { error: 'رابط الملف غير صالح.' };
   }
   const size = Number(a.size);
   if (!(size > 0)) return { error: 'حجم الملف غير صالح.' };
-  const isVideo = a.kind === 'video';
+  const isVideo = kind === 'video';
   const max = isVideo ? CHAT_LIMITS.ATTACH_MAX_VIDEO : CHAT_LIMITS.ATTACH_MAX_OTHER;
   if (size > max) {
     return {
@@ -772,19 +775,18 @@ function sanitizeAttachment(a) {
     };
   }
   const out = {
-    url: a.url,
+    url,
     name: clip(String(a.name || 'ملف'), 255) || 'ملف',
-    size,
-    kind: a.kind,
+    size: Math.round(size),
+    kind,
   };
   if (typeof a.mime === 'string' && a.mime) out.mime = clip(a.mime, 100);
   if (typeof a.publicId === 'string' && a.publicId) out.publicId = clip(a.publicId, 200);
   if (isNum(a.duration) && a.duration >= 0) out.duration = a.duration;
-  if (isNum(a.width) && a.width > 0) out.width = a.width;
-  if (isNum(a.height) && a.height > 0) out.height = a.height;
+  if (isNum(a.width) && a.width > 0) out.width = Math.round(a.width);
+  if (isNum(a.height) && a.height > 0) out.height = Math.round(a.height);
   return { value: out };
 }
-
 /* ---------- بوابة الإرسال ---------- */
 
 function needsRequestFor(view) {
