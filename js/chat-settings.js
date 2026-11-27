@@ -1,11 +1,12 @@
 /* ============================================================
-   js/chat-settings.js — الجزء 1/2
+   js/chat-settings.js — الجزء 1/3
    يحتوي: الاستيرادات، الثوابت، الحالة، أدوات DOM، التنسيق،
-   الصورة الرمزية، حالة المحادثة، المظهر (فاتح/داكن/تلقائي) مع
-   المزامنة بين التبويبات، نافذة التأكيد، التنبيهات الداخلية،
+   حالة المحادثة، المظهر (فاتح/داكن/تلقائي) مع المزامنة بين
+   التبويبات، التنبيهات الداخلية بلا تكرار، نافذة التأكيد،
    وغلاف موحّد لاستدعاء إجراءات ChatCore.
-   الجزء 2/2 يحتوي: أقسام اللوحة، نافذة الإبلاغ، الفتح والإغلاق،
-   التحديث الفوري، الاختصارات، والتصدير (ChatSettings).
+   الجزء 2/3: أدوات التحكم، بناء اللوحة، والتحديث الفوري.
+   الجزء 3/3: الإجراءات، نافذة الإبلاغ، الفتح والإغلاق،
+   الربط بـ ChatCore، والتصدير (ChatSettings).
    ============================================================ */
 
 import { ChatCore } from './chat-core.js';
@@ -77,19 +78,21 @@ const DATE_FMT = new Intl.DateTimeFormat('ar', {
 // ---------- الحالة ----------
 
 const S = {
-  db: null,            // قاعدة البيانات، تُمرَّر من init لكتابة البلاغات
+  db: null,              // قاعدة البيانات، تُمرَّر من init لكتابة البلاغات
   auth: null,
-  uid: null,           // معرّف المستخدم الحالي
-  open: false,         // هل اللوحة مفتوحة
-  chatId: null,        // المحادثة المعروضة
-  view: null,          // أحدث لقطة من ChatView للمحادثة المعروضة
-  refs: null,          // مراجع عناصر تُحدَّث دون إعادة بناء اللوحة
-  root: null,          // عنصر اللوحة
-  lastFocus: null,     // العنصر الذي كان مركّزاً قبل فتح اللوحة
-  dialogOpen: false,   // هل توجد نافذة تأكيد أو إبلاغ مفتوحة
-  busy: false,         // يمنع تنفيذ إجراءين معاً
-  bound: false,        // هل رُبطت أحداث ChatCore
-  themeMql: null,
+  uid: null,             // معرّف المستخدم الحالي
+  open: false,           // هل اللوحة مفتوحة
+  chatId: null,          // المحادثة المعروضة
+  view: null,            // أحدث لقطة من ChatView للمحادثة المعروضة
+  refs: null,            // مراجع عناصر تُحدَّث دون إعادة بناء اللوحة
+  root: null,            // عنصر الغلاف الخارجي للوحة
+  lastFocus: null,       // العنصر الذي كان مركّزاً قبل فتح اللوحة
+  dialogOpen: false,     // هل توجد نافذة تأكيد أو إبلاغ مفتوحة
+  busy: false,           // يمنع تنفيذ إجراءين معاً
+  bound: false,          // هل رُبطت أحداث ChatCore
+  coreOffs: [],          // دوال إلغاء الاشتراك في أحداث ChatCore
+  themeMql: null,        // مراقب وضع الجهاز (فاتح/داكن)
+  onThemeChange: null,   // مستمع تغيّر وضع الجهاز
   toastTimer: 0,
   onOpenProfile: null,
   onAfterRemove: null,
@@ -109,8 +112,9 @@ function el(tag, attrs = {}, ...kids) {
     else if (key === 'text') node.textContent = String(val);
     else if (key === 'value') node.value = String(val);
     else if (key === 'checked') node.checked = true;
-    else if (key.startsWith('on') && typeof val === 'function') node.addEventListener(key.slice(2), val);
-    else node.setAttribute(key, val === true ? '' : String(val));
+    else if (key.startsWith('on') && typeof val === 'function') {
+      node.addEventListener(key.slice(2), val);
+    } else node.setAttribute(key, val === true ? '' : String(val));
   }
   for (const kid of kids.flat()) {
     if (kid == null || kid === false) continue;
@@ -193,6 +197,13 @@ function isMutedView(view, now = Date.now()) {
   return view.muted === true;
 }
 
+/** الحالة الحالية للكتم: 'off' (مفعّلة) أو 'forever' (دائماً) أو 'timed' (مؤقتة). */
+function currentMuteOption(view, now = Date.now()) {
+  if (!isMutedView(view, now)) return 'off';
+  if (view.mutedForever) return 'forever';
+  return toMs(view.mutedUntil) ? 'timed' : 'forever';
+}
+
 function muteStateText(view) {
   if (!isMutedView(view)) return 'الإشعارات مفعّلة';
   const until = toMs(view.mutedUntil);
@@ -200,7 +211,11 @@ function muteStateText(view) {
   return `مكتومة حتى ${fmtDateTime(until)}`;
 }
 
-/** القيمة التي تُمرَّر إلى ChatCore.muteChat: false لإلغاء الكتم، 'forever' للدائم، أو طابع زمني بالمللي ثانية. */
+/**
+ * القيمة التي تُمرَّر إلى ChatCore.muteChat:
+ * false لإلغاء الكتم، 'forever' للدائم، أو طابع مطلق بالمللي ثانية للمدة المحددة.
+ * تُرجع null إذا كان الخيار غير معروف.
+ */
 function muteValueFor(optionId, now = Date.now()) {
   if (optionId === 'off') return false;
   if (optionId === 'forever') return 'forever';
@@ -260,27 +275,51 @@ function setTheme(pref) {
 function watchSystemTheme() {
   if (S.themeMql || !window.matchMedia) return;
   S.themeMql = window.matchMedia('(prefers-color-scheme: dark)');
-  const onChange = () => {
+  S.onThemeChange = () => {
     if (readTheme() === 'system') applyTheme('system');
   };
-  S.themeMql.addEventListener?.('change', onChange);
+  S.themeMql.addEventListener?.('change', S.onThemeChange);
+}
+
+function unwatchSystemTheme() {
+  if (!S.themeMql) return;
+  S.themeMql.removeEventListener?.('change', S.onThemeChange);
+  S.themeMql = null;
+  S.onThemeChange = null;
 }
 
 // ---------- التنبيهات الداخلية ----------
 
-/** تنبيه خفيف داخل اللوحة أو الصفحة. نسخة واحدة تُعاد استخدامها. */
+let flashNode = null;
+
+/**
+ * تنبيه خفيف داخل الصفحة. نسخة واحدة تُعاد استخدامها.
+ * إذا كان النص نفسه معروضاً الآن، يُمدَّد وقته فقط ولا يُعاد عرضه،
+ * فلا تتكرر الرسالة عند النقرات المتتالية.
+ */
 function flash(text, tone = 'info') {
-  let node = document.querySelector('.cs-set-toast');
-  if (!node) {
-    node = el('div', { class: 'cs-set-toast', role: 'status', 'aria-live': 'polite' });
-    document.body.append(node);
+  const msg = String(text || '');
+  if (!msg) return;
+  if (!flashNode || !flashNode.isConnected) {
+    flashNode = el('div', { class: 'cs-set-toast', role: 'status', 'aria-live': 'polite' });
+    document.body.append(flashNode);
   }
-  node.classList.remove('is-info', 'is-success', 'is-danger');
-  node.classList.add(`is-${tone}`);
-  node.textContent = String(text || '');
-  requestAnimationFrame(() => node.classList.add('is-in'));
+  const node = flashNode;
+  const sameVisible = node.textContent === msg && node.classList.contains('is-in');
   clearTimeout(S.toastTimer);
   S.toastTimer = setTimeout(() => node.classList.remove('is-in'), TOAST_MS);
+  if (sameVisible) return;
+  node.classList.remove('is-info', 'is-success', 'is-danger', 'is-in');
+  node.classList.add(`is-${tone}`);
+  node.textContent = msg;
+  requestAnimationFrame(() => node.classList.add('is-in'));
+}
+
+/** رسالة الخطأ المعروضة للمستخدم. الرسائل الإنجليزية الخام تُستبدل برسالة عربية عامة. */
+function errorText(err) {
+  const msg = typeof err?.message === 'string' ? err.message.trim() : '';
+  if (msg && msg.length <= 160 && /[\u0600-\u06FF]/.test(msg)) return msg;
+  return 'تعذّر تنفيذ الإجراء، حاول مرة أخرى';
 }
 
 // ---------- نافذة التأكيد ----------
@@ -292,20 +331,16 @@ function flash(text, tone = 'info') {
 function confirmAction({ title, body, confirmText = 'تأكيد', cancelText = 'إلغاء', danger = false }) {
   if (S.dialogOpen) return Promise.resolve(false);
   S.dialogOpen = true;
-
   const prev = document.activeElement;
   const id = ++uidSeq;
-
   return new Promise((resolve) => {
     let settled = false;
-
     const cancelBtn = el('button', { type: 'button', class: 'cs-set-btn ghost', text: cancelText });
     const okBtn = el('button', {
       type: 'button',
       class: danger ? 'cs-set-btn danger' : 'cs-set-btn primary',
       text: confirmText,
     });
-
     const overlay = el(
       'div',
       { class: 'cs-set-overlay is-top' },
@@ -353,7 +388,6 @@ function confirmAction({ title, body, confirmText = 'تأكيد', cancelText = '
     overlay.addEventListener('mousedown', (e) => {
       if (e.target === overlay) finish(false);
     });
-
     document.addEventListener('keydown', onKey, true);
     document.body.append(overlay);
     requestAnimationFrame(() => overlay.classList.add('is-open'));
@@ -373,32 +407,43 @@ function callCore(method, ...args) {
 
 /**
  * تنفيذ إجراء غير متزامن مع قفل ضد التكرار وتعطيل الزر أثناء التنفيذ.
- * يُرجع true عند النجاح، وfalse عند الفشل بعد عرض الخطأ.
+ * ينجح الإجراء فتظهر رسالة النجاح مرة واحدة فقط، ويفشل فتظهر رسالة الخطأ.
+ * يُرجع true عند النجاح، وfalse عند الفشل أو عند وجود إجراء جارٍ.
  */
 async function guarded(btn, label, fn, { success } = {}) {
   if (S.busy) return false;
   S.busy = true;
-  if (btn) btn.disabled = true;
+  if (btn) {
+    btn.disabled = true;
+    btn.setAttribute('aria-busy', 'true');
+  }
   try {
     await fn();
     if (success) flash(success, 'success');
     return true;
   } catch (err) {
     console.error(`[ChatSettings] ${label}`, err);
-    flash(err?.message || 'تعذّر تنفيذ الإجراء', 'danger');
+    flash(errorText(err), 'danger');
     return false;
   } finally {
     S.busy = false;
-    if (btn?.isConnected) btn.disabled = false;
+    if (btn?.isConnected) {
+      btn.disabled = false;
+      btn.removeAttribute('aria-busy');
+    }
   }
 }
 /* ============================================================
-   js/chat-settings.js — الجزء 2/2
-   يحتوي: إعدادات إضافية للحالة، أدوات التحكم (مفاتيح، خيارات،
-   صفوف)، بناء لوحة الإعدادات بأقسامها، التحديث الفوري عبر
-   syncAll، الإجراءات (تثبيت، كتم، أرشفة، طلبات، حظر، مسح، حذف)،
-   نافذة الإبلاغ، الفتح والإغلاق، الاختصارات، والتصدير (ChatSettings)
+   js/chat-settings.js — الجزء 2/3
+   يحتوي: ثوابت العرض والحالة المساعدة، أدوات التحكم (مفاتيح،
+   خيارات، صفوف، أزرار إجراءات)، معاينة الأصوات، بناء اللوحة
+   بأقسامها، والتحديث الفوري syncAll دون إعادة بناء اللوحة.
+   الجزء 1/3: الاستيرادات والثوابت والحالة وأدوات الحالة والمظهر.
+   الجزء 3/3: الإجراءات، نافذة الإبلاغ، الفتح والإغلاق، الربط
+   بـ ChatCore، والتصدير (ChatSettings).
    ============================================================ */
+
+// ---------- ثوابت العرض والحالة المساعدة ----------
 
 const PERM_TEXT = Object.freeze({
   granted: 'ممنوح، ستصلك الإشعارات عندما تكون الصفحة في الخلفية',
@@ -408,12 +453,20 @@ const PERM_TEXT = Object.freeze({
 });
 
 const RADIO_KEYS = Object.freeze(['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp']);
-const FOCUS_SEL = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const FOCUS_SEL = [
+  'button:not([disabled])',
+  '[href]',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(', ');
 
 let ready = false;
 let storageBound = false;
-let lastChats = [];          // آخر قائمة محادثات وصلت من ChatCore
-let onSearchHook = null;     // يُستدعى من زر البحث داخل المحادثة
+let lastChats = [];        // آخر قائمة محادثات وصلت من ChatCore
+let onSearchHook = null;   // يُستدعى من زر البحث داخل المحادثة
 
 // ---------- أدوات الحالة والعرض ----------
 
@@ -421,19 +474,30 @@ function prefersReducedMotion() {
   return !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 }
 
+/** مفتاح تشغيل/إيقاف: يحدّث aria-checked وصنف is-on. */
 function setSwitch(btn, on) {
   if (!btn) return;
   btn.setAttribute('aria-checked', on ? 'true' : 'false');
   btn.classList.toggle('is-on', !!on);
 }
 
+/** زر تبديل (له حالة ضغط): يحدّث aria-pressed وصنف is-on. */
 function setPressed(btn, on) {
   if (!btn) return;
   btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   btn.classList.toggle('is-on', !!on);
 }
 
-/** مجموعة أزرار راديو بنمط roving tabindex. items: Array<[id, btn]>. */
+/** زر إجراء يعرض حالة فعّالة بصنف is-on فقط (بدون aria-pressed). */
+function setActive(btn, on) {
+  if (!btn) return;
+  btn.classList.toggle('is-on', !!on);
+}
+
+/**
+ * مجموعة أزرار راديو بنمط roving tabindex.
+ * items: Array<[id, btn]>. إن لم يوجد المحدد تكون أول خانة قابلة للتركيز.
+ */
 function syncRadios(items, selected) {
   const hasSelected = items.some(([id]) => id === selected);
   items.forEach(([id, btn], i) => {
@@ -444,7 +508,7 @@ function syncRadios(items, selected) {
   });
 }
 
-/** التنقل بالأسهم داخل مجموعة الراديو، والتفعيل يتم عبر click. */
+/** التنقل بالأسهم داخل مجموعة الراديو. التفعيل يتم عبر click. */
 function radioKeys(e) {
   if (!RADIO_KEYS.includes(e.key)) return;
   const items = [...e.currentTarget.querySelectorAll('[role="radio"]:not([disabled])')];
@@ -474,6 +538,7 @@ function trapTab(e, container) {
   }
 }
 
+/** بطاقة قسم داخل اللوحة بعنوان اختياري. */
 function secCard(title, ...kids) {
   return el(
     'section',
@@ -514,10 +579,15 @@ function switchRow({ label, hint = '', on = false, extra = null, onChange }) {
   return { row, set, btn };
 }
 
-function actionButton(icon, label, onClick) {
+/**
+ * زر إجراء سريع. toggle: true يضيف aria-pressed لأزرار التبديل فقط.
+ */
+function actionButton(icon, label, onClick, { toggle = false } = {}) {
+  const attrs = { type: 'button', class: 'cs-set-action', onclick: onClick };
+  if (toggle) attrs['aria-pressed'] = 'false';
   return el(
     'button',
-    { type: 'button', class: 'cs-set-action', 'aria-pressed': 'false', onclick: onClick },
+    attrs,
     el('span', { class: 'cs-set-action-ic', 'aria-hidden': 'true', text: icon }),
     label,
   );
@@ -587,7 +657,12 @@ function buildPanel() {
   // ----- الملف المختصر -----
   refs.avatarHost = el('div', { class: 'cs-set-avatar-host' });
   refs.name = el('strong', { class: 'cs-set-name' });
-  refs.verified = el('span', { class: 'cs-set-verified', title: 'حساب موثّق', 'aria-label': 'حساب موثّق', text: '✔' });
+  refs.verified = el('span', {
+    class: 'cs-set-verified',
+    title: 'حساب موثّق',
+    'aria-label': 'حساب موثّق',
+    text: '✔',
+  });
   refs.handle = el('span', { class: 'cs-set-handle' });
   refs.status = el('span', { class: 'cs-set-status' });
   refs.viewBtn = el('button', {
@@ -630,18 +705,21 @@ function buildPanel() {
   refs.muteLabel = el('span', { class: 'cs-set-action-txt', text: 'الإشعارات' });
   refs.archLabel = el('span', { class: 'cs-set-action-txt', text: 'أرشفة' });
   refs.searchLabel = el('span', { class: 'cs-set-action-txt', text: 'بحث' });
-  refs.pinBtn = actionButton('📌', refs.pinLabel, onTogglePin);
+  refs.pinBtn = actionButton('📌', refs.pinLabel, onTogglePin, { toggle: true });
   refs.muteBtn = actionButton('🔔', refs.muteLabel, scrollToNotify);
-  refs.archBtn = actionButton('🗂', refs.archLabel, onToggleArchive);
+  refs.archBtn = actionButton('🗂', refs.archLabel, onToggleArchive, { toggle: true });
   refs.searchBtn = actionButton('🔍', refs.searchLabel, onSearchClick);
   const actions = el(
     'section',
     { class: 'cs-set-actions', role: 'group', 'aria-label': 'إجراءات سريعة' },
-    refs.pinBtn, refs.muteBtn, refs.archBtn, refs.searchBtn,
+    refs.pinBtn,
+    refs.muteBtn,
+    refs.archBtn,
+    refs.searchBtn,
   );
 
   // ----- إشعارات هذه المحادثة -----
-  refs.muteState = el('p', { class: 'cs-set-note' });
+  refs.muteState = el('p', { class: 'cs-set-note', 'aria-live': 'polite' });
   refs.muteRadios = MUTE_OPTIONS.map((opt) => [
     opt.id,
     el('button', {
@@ -655,7 +733,12 @@ function buildPanel() {
   ]);
   const muteGroup = el(
     'div',
-    { class: 'cs-set-options', role: 'radiogroup', 'aria-label': 'كتم إشعارات هذه المحادثة', onkeydown: radioKeys },
+    {
+      class: 'cs-set-options',
+      role: 'radiogroup',
+      'aria-label': 'كتم إشعارات هذه المحادثة',
+      onkeydown: radioKeys,
+    },
     refs.muteRadios.map(([, b]) => b),
   );
   refs.notifySec = secCard('إشعارات هذه المحادثة', refs.muteState, muteGroup);
@@ -679,8 +762,12 @@ function buildPanel() {
     'aria-label': 'مستوى الصوت',
   });
   refs.volumeOut = el('output', { class: 'cs-set-range-out', text: '70%' });
-  refs.volume.addEventListener('input', () => ChatSound.updateSettings({ volume: Number(refs.volume.value) }));
-  refs.volume.addEventListener('change', () => previewSound('notify'));
+  refs.volume.addEventListener('input', () => {
+    ChatSound.updateSettings({ volume: Number(refs.volume.value) });
+  });
+  refs.volume.addEventListener('change', () => {
+    if (Number(refs.volume.value) > 0) previewSound('notify');
+  });
   const volumeRow = el(
     'div',
     { class: 'cs-set-row cs-set-row-col' },
@@ -815,7 +902,10 @@ function buildPanel() {
   });
   refs.dataSec = secCard(
     'البيانات',
-    el('p', { class: 'cs-set-note', text: 'هذه الإجراءات تؤثر على حسابك فقط، ولا تحذف شيئاً عند الطرف الآخر.' }),
+    el('p', {
+      class: 'cs-set-note',
+      text: 'هذه الإجراءات تؤثر على حسابك فقط، ولا تحذف شيئاً عند الطرف الآخر.',
+    }),
     refs.clearBtn,
     refs.deleteBtn,
   );
@@ -877,12 +967,13 @@ function syncAll() {
   r.pinLabel.textContent = v.pinned ? 'إلغاء التثبيت' : 'تثبيت';
   setPressed(r.archBtn, !!v.archived);
   r.archLabel.textContent = v.archived ? 'إلغاء الأرشفة' : 'أرشفة';
-  setPressed(r.muteBtn, muted);
+  setActive(r.muteBtn, muted);
   r.muteLabel.textContent = muted ? 'مكتومة' : 'الإشعارات';
 
   // كتم المحادثة
   r.muteState.textContent = muteStateText(v);
-  syncRadios(r.muteRadios, !muted ? 'off' : (v.mutedForever ? 'forever' : null));
+  const muteKind = currentMuteOption(v);
+  syncRadios(r.muteRadios, muteKind === 'timed' ? null : muteKind);
 
   // الصوت والإشعارات العامة
   const st = ChatSound.getSettings();
@@ -901,8 +992,10 @@ function syncAll() {
   r.quietNow.textContent = !st.quietEnabled
     ? 'ساعات الهدوء متوقفة'
     : (ChatSound.isQuietNow() ? 'نشطة الآن' : 'غير نشطة الآن');
+
+  // المؤثرات حسب النوع
   for (const g of ChatSound.groups) {
-    r.evSet.get(g)?.(st.events[g] !== false);
+    r.evSet.get(g)?.(st.events?.[g] !== false);
   }
 
   // المظهر
@@ -913,43 +1006,70 @@ function syncAll() {
   r.blockBtn.textContent = v.blockedByMe ? 'إلغاء الحظر' : 'حظر المستخدم';
   r.blockBtn.className = v.blockedByMe ? 'cs-set-btn ghost wide' : 'cs-set-btn danger wide';
 }
+/* ============================================================
+   js/chat-settings.js — الجزء 3/3
+   يحتوي: الإجراءات (تثبيت، أرشفة، كتم، طلبات، حظر، مسح، حذف)،
+   نافذة الإبلاغ، الفتح والإغلاق، الاختصارات، الربط بأحداث
+   ChatCore، التهيئة والإنهاء، والتصدير (ChatSettings).
+   الجزء 1/3: الاستيرادات والثوابت والحالة وأدوات الحالة والمظهر.
+   الجزء 2/3: أدوات التحكم، بناء اللوحة، والتحديث الفوري.
+   ============================================================ */
 
 // ---------- الإجراءات ----------
 
+/** يمنع تنفيذ إجراء آخر أثناء إجراء جارٍ، ويُبلغ المستخدم بدل التجاهل الصامت. */
+function busyGuard() {
+  if (!S.busy) return false;
+  flash('انتظر لحظة، الإجراء السابق ما زال جارياً', 'info');
+  return true;
+}
+
+function muteSuccessText(optId) {
+  if (optId === 'off') return 'تم تفعيل إشعارات المحادثة';
+  if (optId === 'forever') return 'تم كتم المحادثة دائماً';
+  const opt = MUTE_OPTIONS.find((o) => o.id === optId);
+  return opt ? `تم كتم المحادثة لمدة ${opt.label}` : 'تم تحديث إعدادات الكتم';
+}
+
 async function onTogglePin() {
   const v = S.view;
-  if (!v) return;
+  if (!v || busyGuard()) return;
+  const id = v.id;
+  const next = !v.pinned;
   await guarded(
     S.refs?.pinBtn,
     'pin',
-    () => callCore('pinChat', v.id, !v.pinned),
-    { success: v.pinned ? 'أُلغي تثبيت المحادثة' : 'تم تثبيت المحادثة' },
+    () => callCore('pinChat', id, next),
+    { success: next ? 'تم تثبيت المحادثة' : 'أُلغي تثبيت المحادثة' },
   );
 }
 
-/** الأرشفة تُفعَّل بـ archiveChat، وإلغاؤها بـ restoreChat. */
+/** الأرشفة تُفعَّل بـ archiveChat، وإلغاؤها بـ unarchiveChat. */
 async function onToggleArchive() {
   const v = S.view;
-  if (!v) return;
-  const archived = !!v.archived;
+  if (!v || busyGuard()) return;
+  const id = v.id;
+  const wasArchived = !!v.archived;
   await guarded(
     S.refs?.archBtn,
     'archive',
-    () => (archived ? callCore('restoreChat', v.id) : callCore('archiveChat', v.id, true)),
-    { success: archived ? 'أُعيدت المحادثة إلى القائمة' : 'تمت أرشفة المحادثة' },
+    () => (wasArchived ? callCore('unarchiveChat', id) : callCore('archiveChat', id, true)),
+    { success: wasArchived ? 'أُعيدت المحادثة إلى القائمة' : 'تمت أرشفة المحادثة' },
   );
 }
 
+/** الكتم يُمرَّر لـ muteChat بصيغته الـ async. الخيار 'off' يلغي الكتم. */
 async function onMute(optId) {
   const v = S.view;
-  if (!v) return;
+  if (!v || busyGuard()) return;
   const value = muteValueFor(optId);
   if (value === null) return;
+  const id = v.id;
   await guarded(
     null,
     'mute',
-    () => callCore('muteChat', v.id, value),
-    { success: optId === 'off' ? 'تم تفعيل الإشعارات' : 'تم كتم المحادثة' },
+    () => callCore('muteChat', id, value),
+    { success: muteSuccessText(optId) },
   );
 }
 
@@ -969,7 +1089,7 @@ function openProfile() {
 
 async function onAccept() {
   const id = S.chatId;
-  if (!id) return;
+  if (!id || busyGuard()) return;
   await guarded(
     S.refs?.acceptBtn,
     'accept',
@@ -980,7 +1100,7 @@ async function onAccept() {
 
 async function onDecline() {
   const id = S.chatId;
-  if (!id) return;
+  if (!id || busyGuard()) return;
   const ok = await confirmAction({
     title: 'رفض طلب المحادثة؟',
     body: 'سيُخفى الطلب من قائمتك.',
@@ -995,14 +1115,14 @@ async function onDecline() {
     { success: 'تم رفض الطلب' },
   );
   if (done) {
-    closePanel();
+    closePanel(false);
     S.onAfterRemove?.(id, 'declined');
   }
 }
 
 async function onBlockToggle() {
   const v = S.view;
-  if (!v) return;
+  if (!v || busyGuard()) return;
   const id = v.id;
 
   if (v.blockedByMe) {
@@ -1032,7 +1152,7 @@ async function onBlockToggle() {
 
 async function onClearHistory() {
   const id = S.chatId;
-  if (!id) return;
+  if (!id || busyGuard()) return;
   const ok = await confirmAction({
     title: 'مسح سجل المحادثة من عندك؟',
     body: 'ستبقى الرسائل عند الطرف الآخر، وستختفي من جهازك وحسابك فقط.',
@@ -1050,7 +1170,7 @@ async function onClearHistory() {
 
 async function onDeleteChat() {
   const id = S.chatId;
-  if (!id) return;
+  if (!id || busyGuard()) return;
   const ok = await confirmAction({
     title: 'حذف المحادثة من عندك؟',
     body: 'ستُخفى المحادثة من قائمتك على هذا الحساب فقط، ولن تتأثر عند الطرف الآخر.',
@@ -1070,11 +1190,19 @@ async function onDeleteChat() {
   }
 }
 
+/**
+ * تبديل إشعارات النظام. طلب الإذن يبدأ داخل نقرة المستخدم مباشرة،
+ * وهذا شرط المتصفح، لذلك لا يُسبق باستدعاء async.
+ */
 async function onToggleNotify(v) {
   ChatSound.updateSettings({ notifyEnabled: v });
-  // الطلب يبدأ داخل نقرة المستخدم مباشرة، وهذا شرط المتصفح.
-  if (v && ChatSound.notificationPermission() === 'default') {
-    await ChatSound.requestNotificationPermission();
+  if (v) {
+    const perm = ChatSound.notificationPermission();
+    if (perm === 'default') {
+      await ChatSound.requestNotificationPermission();
+    } else if (perm === 'denied') {
+      flash(PERM_TEXT.denied, 'danger');
+    }
   }
   syncAll();
 }
@@ -1088,6 +1216,10 @@ async function onRequestPermission() {
 
 // ---------- نافذة الإبلاغ ----------
 
+/**
+ * نافذة الإبلاغ عن المحادثة. تكتب في `reports` بالحقول التي تقبلها القاعدة:
+ * reporterUid, targetType, targetId, targetUid, reason, details, status, createdAt.
+ */
 function openReportDialog(view) {
   if (!view?.id || S.dialogOpen) return;
   S.dialogOpen = true;
@@ -1116,11 +1248,13 @@ function openReportDialog(view) {
       onclick: () => pickReason(r.id),
     }),
   ]);
+
   const reasonGroup = el(
     'div',
     { class: 'cs-set-options', role: 'radiogroup', 'aria-label': 'سبب البلاغ', onkeydown: radioKeys },
     reasonItems.map(([, b]) => b),
   );
+
   const details = el('textarea', {
     class: 'cs-set-textarea',
     rows: 3,
@@ -1128,7 +1262,14 @@ function openReportDialog(view) {
     placeholder: 'تفاصيل إضافية (اختياري)',
     'aria-label': 'تفاصيل البلاغ',
   });
-  const cancelBtn = el('button', { type: 'button', class: 'cs-set-btn ghost', text: 'إلغاء', onclick: () => finish() });
+
+  const cancelBtn = el('button', {
+    type: 'button',
+    class: 'cs-set-btn ghost',
+    text: 'إلغاء',
+    onclick: () => finish(),
+  });
+
   const submitBtn = el('button', {
     type: 'button',
     class: 'cs-set-btn danger',
@@ -1141,11 +1282,15 @@ function openReportDialog(view) {
     'div',
     { class: 'cs-set-confirm cs-set-report', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': titleId },
     el('h3', { class: 'cs-set-confirm-title', id: titleId, text: 'الإبلاغ عن المحادثة' }),
-    el('p', { class: 'cs-set-confirm-body', text: 'سيُراجع فريق ClearNote البلاغ. اختر السبب، ويمكنك إضافة تفاصيل.' }),
+    el('p', {
+      class: 'cs-set-confirm-body',
+      text: 'سيُراجع فريق ClearNote البلاغ. اختر السبب، ويمكنك إضافة تفاصيل.',
+    }),
     reasonGroup,
     details,
     el('div', { class: 'cs-set-confirm-foot' }, cancelBtn, submitBtn),
   );
+
   const overlay = el('div', { class: 'cs-set-overlay is-top' }, panel);
 
   const finish = () => {
@@ -1160,21 +1305,26 @@ function openReportDialog(view) {
 
   const submit = async () => {
     if (!reason || finished) return;
-    const ok = await guarded(submitBtn, 'report', async () => {
-      if (!S.db) throw new Error('تعذّر الإبلاغ الآن، الخدمة غير مهيأة');
-      const reporterUid = currentUid();
-      if (!reporterUid) throw new Error('سجّل الدخول أولاً للإبلاغ');
-      await addDoc(collection(S.db, 'reports'), {
-        reporterUid,
-        targetType: 'chat',
-        targetId: chatId,
-        targetUid: otherUid,
-        reason,
-        details: details.value.trim().slice(0, DETAILS_MAX),
-        status: 'open',
-        createdAt: serverTimestamp(),
-      });
-    }, { success: 'تم إرسال البلاغ، شكراً لك' });
+    const ok = await guarded(
+      submitBtn,
+      'report',
+      async () => {
+        if (!S.db) throw new Error('تعذّر الإبلاغ الآن، الخدمة غير مهيأة');
+        const reporterUid = currentUid();
+        if (!reporterUid) throw new Error('سجّل الدخول أولاً للإبلاغ');
+        await addDoc(collection(S.db, 'reports'), {
+          reporterUid,
+          targetType: 'chat',
+          targetId: chatId,
+          targetUid: otherUid,
+          reason,
+          details: details.value.trim().slice(0, DETAILS_MAX),
+          status: 'open',
+          createdAt: serverTimestamp(),
+        });
+      },
+      { success: 'تم إرسال البلاغ، شكراً لك' },
+    );
     if (ok) finish();
   };
 
@@ -1226,13 +1376,12 @@ function open(target) {
 
   S.chatId = id;
   S.view = view;
-
   const built = buildPanel();
   S.root = built.overlay;
   S.refs = built.refs;
   S.open = true;
-  syncAll();
 
+  syncAll();
   document.body.append(built.overlay);
   document.addEventListener('keydown', onPanelKey, true);
   requestAnimationFrame(() => built.overlay.classList.add('is-open'));
@@ -1286,7 +1435,6 @@ function onAuth(user) {
 function onChats(list) {
   lastChats = Array.isArray(list) ? list : [];
   if (!S.open) return;
-
   const fresh = lastChats.find((c) => c?.id === S.chatId);
   if (!fresh) {
     closePanel(false);
@@ -1307,12 +1455,33 @@ function onActive(payload) {
   syncAll();
 }
 
+const CORE_HANDLERS = Object.freeze([
+  ['auth', onAuth],
+  ['chats', onChats],
+  ['chat:active', onActive],
+]);
+
+/** يربط أحداث ChatCore مرة واحدة، ويحفظ دوال الإلغاء لاستخدامها في destroy. */
 function bindCore() {
   if (S.bound) return;
   S.bound = true;
-  ChatCore.on('auth', onAuth);
-  ChatCore.on('chats', onChats);
-  ChatCore.on('chat:active', onActive);
+  S.coreOffs = CORE_HANDLERS.map(([evt, fn]) => {
+    const off = ChatCore.on(evt, fn);
+    if (typeof off === 'function') return off;
+    return () => ChatCore.off?.(evt, fn);
+  });
+}
+
+function unbindCore() {
+  for (const off of S.coreOffs) {
+    try {
+      off();
+    } catch (err) {
+      console.error('[ChatSettings] unbind', err);
+    }
+  }
+  S.coreOffs = [];
+  S.bound = false;
 }
 
 // ---------- التزامن بين التبويبات ----------
@@ -1359,12 +1528,21 @@ function init(options = {}) {
 
 function destroy() {
   closePanel(false);
-  S.unsubSound?.();
+  unbindCore();
+  unwatchSystemTheme();
+
+  if (typeof S.unsubSound === 'function') S.unsubSound();
   S.unsubSound = null;
+
   if (storageBound) {
     window.removeEventListener('storage', onStorage);
     storageBound = false;
   }
+
+  clearTimeout(S.toastTimer);
+  flashNode?.remove();
+  flashNode = null;
+  lastChats = [];
   ready = false;
 }
 
