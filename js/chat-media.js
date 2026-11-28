@@ -1252,9 +1252,7 @@ function openLightbox(att) {
   requestAnimationFrame(() => root.classList.add('is-open'));
   closeBtn.focus();
 }
-
 // ---------- التصدير ----------
-
 export const ChatMedia = Object.freeze({
   pick,
   recordVoice,
@@ -1265,8 +1263,9 @@ export const ChatMedia = Object.freeze({
     maxVideo: MEDIA_CFG.MAX_VIDEO,
     maxOther: MEDIA_CFG.MAX_OTHER,
   }),
-   // ---------- اللصق من لوحة المفاتيح (Ctrl+V) ----------
-/* ---------- لصق الملفات من الحافظة (Ctrl+V) ---------- */
+});
+
+// ---------- لصق الملفات من الحافظة (Ctrl+V) ----------
 function onPaste(e) {
   const files = Array.from(e.clipboardData?.files || []);
   if (!files.length) return;
@@ -1277,4 +1276,3 @@ function onPaste(e) {
   sendFiles(active.id, files);
 }
 document.addEventListener('paste', onPaste);
-});
