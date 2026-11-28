@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ClearNote · إضافة محادثة جديدة</title>
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:light dark}
+body{margin:0;min-height:100dvh;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:#eef1f6;color:#171a20;-webkit-font-smoothing:antialiased}
+@media(prefers-color-scheme:dark){body{background:#0f1115;color:#e6e9ef}}
+.page{max-width:580px;margin:0 auto;padding:18px 16px calc(28px + env(safe-area-inset-bottom))}
+.head{display:flex;align-items:center;gap:12px;margin:2px 0 16px}
+.back{display:inline-flex;align-items:center;padding:8px 14px;border-radius:12px;text-decoration:none;font-size:14px;font-weight:600;background:#fff;color:#171a20;border:1px solid #d9dee8}
+@media(prefers-color-scheme:dark){.back{background:#1a1e26;color:#e6e9ef;border-color:#2a3040}}
+.head h1{font-size:19px;margin:0}
+.search-box input{width:100%;padding:13px 16px;font-size:15px;border-radius:14px;border:1px solid #d9dee8;background:#fff;color:inherit;outline:none}
+.search-box input:focus{border-color:#4f8cff;box-shadow:0 0 0 3px rgba(79,140,255,.18)}
+@media(prefers-color-scheme:dark){.search-box input{background:#1a1e26;border-color:#2a3040}}
+.note{font-size:13px;opacity:.7;margin:10px 2px 0}
+.results{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:#fff;border:1px solid #d9dee8;cursor:pointer;transition:transform .08s ease,background .15s ease}
+@media(prefers-color-scheme:dark){.row{background:#1a1e26;border-color:#2a3040}}
+.row:hover{background:#f5f8ff}
+@media(prefers-color-scheme:dark){.row:hover{background:#222836}}
+.row:active{transform:scale(.985)}
+.avatar{width:46px;height:46px;border-radius:50%;overflow:hidden;flex:0 0 auto;background:#dfe5ef;display:grid;place-items:center;font-weight:700;font-size:18px;color:#41506b}
+@media(prefers-color-scheme:dark){.avatar{background:#2a3040;color:#a9b6cf}}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.row-name{font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{color:#1d9bf0;font-weight:800}
+.row-user{font-size:12.5px;opacity:.65;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty{text-align:center;opacity:.65;padding:30px 0;font-size:14px}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="head">
+    <a class="back" href="chat.html">رجوع</a>
+    <h1>إضافة محادثة جديدة</h1>
+  </header>
+  <div class="search-box">
+    <input id="q" type="search" placeholder="ابحث بالاسم أو اسم المستخدم أو رقم الهاتف" autocomplete="off" autocapitalize="off" spellcheck="false">
+  </div>
+  <p id="hint" class="note">اكتب حرفين على الأقل للبحث بالاسم، أو 6 أرقام للبحث برقم الهاتف.</p>
+  <p id="status" class="note" role="status" hidden></p>
+  <ul id="results" class="results"></ul>
+  <div id="empty" class="empty" hidden>لا يوجد مستخدم مطابق</div>
+</main>
+<script type="module">
+import { auth, db } from './shared.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {
+  collection, doc, getDoc, getDocs, query, where, limit,
+  setDoc, serverTimestamp,
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const LOGIN_PAGE = 'login.html';
+const usersCol = collection(db, 'users');
+
+const input = document.getElementById('q');
+const hintEl = document.getElementById('hint');
+const statusEl = document.getElementById('status');
+const emptyEl = document.getElementById('empty');
+const resultsEl = document.getElementById('results');
+
+let me = null;
+let seq = 0;
+let timer = null;
+let opening = false;
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) { location.replace(LOGIN_PAGE); return; }
+  me = user;
+  input.focus();
+});
+
+function setStatus(text) {
+  statusEl.textContent = String(text || '');
+  statusEl.hidden = !text;
+}
+function clearResults() { resultsEl.replaceChildren(); }
+const initialOf = (name) => (String(name || '').trim().charAt(0) || '؟').toUpperCase();
+function spanEl(cls, text) {
+  const s = document.createElement('span');
+  s.className = cls;
+  s.textContent = text;
+  return s;
+}
+
+function normalize(raw) {
+  const q = String(raw || '').replace(/^@+/, '').trim();
+  return { q, lower: q.toLowerCase(), digits: String(raw || '').replace(/\D/g, '') };
+}
+
+function userInfo(uid, d = {}) {
+  return {
+    uid,
+    name: d.displayName || d.name || d.fullName || d.username || 'مستخدم',
+    photo: d.photoURL || d.avatarUrl || d.avatar || '',
+    username: d.username ? '@' + String(d.username).replace(/^@/, '') : '',
+    verified: d.isVerified === true,
+  };
+}
+
+function rowNode(u) {
+  const li = document.createElement('li');
+  li.className = 'row';
+  const avatar = document.createElement('span');
+  avatar.className = 'avatar';
+  if (u.photo) {
+    const img = document.createElement('img');
+    img.src = u.photo;
+    img.alt = '';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.addEventListener('error', () => {
+      img.remove();
+      avatar.textContent = initialOf(u.name);
+    });
+    avatar.append(img);
+  } else {
+    avatar.textContent = initialOf(u.name);
+  }
+  const main = document.createElement('span');
+  main.className = 'row-main';
+  const nameRow = document.createElement('span');
+  nameRow.className = 'row-name';
+  nameRow.append(spanEl('row-title', u.name));
+  if (u.verified) {
+    const badge = spanEl('badge', '✓');
+    badge.setAttribute('aria-label', 'حساب موثّق');
+    nameRow.append(badge);
+  }
+  main.append(nameRow, spanEl('row-user', u.username || 'مستخدم ClearNote'));
+  li.append(avatar, main);
+  li.addEventListener('click', () => openWith(u.uid));
+  return li;
+}
+
+/** يفتح محادثة مع مستخدم: ينشئ المستند إن لم يوجد ثم ينتقل إلى chat.html */
+async function openWith(otherUid) {
+  if (!me || opening || !otherUid || otherUid === me.uid) return;
+  opening = true;
+  setStatus('جارٍ فتح المحادثة…');
+  const [p0, p1] = [me.uid, otherUid].sort();
+  const id = `${p0}_${p1}`;
+  const ref = doc(db, 'chats', id);
+  try {
+    let snap = null;
+    try {
+      snap = await getDoc(ref);
+    } catch (err) {
+      // محادثة غير موجودة قد ترفض القراءة؛ نتابع للإنشاء كما يفعل chat-core.js
+      if (err?.code !== 'permission-denied') throw err;
+    }
+    if (!snap || !snap.exists()) {
+      try {
+        await setDoc(ref, {
+          participants: [p0, p1],
+          createdAt: serverTimestamp(),
+          status: 'pending',
+          requesterUid: me.uid,
+          requestSent: false,
+          readAt: { [me.uid]: serverTimestamp() },
+        });
+      } catch (err) {
+        // ربما أنشأها الطرف الآخر في نفس اللحظة
+        const again = await getDoc(ref).catch(() => null);
+        if (!again || !again.exists()) throw err;
+      }
+    }
+    location.href = `chat.html?chat=${encodeURIComponent(id)}`;
+  } catch (err) {
+    console.warn('[search] openWith', err);
+    opening = false;
+    setStatus(err?.code === 'permission-denied'
+      ? 'لا تملك صلاحية فتح محادثة مع هذا المستخدم'
+      : 'تعذّر فتح المحادثة، حاول مرة أخرى');
+  }
+}
+
+async function runSearch(raw) {
+  const token = ++seq;
+  clearResults();
+  emptyEl.hidden = true;
+  const { q, lower, digits } = normalize(raw);
+  const jobs = [];
+  if (q.length >= 2) {
+    jobs.push(getDocs(query(usersCol, where('name', '>=', q), where('name', '<=', q + '\uf8ff'), limit(10))));
+    jobs.push(getDocs(query(usersCol, where('lower', 'in', [lower]), limit(5))));
+    jobs.push(getDocs(query(usersCol, where('term', 'in', [q, lower]), limit(10))));
+  }
+  if (digits.length >= 6) {
+    jobs.push(getDocs(query(usersCol, where('digits', 'in', [digits]), limit(5))));
+  }
+  if (!jobs.length) {
+    hintEl.hidden = false;
+    setStatus('');
+    return;
+  }
+  hintEl.hidden = true;
+  setStatus('جارٍ البحث…');
+  const settled = await Promise.all(jobs.map((p) => p.catch((err) => {
+    console.warn('[search] query failed', err);
+    return null;
+  })));
+  if (token !== seq) return;
+  setStatus('');
+  const found = new Map();
+  let failed = 0;
+  for (const snap of settled) {
+    if (!snap) { failed += 1; continue; }
+    snap.forEach((d) => {
+      if (me && d.id !== me.uid && !found.has(d.id)) found.set(d.id, userInfo(d.id, d.data()));
+    });
+  }
+  if (!found.size) {
+    if (failed === settled.length) setStatus('تعذّر تنفيذ البحث، تحقق من الاتصال أو الصلاحيات');
+    else emptyEl.hidden = false;
+    return;
+  }
+  const list = [...found.values()].sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+  for (const u of list) resultsEl.append(rowNode(u));
+}
+
+input.addEventListener('input', () => {
+  clearTimeout(timer);
+  timer = setTimeout(() => runSearch(input.value), 350);
+});
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    clearTimeout(timer);
+    runSearch(input.value);
+  }
+});
+input.addEventListener('search', () => {
+  if (!input.value) {
+    seq += 1;
+    clearResults();
+    emptyEl.hidden = true;
+    setStatus('');
+    hintEl.hidden = false;
+  }
+});
+</script>
+</body>
+</html>
