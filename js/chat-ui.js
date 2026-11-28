@@ -21,7 +21,7 @@
    ============================================================ */
 
 import { ChatCore } from './chat-core.js';
-
+import { ChatSelect } from './chat-select.js';
 const { CHAT_STATUS, MESSAGE_STATE, CHAT_LIMITS } = ChatCore.constants;
 
 /* ---------- ثوابت الواجهة ---------- */
@@ -206,7 +206,8 @@ const ST = {
   active: null,           // { chat, blockedByMe, otherUid }
   rows: new Map(),        // chatId -> { el, sig }
   typing: new Map(),      // chatId -> uids[]
-  room: null,             // حالة الغرفة (تُملأ في الجزء 2/3)
+  room: null,      
+   mounted: false,// حالة الغرفة (تُملأ في الجزء 2/3)
 };
 
 function viewById(id) {
@@ -1706,8 +1707,9 @@ function buildMessageRow(id) {
   row.append(icon('reply', 'cs-ico cs-swipe-ico'), bubble, tools);
   row._bubble = bubble;
 
-  bindLongPress(bubble, (pt) => {
-    if (row._m) openMessageMenu(row._m, pt);
+   bubble.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    if (row._m) openMessageMenu(row._m, { x: e.clientX, y: e.clientY });
   });
   bindBubbleGestures(row, bubble);
 
@@ -1974,6 +1976,7 @@ function getMessageRow(m, c, reason) {
     if (reason !== 'init' && reason !== 'older') row.classList.add('is-enter');
   }
   row._m = m;
+  ChatSelect.attach(row, m);
   row.classList.toggle('is-mine', !!m.mine);
   row.classList.toggle('is-theirs', !m.mine);
   row.classList.toggle('is-join-prev', !!c.joinPrev);
@@ -2397,7 +2400,7 @@ function currentChatId() {
 }
 
 function roomHost() {
-  return ST.room?.root || ST.root?.querySelector('.cs-room') || ST.root || null;
+  return ST.room?.el || ST.root?.querySelector('.cs-room') || ST.root || null;
 }
 
 function notAvailable(text) {
