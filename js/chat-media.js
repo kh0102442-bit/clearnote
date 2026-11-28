@@ -1266,12 +1266,13 @@ export const ChatMedia = Object.freeze({
     maxOther: MEDIA_CFG.MAX_OTHER,
   }),
    // ---------- اللصق من لوحة المفاتيح (Ctrl+V) ----------
+/* ---------- لصق الملفات من الحافظة (Ctrl+V) ---------- */
 function onPaste(e) {
   const files = Array.from(e.clipboardData?.files || []);
-  if (!files.length) return; // نص عادي: يُترك للحقل كما هو
+  if (!files.length) return;
   if (document.querySelector('.cs-media-overlay, .cs-lightbox')) return;
   const active = ChatCore.getActive?.();
-  if (!active?.id) return; // لا توجد محادثة مفتوحة
+  if (!active?.id) return;
   e.preventDefault();
   sendFiles(active.id, files);
 }
