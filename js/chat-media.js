@@ -259,24 +259,21 @@ function buildAttachment({ file, meta, info, name, fallbackDuration }) {
  * يفتح منتقي الملفات بلا قيود على الامتداد. يجب استدعاؤه مباشرة
  * من حدث نقر المستخدم، وإلا يمنعه المتصفح.
  */
-function pickFileFromDevice() {
+function pickFilesFromDevice() {
   return new Promise((resolve) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.hidden = true;
-    input.multiple = false;
-
+    input.multiple = true;
     let settled = false;
-    const done = (file) => {
+    const done = (files) => {
       if (settled) return;
       settled = true;
       input.remove();
-      resolve(file || null);
+      resolve(Array.from(files || []));
     };
-
-    input.addEventListener('change', () => done(input.files?.[0] || null));
+    input.addEventListener('change', () => done(input.files));
     input.addEventListener('cancel', () => done(null));
-
     document.body.append(input);
     input.click();
   });
@@ -630,29 +627,33 @@ function sendAttachmentFile({ chatId, file, info, text = '', replyTo = null, tit
  * يُرجع Promise<boolean>: true فقط عند إرسال رسالة فعلاً.
  */
 async function pick(chatId, opts = {}) {
-  const file = await pickFileFromDevice();
-  if (!file) return false;
-
+  const files = await pickFilesFromDevice();
+  if (!files.length) return false;
   if (!chatId) {
     notifyMedia('افتح محادثة أولاً', 'info');
     return false;
   }
-
-  let info;
-  try {
-    info = inspectFile(file);
-  } catch (err) {
-    notifyMedia(err.message, 'danger');
-    return false;
+  const many = files.length > 1;
+  let sentAny = false;
+  for (const file of files) {
+    let info;
+    try {
+      info = inspectFile(file);
+    } catch (err) {
+      notifyMedia(err.message, 'danger');
+      continue;
+    }
+    const ok = await sendAttachmentFile({
+      chatId,
+      file,
+      info,
+      text: many ? '' : (typeof opts.text === 'string' ? opts.text : ''),
+      replyTo: many ? null : (opts.replyTo ?? null),
+    });
+    if (!ok) break; // إلغاء أو فشل ملف يوقف إرسال البقية
+    sentAny = true;
   }
-
-  return sendAttachmentFile({
-    chatId,
-    file,
-    info,
-    text: typeof opts.text === 'string' ? opts.text : '',
-    replyTo: opts.replyTo ?? null,
-  });
+  return sentAny;
 }
 
 // ---------- تسجيل الصوت ----------
