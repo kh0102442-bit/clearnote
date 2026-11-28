@@ -625,6 +625,65 @@ function sendAttachmentFile({ chatId, file, info, text = '', replyTo = null, tit
  * يفتح منتقي الملفات ثم نافذة المعاينة.
  * يجب استدعاؤه مباشرة من نقرة المستخدم، دون أي await قبله.
  * يُرجع Promise<boolean>: true فقط عند إرسال رسالة فعلاً.
+ */// ---------- إرسال عدة ملفات (من المنتقي أو من اللصق) ----------
+let batchBusy = false;
+
+/** اسم مناسب للملفات الملصوقة التي لا تحمل اسماً (مثل لقطة الشاشة). */
+function pastedName(file) {
+  if (file.name) return file.name;
+  const sub = String(file.type || '').split('/')[1] || 'bin';
+  const ext = sub.split('+')[0].split(';')[0].replace(/[^a-z0-9]/gi, '') || 'bin';
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  return `pasted-${stamp}.${ext}`;
+}
+
+/**
+ * يرسل قائمة ملفات بالترتيب، ولكل ملف نافذة معاينة.
+ * الملف غير الصالح يُتخطى بتنبيه، وإلغاء أو فشل ملف يوقف إرسال البقية.
+ * يُرجع Promise<boolean>: true إذا أُرسل ملف واحد على الأقل.
+ */
+async function sendFiles(chatId, files, opts = {}) {
+  if (batchBusy) {
+    notifyMedia('انتظر اكتمال الإرسال الحالي', 'info');
+    return false;
+  }
+  const valid = [];
+  for (const raw of files) {
+    const file = raw.name ? raw : new File([raw], pastedName(raw), { type: raw.type });
+    try {
+      valid.push({ file, info: inspectFile(file) });
+    } catch (err) {
+      notifyMedia(err.message, 'danger');
+    }
+  }
+  if (!valid.length) return false;
+  batchBusy = true;
+  try {
+    const many = valid.length > 1;
+    let sentAny = false;
+    for (let i = 0; i < valid.length; i += 1) {
+      const { file, info } = valid[i];
+      const base = KIND_TITLE[info.kind] || KIND_TITLE.file;
+      const ok = await sendAttachmentFile({
+        chatId,
+        file,
+        info,
+        text: many ? '' : String(opts.text || ''),
+        replyTo: many ? null : (opts.replyTo ?? null),
+        title: many ? `${base} (${i + 1} من ${valid.length})` : undefined,
+      });
+      if (!ok) break;
+      sentAny = true;
+    }
+    return sentAny;
+  } finally {
+    batchBusy = false;
+  }
+}
+
+/**
+ * يفتح منتقي الملفات ثم يرسلها. يجب استدعاؤه مباشرة من نقرة المستخدم.
+ * يُرجع Promise<boolean>: true فقط عند إرسال رسالة فعلاً.
  */
 async function pick(chatId, opts = {}) {
   const files = await pickFilesFromDevice();
@@ -633,29 +692,8 @@ async function pick(chatId, opts = {}) {
     notifyMedia('افتح محادثة أولاً', 'info');
     return false;
   }
-  const many = files.length > 1;
-  let sentAny = false;
-  for (const file of files) {
-    let info;
-    try {
-      info = inspectFile(file);
-    } catch (err) {
-      notifyMedia(err.message, 'danger');
-      continue;
-    }
-    const ok = await sendAttachmentFile({
-      chatId,
-      file,
-      info,
-      text: many ? '' : (typeof opts.text === 'string' ? opts.text : ''),
-      replyTo: many ? null : (opts.replyTo ?? null),
-    });
-    if (!ok) break; // إلغاء أو فشل ملف يوقف إرسال البقية
-    sentAny = true;
-  }
-  return sentAny;
+  return sendFiles(chatId, files, opts);
 }
-
 // ---------- تسجيل الصوت ----------
 
 function canRecordVoice() {
@@ -1227,4 +1265,15 @@ export const ChatMedia = Object.freeze({
     maxVideo: MEDIA_CFG.MAX_VIDEO,
     maxOther: MEDIA_CFG.MAX_OTHER,
   }),
+   // ---------- اللصق من لوحة المفاتيح (Ctrl+V) ----------
+function onPaste(e) {
+  const files = Array.from(e.clipboardData?.files || []);
+  if (!files.length) return; // نص عادي: يُترك للحقل كما هو
+  if (document.querySelector('.cs-media-overlay, .cs-lightbox')) return;
+  const active = ChatCore.getActive?.();
+  if (!active?.id) return; // لا توجد محادثة مفتوحة
+  e.preventDefault();
+  sendFiles(active.id, files);
+}
+document.addEventListener('paste', onPaste);
 });
